@@ -3,7 +3,7 @@ const router = express.Router();
 import userController from "../controllers/user/userController.js";
 import userMiddleware from "../middlewares/userMiddleware.js"
 import shophomeController from "../controllers/user/shophomeController.js";
-
+import viewProductController from "../controllers/user/viewProductController.js";
 
 // user signup & login
 router.get('/signup', userMiddleware.isLogin, userController.getSignUp)
@@ -24,11 +24,14 @@ router.get('/auth/google/callback',userMiddleware.isLogin,userController.getGoog
 
 
 //user home page
-router.get("/home", shophomeController.getHome)
+router.get("/",shophomeController.getHome)
+router.get("/home",userMiddleware.checkSession, shophomeController.getHome)
+router.get("/shop",shophomeController.getShop)
 
-// router.get('/',shopnhomeController.getHome)
-// router.get('/home',userMiddleware.checkSession,shopnhomeController.getHome)
-// router.get('/shop', shopnhomeController.getShop);
+//view product
+ router.get("/product/:id",userMiddleware.checkSession,viewProductController.getProductDetails)
+
+//  router.get('/product/:id', userMiddleware.checkSession, viewProductController.getProductDetails);
 
 export default router;
 

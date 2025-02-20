@@ -1,121 +1,452 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GymVault - Supplements & Proteins</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <a href="/" class="text-2xl font-bold text-blue-600">GymVault</a>
+ >
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+   
+    <%- include("../partials/nav") %>
+
+
+    <div class="p-6 flex-1"> 
+        <div class="flex justify-between items-center mb-4">
+            
+      
+            <div class="bg-gray-300">
+                <div class="mt-16"></div>
+            
+                <!-- Breadcrumb -->
+                <div class="bg-gray-300 pt-4">
+                  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <nav class="flex" aria-label="Breadcrumb">
+                      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                        <!-- Home Link -->
+                        <li class="inline-flex items-center">
+                          <a href="/home" 
+                             class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900">
+                            <i class="fas fa-home mr-2"></i>
+                            Home
+                          </a>
+                        </li>
+                        <!-- Separator -->
+                        <li>
+                          <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-500 text-sm mx-2"></i>
+                            <span class="text-sm font-medium text-gray-500">Shop</span>
+                          </div>
+                        </li>
+                      </ol>
+                    </nav>
+                  </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <a href="/shop" class="text-gray-700 hover:text-blue-600">Shop</a>
-                    <a href="/cart" class="text-gray-700 hover:text-blue-600">Cart</a>
-                    <a href="/login" class="text-gray-700 hover:text-blue-600">Login</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <div class="relative bg-gray-900 h-96">
-        <img src="/images/gym-supplements-hero.jpg" alt="Supplements" class="w-full h-full object-cover opacity-50">
-        <div class="absolute inset-0 flex items-center justify-center">
-            <div class="text-center">
-                <h1 class="text-4xl font-bold text-white mb-4">Premium Gym Supplements</h1>
-                <p class="text-xl text-white mb-8">Fuel your workout with our premium range of proteins and supplements</p>
-                <a href="#products" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700">Shop Now</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Categories -->
-    <div class="max-w-7xl mx-auto px-4 py-12">
-        <h2 class="text-3xl font-bold text-center mb-8">Categories</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white rounded-lg shadow-md p-6 text-center">
-                <img src="/images/whey-protein.jpg" alt="Whey Protein" class="w-full h-48 object-cover rounded-lg mb-4">
-                <h3 class="text-xl font-semibold mb-2">Whey Protein</h3>
-                <p class="text-gray-600">High-quality protein supplements for muscle growth</p>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 text-center">
-                <img src="/images/pre-workout.jpg" alt="Pre-Workout" class="w-full h-48 object-cover rounded-lg mb-4">
-                <h3 class="text-xl font-semibold mb-2">Pre-Workout</h3>
-                <p class="text-gray-600">Energy boosters for intense training sessions</p>
-            </div>
-            <div class="bg-white rounded-lg shadow-md p-6 text-center">
-                <img src="/images/vitamins.jpg" alt="Vitamins" class="w-full h-48 object-cover rounded-lg mb-4">
-                <h3 class="text-xl font-semibold mb-2">Vitamins & Minerals</h3>
-                <p class="text-gray-600">Essential nutrients for overall health</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Featured Products -->
-    <div id="products" class="bg-gray-100 py-12">
-        <div class="max-w-7xl mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Featured Products</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <!-- Product Card -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="/images/product1.jpg" alt="Product" class="w-full h-48 object-cover">
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold mb-2">Gold Standard Whey</h3>
-                        <p class="text-gray-600 mb-2">Premium whey protein isolate</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xl font-bold">₹2999</span>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add to Cart</button>
+            
+                <!-- Page Content -->
+                <div class="bg-gray-300">
+                  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center"></h2>
+            
+                    <div class="flex flex-col md:flex-row gap-8 ">
+                      <!-- Left Sidebar - Filters -->
+                      <div class="md:w-1/4">
+                        <div
+                          class="sticky top-4 space-y-6 bg-white p-6 rounded-lg shadow-sm"
+                        >
+                          <!-- Sorting Section -->
+                          <div class="mb-6">
+                            <label
+                              for="sortFilter"
+                              class="block text-gray-700 font-medium mb-2"
+                              >Sort By</label
+                            >
+                            <select
+                              id="sortFilter"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                            >
+                              <option value="default">Default</option>
+                              <option value="priceLowToHigh">Price: Low to High</option>
+                              <option value="priceHighToLow">Price: High to Low</option>
+                              <option value="ratingHighToLow">Rating: High to Low</option>
+                              <option value="newArrivals">New Arrivals</option>
+                            </select>
+                          </div>
+            
+                          <!-- Filter Section -->
+                          <div class="space-y-4">
+                           
+            
+            
+            
+                            <div>
+                              <label
+                                for="size"
+                                class="block text-gray-700 font-medium mb-2"
+                                >Size</label
+                              >
+                              <select
+                                id="size"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                              >
+                                <option value="">All</option>
+                              </select>
+                            </div>
+            
+                            <div>
+                              <label class="block text-gray-700 font-medium mb-2"
+                                >Price Range</label
+                              >
+                              <div class="flex gap-2">
+                                <input
+                                  type="number"
+                                  id="minPrice"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                                  placeholder="Min"
+                                />
+                                <input
+                                  type="number"
+                                  id="maxPrice"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                                  placeholder="Max"
+                                />
+                              </div>
+                            </div>
+            
+                            <div>
+                              <label
+                                for="stockFilter"
+                                class="block text-gray-700 font-medium mb-2"
+                                >Stock Status</label
+                              >
+                              <select
+                                id="stockFilter"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                              >
+                                <option value="">All Products</option>
+                                <option value="inStock">In Stock</option>
+                                <option value="outOfStock">Out of Stock</option>
+                              </select>
+                            </div>
+                          </div>
+            
+                          <!-- Reset Button -->
+                          <div class="mt-6">
+                            <button
+                              id="resetButton"
+                              class="px-4 py-2 bg-zinc-800 text-white rounded-lg transform transition-transform duration-300 ease-in-out hover:bg-zinc-600 hover:scale-105 active:bg-zinc-700 active:scale-95"
+                            >
+                              Reset Filters
+                            </button>
+                          </div>
                         </div>
+                      </div>
+            
+                      <!-- Right Side - Product Grid -->
+                      <div class="md:w-3/4">
+                        <!-- Search Bar -->
+                        <div class="mb-6 flex-1 border-2 border-black-500 rounded-xl">
+                          <div class="flex items-center bg-grey ">
+                            <input
+                            
+                              type="text"
+                              id="searchInput"
+                              class="h-10 flex-grow px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:border-2 focus:border-gray-900"
+                              placeholder="Search products..."
+                            />
+                            <button
+                              id="searchButton"
+                              class="h-10 px-4 py-2 bg-zinc-800 text-white rounded-r-lg transform transition-transform duration-300 ease-in-out hover:bg-zinc-600 hover:scale-105 active:bg-zinc-700 active:scale-95"
+                            >
+                              Search
+                            </button>
+                          </div>
+                        </div>
+            
+                        <div
+                          id="productGrid"
+                          class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-16"
+                        >
+                          <!-- Dynamic product rendering here -->
+                          <% products.forEach(product => { %>
+                          <a href="/product/<%= product._id %>" 
+                             class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 relative">
+                            <!-- Product Image with Discount Badge -->
+                            <div class="relative aspect-[4/5] overflow-hidden">
+                              <img 
+                                src="<%= product.imageUrl[0] %>" 
+                                alt="<%= product.productName %>"
+                                class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                loading="lazy"
+                              >
+                              <% if (product.offerApplied && product.offerPrice) { %>
+                                <div class="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded text-xs font-medium">
+                                  -<%= Math.round((product.price - product.offerPrice) / product.price * 100) %>%
+                                </div>
+                              <% } %>
+                              <% if (product.stock === 0) { %>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                  <span class="bg-black bg-opacity-75 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+                                    Out of Stock
+                                  </span>
+                                </div>
+                              <% } %>
+                            </div>
+            
+                            <!-- Product Info -->
+                            <div class="p-2">
+                              <h2 class="text-gray-800 text-sm font-medium truncate">
+                                <%= product.productName %>
+                              </h2>
+                              <div class="flex items-baseline gap-1 mt-1">
+                                <% if (product.offerApplied) { %>
+                                  <span class="text-base font-bold text-gray-900">₹<%= product.offerPrice %></span>
+                                  <span class="text-xs text-gray-500 line-through">₹<%= product.price %></span>
+                                  <span class="text-xs text-red-500">
+                                    -<%= product.discountPercentage %>%
+                                  </span>
+                                <% } else { %>
+                                  <span class="text-base font-bold text-gray-900">₹<%= product.price %></span>
+                                <% } %>
+                              </div>
+                            </div>
+                          </a>
+                          <% }) %>
+                        </div>
+            
+                        <div class="flex justify-center items-center space-x-4 mt-8 mb-16">
+                            <button id="prevPage" class="px-4 py-2 bg-zinc-800 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transform transition-transform duration-300 ease-in-out hover:bg-zinc-600 hover:scale-105 active:bg-zinc-700 active:scale-95">
+                                Previous
+                            </button>
+                            <span id="pageInfo" class="text-gray-700">
+                                Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                            </span>
+                            <button id="nextPage" class="px-4 py-2 bg-zinc-800 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transform transition-transform duration-300 ease-in-out hover:bg-zinc-600 hover:scale-105 active:bg-zinc-700 active:scale-95">
+                                Next
+                            </button>
+                        </div>
+                      </div>
                     </div>
+                  </div>
                 </div>
-                <!-- Repeat product cards as needed -->
-            </div>
+            
+                <!-- Added margin/padding before footer -->
+                <div class="pb-16"></div>
+            
+                <%- include("../partials/footer") %>
+                <script>
+                  document.addEventListener('DOMContentLoaded', function() {
+                      // Cache DOM elements
+                      const productGrid = document.getElementById('productGrid');
+                      const searchInput = document.getElementById('searchInput');
+                      const searchButton = document.getElementById('searchButton');
+                      const sortFilter = document.getElementById('sortFilter');
+                      const sizeFilter = document.getElementById('size');
+                      const minPriceFilter = document.getElementById('minPrice');
+                      const maxPriceFilter = document.getElementById('maxPrice');
+                      const stockFilter = document.getElementById('stockFilter');
+                      const resetButton = document.getElementById('resetButton');
+                      const prevPageBtn = document.getElementById('prevPage');
+                      const nextPageBtn = document.getElementById('nextPage');
+                      const currentPageSpan = document.getElementById('currentPage');
+                      const totalPagesSpan = document.getElementById('totalPages');
+                     
+                      
+            
+                      // Store original products data
+                      let products = <%- JSON.stringify(products) %>;
+                      const originalProducts = [...products];
+            
+                      // Function to apply all filters
+                      async function applyFilters() {
+                          currentPage = 1; // Reset to first page when filters change
+                          await fetchProducts(currentPage);
+                      }
+            
+                      // Function to render products
+                      function renderProducts(productsToRender) {
+                          if (productsToRender.length === 0) {
+                              productGrid.innerHTML = `
+                                  <div class="col-span-full text-center py-8">
+                                      <p class="text-gray-500">No products found matching your criteria</p>
+                                  </div>
+                              `;
+                              return;
+                          }
+            
+                          productGrid.innerHTML = productsToRender.map(product => `
+                              <a href="/product/${product._id}" 
+                                 class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 relative">
+                                  <div class="relative aspect-[4/5] overflow-hidden">
+                                      <img
+                                          src="${product.imageUrl[0]}"
+                                          alt="${product.productName}"
+                                          class="w-full h-full object-cover hover:scale-105 transition-transform duration-300 ${product.stock === 0 ? 'opacity-60' : ''}"
+                                          loading="lazy"
+                                      >
+                                      ${product.offerApplied && product.offerPrice ? `
+                                          <div class="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded text-xs font-medium">
+                                              -${Math.round((product.price - product.offerPrice) / product.price * 100)}%
+                                          </div>
+                                      ` : ''}
+                                      ${product.stock === 0 ? `
+                                          <div class="absolute inset-0 flex items-center justify-center">
+                                              <span class="bg-black bg-opacity-75 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+                                                  Out of Stock
+                                              </span>
+                                          </div>
+                                      ` : ''}
+                                  </div>
+                                  <div class="p-2">
+                                      <h2 class="text-gray-800 text-sm font-medium truncate">
+                                          ${product.productName}
+                                      </h2>
+                                      <div class="flex items-baseline gap-1 mt-1">
+                                          ${product.offerApplied && product.offerPrice ? `
+                                              <span class="text-base font-bold text-gray-900">₹${product.offerPrice}</span>
+                                              <span class="text-xs text-gray-500 line-through">₹${product.price}</span>
+                                          ` : `
+                                              <span class="text-base font-bold text-gray-900">₹${product.price}</span>
+                                          `}
+                                      </div>
+                                  </div>
+                              </a>
+                          `).join('');
+                      }
+            
+                      // Function to populate filter options
+                      function populateFilterOptions() {
+            
+                          
+                          // Get unique sizes
+                          const sizes = [...new Set(originalProducts.flatMap(p => p.size))].filter(Boolean).sort();
+                          
+                         
+                          
+                          // Clear existing options
+            
+                          while (sizeFilter.options.length > 1) {
+                              sizeFilter.remove(1);
+                          }
+            
+            
+                        
+            
+                          // Add size options
+                          size.forEach(size => {
+                              const option = new Option(size, size);
+                              sizeFilter.add(option);
+                          });
+                      }
+            
+                      // Event listeners
+                      searchButton.addEventListener('click', applyFilters);
+                      searchInput.addEventListener('keyup', (e) => {
+                          if (e.key === 'Enter') applyFilters();
+                      });
+                      
+                      // Add input event listeners for immediate filtering
+                      [sortFilter, sizeFilter, stockFilter].forEach(filter => {
+                          filter.addEventListener('change', applyFilters);
+                      });
+            
+                      // Add debounced event listeners for price inputs
+                      let priceTimeout;
+                      [minPriceFilter, maxPriceFilter].forEach(input => {
+                          input.addEventListener('input', () => {
+                              clearTimeout(priceTimeout);
+                              priceTimeout = setTimeout(applyFilters, 500);
+                          });
+                      });
+            
+                      // Reset filters
+                      resetButton.addEventListener('click', async () => {
+                          searchInput.value = '';
+                          sortFilter.value = 'default';
+                         
+                          
+                          sizeFilter.value = '';
+                          minPriceFilter.value = '';
+                          maxPriceFilter.value = '';
+                          stockFilter.value = '';
+                          await fetchProducts(1);
+                      });
+            
+                      // Add pagination state
+                      let currentPage = 1;
+                      let totalPages = 1;
+            
+                      // Function to fetch products with pagination
+                      async function fetchProducts(page = 1) {
+                          try {
+                              const queryParams = new URLSearchParams({
+                                  page,
+                                  search: searchInput.value,
+                                  sort: sortFilter.value,
+                                  size: sizeFilter.value,
+                                  minPrice: minPriceFilter.value,
+                                  maxPrice: maxPriceFilter.value,
+                                  stock: stockFilter.value
+                              });
+            
+                              const response = await fetch(`/shop?${queryParams.toString()}`, {
+                                  headers: {
+                                      'X-Requested-With': 'XMLHttpRequest'
+                                  }
+                              });
+                              
+                              if (!response.ok) throw new Error('Network response was not ok');
+                              
+                              const data = await response.json();
+                              
+                              // Update pagination state
+                              currentPage = data.pagination.currentPage;
+                              totalPages = data.pagination.totalPages;
+                              
+                              // Update UI
+                              currentPageSpan.textContent = currentPage;
+                              totalPagesSpan.textContent = totalPages;
+                              prevPageBtn.disabled = !data.pagination.hasPrevPage;
+                              nextPageBtn.disabled = !data.pagination.hasNextPage;
+                              
+                              // Render products
+                              renderProducts(data.products);
+                              
+                              // Scroll to top of product grid smoothly
+                              productGrid.scrollIntoView({ behavior: 'smooth' });
+                          } catch (error) {
+                              console.error('Error fetching products:', error);
+                          }
+                      }
+            
+                      // Add pagination event listeners
+                      prevPageBtn.addEventListener('click', () => {
+                          if (currentPage > 1) {
+                              fetchProducts(currentPage - 1);
+                          }
+                      });
+            
+                      nextPageBtn.addEventListener('click', () => {
+                          if (currentPage < totalPages) {
+                              fetchProducts(currentPage + 1);
+                          }
+                      });
+            
+                      // Initialize pagination
+                      const initialPagination = <%- JSON.stringify(pagination || { currentPage: 1, totalPages: 1 }) %>;
+                      currentPage = initialPagination.currentPage;
+                      totalPages = initialPagination.totalPages;
+                      currentPageSpan.textContent = currentPage;
+                      totalPagesSpan.textContent = totalPages;
+                      prevPageBtn.disabled = !initialPagination.hasPrevPage;
+                      nextPageBtn.disabled = !initialPagination.hasNextPage;
+            
+                      // Initialize
+                      populateFilterOptions();
+                  });
+                </script>
+              </div>
+            </html>
+
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">About Us</h4>
-                    <p class="text-gray-400">Your trusted source for premium gym supplements and nutrition products.</p>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white">Shop</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">About</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Contact</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li>Email: info@gymvault.com</li>
-                        <li>Phone: +91 1234567890</li>
-                        <li>Address: 123 Fitness Street, Gym City</li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white">Facebook</a>
-                        <a href="#" class="text-gray-400 hover:text-white">Instagram</a>
-                        <a href="#" class="text-gray-400 hover:text-white">Twitter</a>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-8 pt-8 border-t border-gray-800 text-center">
-                <p class="text-gray-400">&copy; 2024 GymVault. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-</body>
-</html>
+ 

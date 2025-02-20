@@ -1,261 +1,195 @@
-<!-- Main container with padding -->
-<div class="p-4 md:p-6 flex-1">
-    <div class="bg-gray-50">
-    <!-- Fixed navigation bar -->
-    <div class="sticky top-0 w-full z-50 bg-white shadow-lg border border-gray-300">
-        <div class="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16 md:h-20">
-                <!-- Left Section: Logo and Home -->
-                <div class="flex items-center space-x-4 md:space-x-8">
-                    <a href="/home" class="flex items-center space-x-2 md:space-x-3">
-                        <img src="/images/image.png" alt="GymVault Logo" class="h-8 md:h-12 w-auto">
-                        <h1 class="text-xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">GymVault</h1>
-                    </a>
-                    <a href="/home" class="flex items-center space-x-1 md:space-x-2 text-gray-700 hover:text-red-600 px-2 md:px-3 py-1 md:py-2 font-medium transition duration-300">
-                        <i class="fas fa-home text-lg md:text-xl"></i>
-                        <span class="hidden md:block">Home</span>
-                    </a>
-                </div>
 
-                <!-- Middle Section: Search Bar -->
-                <div class="hidden sm:flex flex-1 max-w-xl px-2 md:px-6">
-                    <div class="relative w-full">
-                        <input type="text" 
-                               placeholder="Search products..." 
-                               class="w-full px-3 md:px-4 py-1 md:py-2 rounded-full border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-sm md:text-base">
-                        <button class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <i class="fas fa-search text-gray-400 hover:text-red-600"></i>
-                        </button>
-                    </div>
-                </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 
-                <!-- Right Section: Profile, Cart, Wishlist -->
-                <div class="flex items-center space-x-3 md:space-x-6">
-                    <!-- Wishlist -->
-                    <div class="group relative">
-                        <a href="/wishlist" class="p-1 md:p-2 flex flex-col items-center">
-                            <div class="relative">
-                                <i class="fas fa-heart text-xl md:text-2xl text-gray-700 group-hover:text-red-600 transition duration-300"></i>
-                                <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">0</span>
-                            </div>
-                            <span class="text-xs mt-1 text-gray-600 group-hover:text-red-600 hidden md:block">Wishlist</span>
-                        </a>
-                    </div>
+  <div class="bg-gray-50">
+    <%- include('../partials/nav')%>
 
-                    <!-- Cart -->
-                    <div class="group relative">
-                        <a href="/cart" class="p-1 md:p-2 flex flex-col items-center">
-                            <div class="relative">
-                                <i class="fas fa-shopping-bag text-xl md:text-2xl text-gray-700 group-hover:text-red-600 transition duration-300"></i>
-                                <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">0</span>
-                            </div>
-                            <span class="text-xs mt-1 text-gray-600 group-hover:text-red-600 hidden md:block">Cart</span>
-                        </a>
-                    </div>
-
-                    <!-- Profile Dropdown -->
-                    <div class="group relative">
-                        <button class="p-1 md:p-2 flex flex-col items-center">
-                            <div class="relative">
-                                <i class="fas fa-user-circle text-xl md:text-2xl text-gray-700 group-hover:text-red-600 transition duration-300"></i>
-                            </div>
-                            <span class="text-xs mt-1 text-gray-600 group-hover:text-red-600 hidden md:block">Profile</span>
-                        </button>
-                        <!-- Dropdown Menu -->
-                        <div class="hidden group-hover:block absolute right-0 w-40 md:w-48 py-2 bg-white rounded-md shadow-xl z-50">
-                            <a href="/profile" class="flex items-center px-3 md:px-4 py-2 text-xs md:text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-user-cog mr-2 md:mr-3"></i>
-                                My Profile
-                            </a>
-                            <a href="/orders" class="flex items-center px-3 md:px-4 py-2 text-xs md:text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-box mr-2 md:mr-3"></i>
-                                My Orders
-                            </a>
-                            <a href="/settings" class="flex items-center px-3 md:px-4 py-2 text-xs md:text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-cog mr-2 md:mr-3"></i>
-                                Settings
-                            </a>
-                            <div class="border-t border-gray-100"></div>
-                            <a href="/logout" class="flex items-center px-3 md:px-4 py-2 text-xs md:text-sm text-red-600 hover:bg-gray-100">
-                                <i class="fas fa-sign-out-alt mr-2 md:mr-3"></i>
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Search Bar -->
-    <div class="sm:hidden p-4 bg-white border-b">
-        <div class="relative">
-            <input type="text" 
-                   placeholder="Search products..." 
-                   class="w-full px-3 py-2 rounded-full border border-gray-300 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-sm">
-            <button class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <i class="fas fa-search text-gray-400 hover:text-red-600"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Rest of the content remains exactly the same -->
     <!-- Hero Section -->
-    <div class="pt-8 md:pt-16">
-        <div class="relative h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] w-full">
-            <img src="/images/760_202502141152_GSW_Banner_flavored.webp" alt="Gym Equipment" class="w-full h-full object-cover">
-            <!-- Hero Content Overlay -->
-            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div class="text-center text-white px-4">
-                    <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">Premium Fitness Supplements</h1>
-                    <p class="text-base sm:text-lg md:text-xl mb-6 md:mb-8">Fuel your workouts with top-quality products</p>
-                    <button class="bg-red-600 px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-semibold hover:bg-red-700">
-                        Shop Now
-                    </button>
-                </div>
+    <section class="relative mt-14 sm:mt-16">
+      <!-- Mobile Hero (visible only on small screens) -->
+      <div class="sm:hidden">
+        <div class="relative h-[60vh] mybg-green">
+          <!-- Mobile Content -->
+          <div class="container mx-auto px-4 h-full flex flex-col justify-center">
+            <span class="text-gray-300 text-sm tracking-wider mb-4">WELCOME TO LACIFY</span>
+            <h1 class="text-3xl font-bold text-white mb-4">
+              Discover Your Perfect Shoes
+            </h1>
+            <p class="text-gray-200 text-base mb-6 max-w-lg">
+              Explore our collection of premium Shoes for every occasion
+            </p>
+            <div class="flex gap-3">
+              <a href="/shop" class="bg-white text-gray-900 px-6 py-2.5 rounded-lg hover:bg-gray-100 transition-colors text-sm flex-1 text-center">
+                Shop Now
+              </a>
+              <a href="#featured" class="border border-white text-white px-6 py-2.5 rounded-lg hover:bg-white/10 transition-colors text-sm flex-1 text-center">
+                View Featured
+              </a>
             </div>
+          </div>
+          <!-- Decorative Elements -->
+          <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
+          <div class="absolute top-4 right-4 w-24 h-24 opacity-10">
+            <div class="grid grid-cols-3 gap-2">
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full"></div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Desktop Hero (hidden on small screens) -->
+      <div class="hidden sm:block h-[80vh] relative overflow-hidden">
+        <img 
+          src="/images/banner1.jpg" 
+          alt="Shoes" 
+          class="w-full h-full object-cover object-center" 
+        />
+        <div class="absolute inset-0 bg-gradient-to-l from-black/70 via-black/50 to-transparent">
+          <div class="container mx-auto px-4 h-full flex items-center sm:justify-end">
+            <div class="max-w-2xl mx-4 sm:mx-0">
+              <span class="text-gray-300 text-sm tracking-wider mb-4 block">WELCOME TO LACIFY</span>
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+                Discover Your Perfect Shoes
+              </h1>
+              <p class="text-gray-200 text-lg mb-8 max-w-lg">
+                Explore our collection of premium Shoes for every occasion
+              </p>
+              <div class="flex gap-4">
+                <a href="/shop" class="bg-white text-gray-900 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+                  Shop Now
+                </a>
+                <a href="#featured" class="border border-white text-white px-8 py-3 rounded-lg hover:bg-white/10 transition-colors">
+                  View Featured
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+   <!-- Categories Section -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Shop by Category</h2>
+      <p class="text-gray-600">Find the perfect Shoe for every style</p>
     </div>
-
-    <!-- Categories Section -->
-    <section class="py-8 md:py-16 bg-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">Our Categories</h2>
-            <!-- Category Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                <!-- Proteins Category Card -->
-                <div class="aspect-w-1 aspect-h-1">
-                    <div class="relative h-40 sm:h-48 md:h-64 rounded-lg overflow-hidden">
-                        <img src=" \images\Artboard_2_d935a1f7-41fa-462f-b939-79c8ef84da7d.avif" alt="Proteins" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                            <h3 class="text-white text-lg md:text-xl font-bold">Proteins</h3>
-                        </div>
-                    </div>
-                </div>
-                <!-- Pre-Workout Category Card -->
-                <div class="aspect-w-1 aspect-h-1">
-                    <div class="relative h-40 sm:h-48 md:h-64 rounded-lg overflow-hidden">
-                        <img src="/images/pre-workout-.webp" alt="Pre-Workout" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                            <h3 class="text-white text-lg md:text-xl font-bold">Pre-Workout</h3>
-                        </div>
-                    </div>
-                </div>
-                <!-- BCAA Category Card -->
-                <div class="aspect-w-1 aspect-h-1">
-                    <div class="relative h-40 sm:h-48 md:h-64 rounded-lg overflow-hidden">
-                        <img src="\images\BCAA.webp" alt="BCAA" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                            <h3 class="text-white text-lg md:text-xl font-bold">BCAA</h3>
-                        </div>
-                    </div>
-                </div>
-                <!-- Vitamins Category Card -->
-                <div class="aspect-w-1 aspect-h-1">
-                    <div class="relative h-40 sm:h-48 md:h-64 rounded-lg overflow-hidden">
-                        <img src="/images/creatine-monohydrate.webp" alt="Vitamins" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                            <h3 class="text-white text-lg md:text-xl font-bold">creatine-monohydrate</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="flex overflow-x-auto gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 pb-4 sm:pb-0">
+      <!-- Sneakers -->
+      <a href="/shop?category=sneakers" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
+        <img src="/images/sneaker.png" alt="Sneakers" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-black/40 flex items-end p-6">
+          <div>
+            <h3 class="text-white text-xl font-semibold mb-2">Sneakers</h3>
+            <span class="text-gray-200 text-sm">Explore →</span>
+          </div>
         </div>
+      </a>
+      <!-- Casuals -->
+      <a href="/shop?category=casuals" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
+        <img src="/images/casual.png" alt="Casuals" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-black/40 flex items-end p-6">
+          <div>
+            <h3 class="text-white text-xl font-semibold mb-2">Casuals</h3>
+            <span class="text-gray-200 text-sm">Explore →</span>
+          </div>
+        </div>
+      </a>
+      <!-- Runners -->
+      <a href="/shop?category=runners" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
+        <img src="/images/runner.png" alt="Runners" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-black/40 flex items-end p-6">
+          <div>
+            <h3 class="text-white text-xl font-semibold mb-2">Runners</h3>
+            <span class="text-gray-200 text-sm">Explore →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+    <!-- Featured Products -->
+    <section id="featured" class="py-16 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 sm:mb-12">
+          <div class="mb-4 sm:mb-0">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-8 h-[2px] bg-gray-900"></span>
+              <span class="text-gray-500 text-sm tracking-wider uppercase">Featured</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900">Latest Arrivals</h2>
+          </div>
+          <a href="/shop" class="group inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+            View Collection 
+            <span class="ml-2 transform transition-transform duration-300 group-hover:translate-x-1">→</span>
+          </a>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="flex overflow-x-auto gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-6 pb-4 sm:pb-0">
+          <% products.forEach(product => { %>
+          <a href="/product/<%= product._id %>" class="group min-w-[240px] sm:min-w-0">
+            <div class="bg-white rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300">
+              <!-- Product Image -->
+              <div class="relative aspect-square overflow-hidden bg-gray-100">
+                <img
+                  src="<%= product.imageUrl[0] %>"
+                  alt="<%= product.productName %>"
+                  class="w-full h-full object-cover transform transition-all duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <% if (product.discountPrice < product.price) { %>
+                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-xs font-medium">
+                  -<%= Math.round((product.price - product.discountPrice) / product.price * 100) %>%
+                </div>
+                <% } %>
+                <!-- Quick View Button -->
+                <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                  <span class="text-white text-sm font-medium">Quick View</span>
+                </div>
+              </div>
+
+              <!-- Product Info -->
+              <div class="p-5">
+                <!-- Brand & Rating -->
+                <div class="flex justify-between items-center mb-2">
+                  <div class="text-sm text-gray-500 font-medium"><%= product.brand %></div>
+                  <div class="flex items-center gap-1">
+                    <i class="fas fa-star text-yellow-400 text-xs"></i>
+                    <span class="text-sm text-gray-500"><%= product.rating %></span>
+                  </div>
+                </div>
+                
+                <!-- Product Name -->
+                <h3 class="text-gray-900 font-medium mb-2 truncate group-hover:text-gray-700 transition-colors">
+                  <%= product.productName %>
+                </h3>
+                
+                <!-- Price -->
+                <div class="flex items-baseline gap-2">
+                  <span class="text-lg font-bold text-gray-900">₹<%= product.price %></span>
+                  <% if (product.discountPrice < product.price) { %>
+                  <!-- <span class="text-sm text-gray-400 line-through">₹<%= product.price %></span> -->
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </a>
+          <% }); %>
+        </div>
+      </div>
     </section>
 
-    <!-- Featured Products Section -->
-    <section class="py-8 md:py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">Featured Products</h2>
-            <!-- Products Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-                <!-- Product Card -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="p-3 md:p-4">
-                        <img src="/images/whey-protein-gold-standard.webp" alt="Whey Protein" class="w-full h-36 sm:h-40 md:h-48 object-cover rounded">
-                        <div class="mt-3 md:mt-4">
-                            <h3 class="text-base md:text-lg font-semibold">Gold Standard Whey</h3>
-                            <p class="text-sm md:text-base text-gray-600 mt-1 md:mt-2">Premium Protein Powder</p>
-                            <div class="mt-3 md:mt-4 flex justify-between items-center">
-                                <span class="text-lg md:text-xl font-bold">$59.99</span>
-                                <button class="bg-red-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded text-sm md:text-base">Add to Cart</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="py-8 md:py-16 bg-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                <!-- Free Shipping Feature -->
-                <div class="flex flex-col items-center text-center p-4 md:p-6">
-                    <i class="fas fa-truck text-3xl md:text-4xl text-red-600 mb-3 md:mb-4"></i>
-                    <h3 class="text-lg md:text-xl font-semibold mb-1 md:mb-2">Free Shipping</h3>
-                    <p class="text-sm md:text-base text-gray-600">On orders over $99</p>
-                </div>
-                <!-- Premium Quality Feature -->
-                <div class="flex flex-col items-center text-center p-4 md:p-6">
-                    <i class="fas fa-medal text-3xl md:text-4xl text-red-600 mb-3 md:mb-4"></i>
-                    <h3 class="text-lg md:text-xl font-semibold mb-1 md:mb-2">Premium Quality</h3>
-                    <p class="text-sm md:text-base text-gray-600">100% authentic products</p>
-                </div>
-                <!-- Support Feature -->
-                <div class="flex flex-col items-center text-center p-4 md:p-6">
-                    <i class="fas fa-headset text-3xl md:text-4xl text-red-600 mb-3 md:mb-4"></i>
-                    <h3 class="text-lg md:text-xl font-semibold mb-1 md:mb-2">24/7 Support</h3>
-                    <p class="text-sm md:text-base text-gray-600">Expert assistance</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8 md:py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Footer Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                <!-- Company Info -->
-                <div>
-                    <h4 class="text-base md:text-lg font-semibold mb-3 md:mb-4">GymVault</h4>
-                    <p class="text-sm md:text-base text-gray-400">Your trusted source for premium fitness supplements.</p>
-                </div>
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="text-base md:text-lg font-semibold mb-3 md:mb-4">Quick Links</h4>
-                    <ul class="space-y-1 md:space-y-2">
-                        <li><a href="#" class="text-sm md:text-base text-gray-400 hover:text-white">About Us</a></li>
-                        <li><a href="#" class="text-sm md:text-base text-gray-400 hover:text-white">Products</a></li>
-                        <li><a href="#" class="text-sm md:text-base text-gray-400 hover:text-white">Contact</a></li>
-                    </ul>
-                </div>
-                <!-- Contact Info -->
-                <div>
-                    <h4 class="text-base md:text-lg font-semibold mb-3 md:mb-4">Contact</h4>
-                    <ul class="space-y-1 md:space-y-2 text-sm md:text-base text-gray-400">
-                        <li>Email: info@gymvault.com</li>
-                        <li>Phone: (555) 123-4567</li>
-                        <li>Address: 123 Fitness Street</li>
-                    </ul>
-                </div>
-                <!-- Social Media Links -->
-                <div>
-                    <h4 class="text-base md:text-lg font-semibold mb-3 md:mb-4">Follow Us</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white text-xl md:text-2xl"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white text-xl md:text-2xl"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white text-xl md:text-2xl"><i class="fab fa-twitter"></i></a>
-                    </div>
-                </div>
-            </div>
-            <!-- Copyright -->
-            <div class="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-gray-800 text-center">
-                <p class="text-sm md:text-base text-gray-400">&copy; 2024 GymVault. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-</div>
+    <%- include('../partials/footer')%>
 </div>
