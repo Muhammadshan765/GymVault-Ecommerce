@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymVault - Supplements & Proteins</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">GymVault</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/shop" class="text-gray-700 hover:text-blue-600">Shop</a>
+                    <a href="/cart" class="text-gray-700 hover:text-blue-600">Cart</a>
+                    <a href="/login" class="text-gray-700 hover:text-blue-600">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative bg-gray-900 h-96">
+        <img src="/images/gym-supplements-hero.jpg" alt="Supplements" class="w-full h-full object-cover opacity-50">
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-white mb-4">Premium Gym Supplements</h1>
+                <p class="text-xl text-white mb-8">Fuel your workout with our premium range of proteins and supplements</p>
+                <a href="#products" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700">Shop Now</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <h2 class="text-3xl font-bold text-center mb-8">Categories</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                <img src="/images/whey-protein.jpg" alt="Whey Protein" class="w-full h-48 object-cover rounded-lg mb-4">
+                <h3 class="text-xl font-semibold mb-2">Whey Protein</h3>
+                <p class="text-gray-600">High-quality protein supplements for muscle growth</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                <img src="/images/pre-workout.jpg" alt="Pre-Workout" class="w-full h-48 object-cover rounded-lg mb-4">
+                <h3 class="text-xl font-semibold mb-2">Pre-Workout</h3>
+                <p class="text-gray-600">Energy boosters for intense training sessions</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                <img src="/images/vitamins.jpg" alt="Vitamins" class="w-full h-48 object-cover rounded-lg mb-4">
+                <h3 class="text-xl font-semibold mb-2">Vitamins & Minerals</h3>
+                <p class="text-gray-600">Essential nutrients for overall health</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Products -->
+    <div id="products" class="bg-gray-100 py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Featured Products</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Product Card -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="/images/product1.jpg" alt="Product" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold mb-2">Gold Standard Whey</h3>
+                        <p class="text-gray-600 mb-2">Premium whey protein isolate</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xl font-bold">₹2999</span>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Repeat product cards as needed -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">About Us</h4>
+                    <p class="text-gray-400">Your trusted source for premium gym supplements and nutrition products.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Shop</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">About</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Email: info@gymvault.com</li>
+                        <li>Phone: +91 1234567890</li>
+                        <li>Address: 123 Fitness Street, Gym City</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">Facebook</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Instagram</a>
+                        <a href="#" class="text-gray-400 hover:text-white">Twitter</a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center">
+                <p class="text-gray-400">&copy; 2024 GymVault. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,1108 @@
+<%- include('../partials/sidebar')%>
+
+
+
+
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js" defer></script>
+     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <!-- <div class="p-6 flex-1">
+        <div class="flex justify-between items-center mb-4"> -->
+
+            <div class=" p-6 flex-1" id="main-content">
+                <header class="flex items-center justify-between mb-8 p-4 lg:p-8 border-b border-gray-700">
+                    <button id="toggleSidebar" class="text-white lg:hidden">
+
+                    </button>
+                    <h1 class="text-2xl font-semibold text-gray-200">Product Management</h1>
+                </header>
+
+                <main class="flex justify-between items-center mb-4">
+                    <div class="overflow-x-auto">
+                        <div class="min-w-full bg-zinc-800 rounded-lg shadow-md">
+                            <!-- Table Header with Add Product Button -->
+                            <div
+                                class="p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <h2 class="text-xl md:text-2xl font-semibold text-gray-200">Products</h2>
+                                <button id="addProductBtn"
+                                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors w-full sm:w-auto justify-center">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Add Product</span>
+                                </button>
+                            </div>
+
+                            <!-- Table Container -->
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-zinc-700">
+                                    <thead class="bg-zinc-900">
+                                        <tr>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider">
+                                                Image</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider">
+                                                Product</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider hidden md:table-cell">
+                                                Brand</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider hidden lg:table-cell">
+                                                Category</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider">
+                                                Price</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">
+                                                Stock</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">
+                                                Status</th>
+                                            <th
+                                                class="px-4 py-3 text-right text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider">
+                                                Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-zinc-700">
+                                        <% products.forEach(product=> { %>
+                                            <tr class="hover:bg-zinc-700/50 transition-colors">
+                                                <td class="px-4 py-3 whitespace-nowrap">
+                                                    <img src="<%= product.imageUrl[0] %>"
+                                                        alt="<%= product.productName %>"
+                                                        class="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg">
+                                                </td>
+                                                <td class="px-4 py-3">
+                                                    <div class="flex flex-col">
+                                                        <span class="text-sm md:text-base font-medium text-gray-200">
+                                                            <%= product.productName %>
+                                                        </span>
+                                                        <span class="text-xs text-gray-400 md:hidden">
+                                                            <%= product.brand %>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td
+                                                    class="px-4 py-3 text-sm md:text-base text-gray-300 hidden md:table-cell">
+                                                    <%= product.brand %>
+                                                </td>
+                                                <td
+                                                    class="px-4 py-3 text-sm md:text-base text-gray-300 hidden lg:table-cell">
+                                                    <%= product.categoriesId.name %>
+                                                </td>
+                                                <td class="px-4 py-3 text-sm md:text-base text-gray-200">₹<%=
+                                                        product.price.toLocaleString() %>
+                                                </td>
+                                                <td
+                                                    class="px-4 py-3 text-sm md:text-base text-gray-300 hidden sm:table-cell">
+                                                    <%= product.size.reduce((total, sizeObj)=> total + sizeObj.stock, 0)
+                                                        %>
+                                                </td>
+                                                <td
+                                                    class="px-4 py-3 text-sm md:text-base text-gray-300 hidden sm:table-cell">
+                                                    <%= product.isActive ? 'Active' : 'Inactive' %>
+                                                </td>
+                                                <td class="px-4 py-3">
+                                                    <div class="flex flex-col sm:flex-row gap-2 justify-end">
+                                                        <button
+                                                            class="edit-product bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200 w-full sm:w-auto"
+                                                            data-id="<%= product._id %>" type="button">
+                                                            Edit
+                                                        </button>
+
+                                                        <button
+                                                            class="toggle-status px-3 py-1 rounded-md text-sm transition-colors duration-200 w-full sm:w-auto
+                                                 <%= product.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %> text-white"
+                                                            data-id="<%= product._id %>"
+                                                            data-active="<%= product.isActive %>">
+                                                            <%= product.isActive ? 'Hide' : 'Show' %>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Page Info -->
+                            <!-- / -->
+
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Product Modal -->
+            <div id="productModal"
+                class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-zinc-900 rounded-lg w-[90%] md:w-[800px] max-h-[90vh] overflow-y-auto p-6">
+                    <h2 id="modalTitle" class="text-xl font-bold text-gray-100 mb-4">Add New Product</h2>
+                    <form id="productForm" enctype="multipart/form-data">
+                        <input type="hidden" id="productId" name="productId">
+
+                        <div id="formErrorMessage" class="hidden bg-red-500 text-white p-3 rounded mb-4"></div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-400 mb-1">Product Name</label>
+                                <input type="text" name="productName" id="productName" required
+                                    oninput="this.value = capitalizeAndTrim(this.value)"
+                                    class="w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200">
+                                <p class="text-xs text-gray-500 mt-1">Only letters and spaces allowed</p>
+                            </div>
+
+
+                            <div>
+                                <label class="block text-gray-400 mb-1">Brand</label>
+                                <input type="text" name="brand" id="brand" required pattern="[A-Za-z\s]+"
+                                    oninput="this.value = capitalizeAndTrim(this.value)"
+                                    class="w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200">
+                                <p class="text-xs text-gray-500 mt-1">Only letters and spaces allowed</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-400 mb-1">Category</label>
+                                <select name="categoriesId" id="categoriesId" required
+                                    class="w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200">
+                                    <% categories.forEach(category=> { %>
+                                        <option value="<%= category._id %>">
+                                            <%= category.name %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-400 mb-1">Sizes and Stock</label>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <% const availableSizes=['6', '7' , '8' , '9' , '10' ]; %>
+                                        <% availableSizes.forEach(size=> { %>
+                                            <div class="size-stock-container">
+                                                <label class="flex items-center space-x-2 mb-2">
+                                                    <input type="checkbox" name="size-checkbox" value="<%= size %>"
+                                                        class="size-checkbox form-checkbox text-green-500">
+                                                    <span class="text-gray-200">Size <%= size %></span>
+                                                </label>
+                                                <input type="number" name="size-stock-<%= size %>"
+                                                    class="size-stock w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200"
+                                                    min="0" max="1000" disabled placeholder="Stock">
+                                            </div>
+                                            <% }); %>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Select sizes and enter stock for each</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-400 mb-1">Price (₹)</label>
+                                <input type="number" name="price" id="price" min="0" max="100000"
+                                    class="w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200">
+                                <p class="text-xs text-gray-500 mt-1">Enter price between ₹0 and ₹100,000</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-400 mb-1">Description</label>
+                                <input type="text" name="description" id="variantDescription" required minlength="10"
+                                    maxlength="50" oninput="this.value = validateVariantDescription(this.value)"
+                                    class="w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200">
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <span id="variantCharCount">0</span>/50 characters (minimum 10)
+                                </p>
+                            </div>
+
+                            <div class="col-span-2">
+                                <label class="block text-gray-400 mb-1">
+                                    Images (All 3 images are required - Max 5MB each, Square format)
+                                </label>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <% for(let i=0; i < 3; i++) { %>
+                                        <div class="image-upload-container">
+                                            <input type="file" name="images" class="product-image hidden"
+                                                accept="image/jpeg,image/png,image/webp" data-index="<%= i %>" required>
+                                            <div
+                                                class="image-preview bg-zinc-800 border-2 border-dashed border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-green-500 transition-colors">
+                                                <div
+                                                    class="preview-content h-48 flex flex-col items-center justify-center">
+                                                    <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                                                    <p class="text-sm text-gray-400">Click to upload</p>
+                                                    <p class="text-xs text-gray-500 mt-1">Image <%= i + 1 %> (Required)
+                                                    </p>
+                                                    <p class="text-xs text-gray-500">Square format, max 5MB</p>
+                                                </div>
+                                            </div>
+                                            <p class="error-message text-red-500 text-xs mt-1 hidden"></p>
+                                        </div>
+                                        <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end mt-6 space-x-4">
+                            <button type="button" id="cancelModal"
+                                class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold py-2 px-4 rounded-lg">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-lg">
+                                Save Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Image Cropper Modal -->
+            <div id="cropperModal"
+                class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-zinc-900 rounded-lg p-6 w-[90%] md:w-[600px]">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-200">Crop Image</h3>
+                    <div class="mb-4">
+                        <div id="cropperContainer" class="max-h-[400px] overflow-hidden">
+                            <img id="cropperImage" src="" alt="Image to crop">
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button id="cancelCrop"
+                            class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold py-2 px-4 rounded-lg">
+                            Cancel
+                        </button>
+                        <button id="cropImage"
+                            class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-lg">
+                            Crop & Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    // DOM Elements
+                    const productModal = document.getElementById('productModal');
+                    const cropperModal = document.getElementById('cropperModal');
+                    const addProductBtn = document.getElementById('addProductBtn');
+                    const cancelModal = document.getElementById('cancelModal');
+                    const productForm = document.getElementById('productForm');
+                    const modalTitle = document.getElementById('modalTitle');
+                    const toggleSidebar = document.getElementById('toggleSidebar');
+                    const mainContent = document.getElementById('main-content');
+                    const cropperImage = document.getElementById('cropperImage');
+                    const cancelCrop = document.getElementById('cancelCrop');
+                    const cropImage = document.getElementById('cropImage');
+
+                    let currentImageInput = null;
+                    let cropper = null;
+                    let croppedImageBlob = null;
+
+                    // Toggle Sidebar
+                    toggleSidebar.addEventListener('click', () => {
+                        mainContent.classList.toggle('lg:ml-64');
+                    });
+
+                    // Show Modal for New Product
+                    addProductBtn.addEventListener('click', () => {
+                        // Reset form and clear any previous data
+                        productForm.reset();
+                        document.getElementById('productId').value = '';
+                        modalTitle.textContent = 'Add New Product';
+
+                        // Clear image previews
+                        document.querySelectorAll('.image-preview').forEach(preview => {
+                            preview.innerHTML = `
+                        <div class="preview-content h-48 flex flex-col items-center justify-center">
+                          <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                          <p class="text-sm text-gray-400">Click to upload</p>
+                          <p class="text-xs text-gray-500 mt-1">Required image</p>
+                          <p class="text-xs text-gray-500">Square format, max 5MB</p>
+                        </div>
+                      `;
+                        });
+
+                        // Reset character count
+                        document.getElementById('variantCharCount').textContent = '0';
+
+                        // Reset size and stock inputs
+                        document.querySelectorAll('.size-checkbox').forEach(checkbox => {
+                            checkbox.checked = false;
+                            const stockInput = checkbox.closest('.size-stock-container').querySelector('.size-stock');
+                            stockInput.disabled = true;
+                            stockInput.value = '';
+                        });
+
+                        // Show modal
+                        productModal.classList.remove('hidden');
+                    });
+
+                    // Hide Modal
+                    cancelModal.addEventListener('click', () => {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Any unsaved changes will be lost!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#10B981',
+                            cancelButtonColor: '#EF4444',
+                            confirmButtonText: 'Yes, close it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                productModal.classList.add('hidden');
+                                productForm.reset();
+                            }
+                        });
+                    });
+
+                    // Handle Image Upload and Preview
+                    document.querySelectorAll('.product-image').forEach(input => {
+                        input.addEventListener('change', async (e) => {
+                            const file = e.target.files[0];
+                            if (!file) return;
+
+                            // Update file type validation to include WebP
+                            const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+                            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+
+                            // Validate file size
+
+
+                            // Validate file type
+                            if (!validTypes.includes(file.type)) {
+                                await Swal.fire({
+                                    icon: 'error',
+                                    title: 'Invalid File Type',
+                                    text: 'Please upload only JPG, JPEG, PNG, or WebP images',
+                                    confirmButtonColor: '#10B981'
+                                });
+                                input.value = '';
+                                return;
+                            }
+
+                            currentImageInput = input;
+                            const reader = new FileReader();
+
+                            reader.onload = (e) => {
+                                cropperImage.src = e.target.result;
+                                cropperModal.classList.remove('hidden');
+
+                                if (cropper) {
+                                    cropper.destroy();
+                                }
+
+                                cropper = new Cropper(cropperImage, {
+                                    aspectRatio: 1,
+                                    viewMode: 2,
+                                    autoCropArea: 2,
+                                    responsive: true,
+                                    restore: false,
+                                    guides: true,
+                                    center: true,
+                                    highlight: false,
+                                    cropBoxMovable: true,
+                                    cropBoxResizable: true,
+                                    toggleDragModeOnDblclick: false,
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    });
+
+                    // Cancel Crop
+                    cancelCrop.addEventListener('click', () => {
+                        cropperModal.classList.add('hidden');
+                        currentImageInput.value = '';
+                        if (cropper) {
+                            cropper.destroy();
+                            cropper = null;
+                        }
+                    });
+
+                    // Crop Image
+                    cropImage.addEventListener('click', async () => {
+                        if (!cropper) return;
+
+                        try {
+                            const canvas = cropper.getCroppedCanvas({
+                                width: 800,
+                                height: 800,
+                                imageSmoothingEnabled: true,
+                                imageSmoothingQuality: 'high',
+                            });
+
+                            const preview = currentImageInput.closest('.image-upload-container').querySelector('.image-preview');
+
+                            // Convert to WebP if supported, fallback to JPEG
+                            const format = 'image/webp';
+                            const quality = 0.9;
+
+                            // Try WebP first
+                            let blob = await new Promise(resolve => canvas.toBlob(resolve, format, quality));
+
+                            // Fallback to JPEG if WebP fails
+                            if (!blob) {
+                                blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+                            }
+
+                            // Create appropriate filename with extension
+                            const extension = blob.type === 'image/webp' ? 'webp' : 'jpg';
+                            const fileName = `cropped-image.${extension}`;
+
+                            // Create a File object
+                            const croppedFile = new File([blob], fileName, {
+                                type: blob.type,
+                                lastModified: new Date().getTime()
+                            });
+
+                            // Create a new FileList-like object
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(croppedFile);
+
+                            // Update the file input
+                            currentImageInput.files = dataTransfer.files;
+
+                            // Update preview
+                            preview.innerHTML = `<img src="${canvas.toDataURL(blob.type, quality)}" class="w-full h-full object-cover rounded">`;
+
+                            // Close cropper modal
+                            cropperModal.classList.add('hidden');
+                            cropper.destroy();
+                            cropper = null;
+
+                        } catch (error) {
+                            console.error('Cropping error:', error);
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to crop image',
+                                confirmButtonColor: '#10B981'
+                            });
+                        }
+                    });
+
+                    // Form submission handler for edit
+                    document.getElementById('productForm').addEventListener('submit', async function (e) {
+                        e.preventDefault();
+                        try {
+                            // Show loading state
+                            Swal.fire({
+                                title: 'Processing...',
+                                text: 'Please wait while we process your request',
+                                allowOutsideClick: false,
+                                confirmButtonColor: '#10B981',
+                            });
+
+                            const formData = new FormData(this);
+                            const productId = document.getElementById('productId').value;
+
+                            // Validate required fields
+                            const requiredFields = ['productName', 'brand', 'categoriesId', 'size', 'description', 'price', 'stock'];
+                            for (const field of requiredFields) {
+                                const value = formData.get(field);
+                                if (!value || value.trim() === '') {
+                                    throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')} is required`);
+                                }
+                            }
+
+                            let url, processedFormData;
+
+                            if (productId) {
+                                // Edit mode
+                                url = `/admin/products/edit/${productId}`;
+                                processedFormData = new FormData();
+
+                                // Add all non-file fields
+                                for (let [key, value] of formData.entries()) {
+                                    if (key !== 'images') {
+                                        processedFormData.append(key, value);
+                                    }
+                                }
+
+                                // Handle image updates
+                                const imageInputs = document.querySelectorAll('.product-image');
+                                const updatedIndexes = [];
+
+                                imageInputs.forEach((input, index) => {
+                                    if (input.files && input.files[0]) {
+                                        processedFormData.append('images', input.files[0]);
+                                        updatedIndexes.push(index);
+                                    }
+                                });
+
+                                // Only add imageIndexes if there are actually updated images
+                                if (updatedIndexes.length > 0) {
+                                    processedFormData.append('imageIndexes', updatedIndexes.join(','));
+                                }
+                            } else {
+                                // New product mode
+                                url = '/admin/products/add';
+                                processedFormData = formData;
+
+                                // Validate all images are present for new product
+                                const imageInputs = document.querySelectorAll('.product-image');
+                                let hasAllImages = true;
+
+                                imageInputs.forEach(input => {
+                                    if (!input.files || !input.files[0]) {
+                                        hasAllImages = false;
+                                    }
+                                });
+
+                                if (!hasAllImages) {
+                                    throw new Error('Please upload all 3 required images');
+                                }
+                            }
+
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                body: processedFormData
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok) {
+                                await Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: data.message,
+                                    confirmButtonColor: '#10B981'
+                                });
+                                window.location.reload();
+                            } else {
+                                throw new Error(data.message || 'Error processing request');
+                            }
+
+                        } catch (error) {
+                            console.error('Error:', error);
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: error.message || 'An error occurred while processing your request',
+                                confirmButtonColor: '#10B981'
+                            });
+                        }
+                    });
+
+                    // Remove the required attribute from form fields since we're handling validation with JavaScript
+                    document.querySelectorAll('input, select, textarea').forEach(element => {
+                        element.removeAttribute('required');
+                    });
+
+                    // Update the edit product handler
+                    document.querySelectorAll('.edit-product').forEach(button => {
+                        button.addEventListener('click', async function () {
+                            try {
+                                const productId = this.getAttribute('data-id');
+
+
+                                const response = await fetch(`/admin/products/${productId}`);
+
+
+                                if (!response.ok) {
+                                    const errorData = await response.json();
+                                    throw new Error(errorData.message || 'Failed to fetch product details');
+                                }
+
+                                const product = await response.json();
+
+
+                                // Reset form and populate data
+                                document.getElementById('productId').value = product._id;
+                                document.getElementById('productName').value = product.productName;
+                                document.getElementById('brand').value = product.brand;
+                                document.getElementById('categoriesId').value = product.categoriesId._id;
+                                document.getElementById('variantDescription').value = product.description;
+                                document.getElementById('price').value = product.price;
+
+                                // Reset and populate image previews
+                                const imageContainers = document.querySelectorAll('.image-upload-container');
+                                product.imageUrl.forEach((url, index) => {
+                                    if (index < imageContainers.length) {
+                                        const preview = imageContainers[index].querySelector('.image-preview');
+                                        preview.innerHTML = `
+                                          <img src="${url}" class="w-full h-full object-cover rounded">
+                                      `;
+                                    }
+                                });
+
+                                // Reset all size-stock inputs
+                                document.querySelectorAll('.size-checkbox').forEach(checkbox => {
+                                    checkbox.checked = false;
+                                    const stockInput = document.querySelector(`[name="size-stock-${checkbox.value}"]`);
+                                    if (stockInput) {
+                                        stockInput.disabled = true;
+                                        stockInput.value = '';
+                                    }
+                                });
+
+                                // Populate the size-stock data
+                                if (product.size && Array.isArray(product.size)) {
+                                    product.size.forEach(({ size, stock }) => {
+                                        const checkbox = document.querySelector(`.size-checkbox[value="${size}"]`);
+                                        if (checkbox) {
+                                            checkbox.checked = true;
+                                            const stockInput = document.querySelector(`[name="size-stock-${size}"]`);
+                                            if (stockInput) {
+                                                stockInput.disabled = false;
+                                                stockInput.value = stock;
+                                            }
+                                        }
+                                    });
+                                }
+
+                                // Update modal title
+                                document.getElementById('modalTitle').textContent = 'Edit Product';
+
+                                // Show modal
+                                document.getElementById('productModal').classList.remove('hidden');
+
+                            } catch (error) {
+                                console.error('Error fetching product details:', error);
+                                await Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: error.message || 'Failed to load product details',
+                                    confirmButtonColor: '#10B981'
+                                });
+                            }
+                        });
+                    });
+
+                    // Add input validation for product name and brand
+                    document.getElementById('productName').addEventListener('input', function () {
+                        if (this.value.length > 10) {
+                            this.value = this.value.substring(0, 10);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Character Limit Reached',
+                                text: 'Product name cannot exceed 10 characters',
+                                confirmButtonColor: '#10B981'
+                            });
+                        }
+                    });
+
+                    document.getElementById('brand').addEventListener('input', function () {
+                        if (this.value.length > 10) {
+                            this.value = this.value.substring(0, 10);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Character Limit Reached',
+                                text: 'Brand name cannot exceed 10 characters',
+                                confirmButtonColor: '#10B981'
+                            });
+                        }
+                    });
+
+                    // Delete Product Handler
+                    document.querySelectorAll('.delete-product').forEach(button => {
+                        button.addEventListener('click', async function () {
+                            const productId = this.getAttribute('data-id');
+
+                            const result = await Swal.fire({
+                                title: 'Are you sure?',
+                                text: "You won't be able to revert this!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#10B981',
+                                cancelButtonColor: '#EF4444',
+                                confirmButtonText: 'Yes, delete it!'
+                            });
+
+                            if (result.isConfirmed) {
+                                try {
+                                    const response = await fetch(`/admin/products/delete/${productId}`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        }
+                                    });
+
+                                    const data = await response.json();
+
+                                    if (response.ok) {
+                                        await Swal.fire({
+                                            title: 'Deleted!',
+                                            text: 'Product has been deleted.',
+                                            icon: 'success',
+                                            confirmButtonColor: '#10B981'
+                                        });
+                                        window.location.reload();
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: data.message || 'Error deleting product',
+                                            icon: 'error',
+                                            confirmButtonColor: '#10B981'
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.error('Delete error:', error);
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'An error occurred while deleting the product',
+                                        icon: 'error',
+                                        confirmButtonColor: '#10B981'
+                                    });
+                                }
+                            }
+                        });
+                    });
+
+                    // Handle Status Toggle
+                    document.querySelectorAll('.toggle-status').forEach(button => {
+                        button.addEventListener('click', async () => {
+                            const productId = button.dataset.id;
+                            const isActive = button.dataset.active === 'true';
+                            const newStatus = !isActive ? 'activate' : 'deactivate';
+
+                            const result = await Swal.fire({
+                                title: 'Are you sure?',
+                                text: `Do you want to ${newStatus} this product?`,
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: '#10B981',
+                                cancelButtonColor: '#6B7280',
+                                confirmButtonText: 'Yes, proceed!'
+                            });
+
+                            if (result.isConfirmed) {
+                                try {
+                                    const response = await fetch(`/admin/products/toggle-status/${productId}`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({ isActive: !isActive })
+                                    });
+
+                                    if (response.ok) {
+                                        await Swal.fire({
+                                            title: 'Success!',
+                                            text: `Product ${newStatus}d successfully`,
+                                            icon: 'success',
+                                            confirmButtonColor: '#10B981',
+                                            timer: 3000
+                                        });
+                                        window.location.reload();
+                                    } else {
+                                        const error = await response.json();
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: error.message || `Error ${newStatus}ing product`,
+                                            icon: 'error',
+                                            confirmButtonColor: '#10B981'
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.error('Error:', error);
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'An error occurred while updating product status',
+                                        icon: 'error',
+                                        confirmButtonColor: '#10B981'
+                                    });
+                                }
+                            }
+                        });
+                    });
+
+                    // Image handling functions
+                    function handleImageUpload(input, preview, errorMessage) {
+                        const file = input.files[0];
+                        const maxSize = input.getAttribute('data-max-size') * 1024;
+
+                        errorMessage.textContent = '';
+                        errorMessage.classList.add('hidden');
+
+                        if (!file) {
+                            errorMessage.textContent = 'Image is required';
+                            errorMessage.classList.remove('hidden');
+                            return;
+                        }
+
+                        if (file.size > maxSize) {
+                            errorMessage.classList.remove('hidden');
+                            input.value = '';
+                            return;
+                        }
+
+                        const img = new Image();
+                        const reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            img.src = e.target.result;
+                            img.onload = function () {
+                                const aspectRatio = this.width / this.height;
+                                if (aspectRatio < 0.8 || aspectRatio > 1.2) {
+                                    errorMessage.textContent = 'Please use a square image (1:1 ratio)';
+                                    errorMessage.classList.remove('hidden');
+                                    input.value = '';
+                                    return;
+                                }
+
+                                preview.innerHTML = `
+                          <img src="${e.target.result}" 
+                               class="w-full h-full object-cover rounded">
+                        `;
+                            };
+                        };
+                        reader.readAsDataURL(file);
+                    }
+
+                    // Initialize image upload handlers
+                    document.querySelectorAll('.image-upload-container').forEach(container => {
+                        const preview = container.querySelector('.image-preview');
+                        const input = container.querySelector('input[type="file"]');
+                        const errorMessage = container.querySelector('.error-message');
+
+                        preview.addEventListener('click', () => input.click());
+                        input.addEventListener('change', () => handleImageUpload(input, preview, errorMessage));
+                    });
+
+                    function capitalizeAndTrim(value) {
+                        // Remove extra spaces and trim
+                        value = value.replace(/\s+/g, ' ').trim();
+
+                        // Capitalize first letter of each word
+                        return value.split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ');
+                    }
+
+                    // Form validation
+                    document.getElementById('productForm').addEventListener('submit', function (e) {
+                        const nameInput = document.getElementById('productName');
+                        const brandInput = document.getElementById('brand');
+
+                        const letterPattern = /^[A-Za-z\s]+$/;
+                        let errors = [];
+
+                        if (!letterPattern.test(nameInput.value)) {
+                            errors.push('Product Name must contain only letters and spaces');
+                        }
+
+                        if (!letterPattern.test(brandInput.value)) {
+                            errors.push('Brand must contain only letters and spaces');
+                        }
+
+                        const priceInput = document.getElementById('price');
+                        const stockInput = document.getElementById('stock');
+
+                        // Price validation
+                        priceInput.addEventListener('input', function () {
+                            let value = parseFloat(this.value);
+                            if (value < 0) this.value = 0;
+                            if (value > 100000) this.value = 100000;
+                            // Ensure only 2 decimal places
+                            this.value = parseFloat(this.value).toFixed(2);
+                        });
+
+                        // Stock validation
+                        stockInput.addEventListener('input', function () {
+                            let value = parseInt(this.value);
+                            if (value < 0) this.value = 0;
+                            if (value > 1000) this.value = 1000;
+                            // Ensure whole numbers only
+                            this.value = Math.floor(value);
+                        });
+
+                        if (isNaN(parseFloat(priceInput.value)) || parseFloat(priceInput.value) < 0 || parseFloat(priceInput.value) > 100000) {
+                            errors.push('Price must be between ₹0 and ₹100,000');
+                        }
+
+                        if (isNaN(parseInt(stockInput.value)) || parseInt(stockInput.value) < 0 || parseInt(stockInput.value) > 1000) {
+                            errors.push('Stock must be between 0 and 1000 units');
+                        }
+
+                        if (errors.length > 0) {
+                            e.preventDefault();
+                            showValidationError(errors.join('\n'));
+                            return false;
+                        }
+
+                        // Capitalize and trim text inputs before submission
+                        nameInput.value = capitalizeAndTrim(nameInput.value);
+                        brandInput.value = capitalizeAndTrim(brandInput.value);
+                    });
+
+                    // Initialize all text inputs with proper formatting
+                    document.querySelectorAll('input[type="text"]').forEach(input => {
+                        input.addEventListener('blur', function () {
+                            this.value = capitalizeAndTrim(this.value);
+                        });
+                    });
+
+                    // Character counter for variant description
+                    const variantDescField = document.getElementById('variantDescription');
+                    const variantCharCount = document.getElementById('variantCharCount');
+
+                    function validateVariantDescription(value) {
+                        // Update character count
+                        variantCharCount.textContent = value.length;
+
+                        // Trim and limit length
+                        value = value.trim();
+                        if (value.length > 25) {
+                            value = value.substring(0, 25);
+                        }
+
+                        return value;
+                    }
+
+                    variantDescField.addEventListener('input', function () {
+                        variantCharCount.textContent = this.value.length;
+                    });
+
+                    // Enable/disable stock inputs when size checkboxes change
+                    document.querySelectorAll('.size-checkbox').forEach(checkbox => {
+                        checkbox.addEventListener('change', function () {
+                            const stockInput = document.querySelector(`[name="size-stock-${this.value}"]`);
+                            stockInput.disabled = !this.checked;
+                            if (this.checked) {
+                                stockInput.value = '0';
+                            } else {
+                                stockInput.value = '';
+                            }
+                        });
+                    });
+
+                    // Update form submission handler
+                    document.getElementById('productForm').addEventListener('submit', async function (e) {
+                        e.preventDefault();
+
+                        try {
+                            // Collect size and stock data
+                            const sizeStockData = [];
+                            const checkedSizes = document.querySelectorAll('.size-checkbox:checked');
+
+                            if (checkedSizes.length === 0) {
+                                throw new Error('Please select at least one size');
+                            }
+
+                            checkedSizes.forEach(checkbox => {
+                                const size = checkbox.value;
+                                const stockInput = document.querySelector(`[name="size-stock-${size}"]`);
+                                const stock = parseInt(stockInput.value);
+
+                                if (isNaN(stock) || stock < 0) {
+                                    throw new Error(`Please enter a valid stock number for size ${size}`);
+                                }
+
+                                sizeStockData.push({ size, stock });
+                            });
+
+                            // Create FormData object
+                            const formData = new FormData(this);
+
+                            // Remove any existing sizeStock data
+                            formData.delete('sizeStock');
+
+                            // Add the size-stock data as JSON string
+                            formData.append('sizeStock', JSON.stringify(sizeStockData));
+
+                            // Show loading state
+                            Swal.fire({
+                                title: 'Processing...',
+                                text: 'Please wait while we save the product',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            // Determine if this is an edit or add operation
+                            const productId = document.getElementById('productId').value;
+                            const url = productId ? `/admin/products/edit/${productId}` : '/admin/products/add';
+
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            const result = await response.json();
+
+                            if (response.ok) {
+                                await Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: result.message,
+                                    confirmButtonColor: '#10B981'
+                                });
+                                window.location.reload();
+                            } else {
+                                throw new Error(result.message || 'Error saving product');
+                            }
+
+                        } catch (error) {
+                            console.error('Error:', error);
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: error.message || 'An error occurred while saving the product',
+                                confirmButtonColor: '#10B981'
+                            });
+                        }
+                    });
+
+                    // Add this function to populate size-stock data when editing
+                    function populateSizeStock(sizes) {
+                        if (!sizes || !Array.isArray(sizes)) return;
+
+                        sizes.forEach(({ size, stock }) => {
+                            const checkbox = document.querySelector(`.size-checkbox[value="${size}"]`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+                                const stockInput = document.querySelector(`[name="size-stock-${size}"]`);
+                                if (stockInput) {
+                                    stockInput.disabled = false;
+                                    stockInput.value = stock;
+                                }
+                            }
+                        });
+                    }
+
+                    // Update the edit product handler
+                    document.querySelectorAll('.edit-product').forEach(button => {
+                        button.addEventListener('click', async function () {
+                            try {
+                                const productId = this.getAttribute('data-id');
+                                const response = await fetch(`/admin/products/${productId}`);
+
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch product details');
+                                }
+
+                                const product = await response.json();
+
+                                // Reset all size-stock inputs
+                                document.querySelectorAll('.size-checkbox').forEach(checkbox => {
+                                    checkbox.checked = false;
+                                    const stockInput = document.querySelector(`[name="size-stock-${checkbox.value}"]`);
+                                    if (stockInput) {
+                                        stockInput.disabled = true;
+                                        stockInput.value = '';
+                                    }
+                                });
+
+                                // Populate the size-stock data
+                                if (product.size && Array.isArray(product.size)) {
+                                    populateSizeStock(product.size);
+                                }
+
+                                // Show modal
+                                document.getElementById('productModal').classList.remove('hidden');
+
+                            } catch (error) {
+                                console.error('Error:', error);
+                                await Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: error.message || 'Failed to load product details',
+                                    confirmButtonColor: '#10B981'
+                                });
+                            }
+                        });
+                    });
+                });
+            </script>
+
+<!-- 
+        </div>
+    </div> -->

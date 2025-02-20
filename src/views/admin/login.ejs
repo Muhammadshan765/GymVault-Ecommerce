@@ -1,0 +1,183 @@
+<main class="w-full flex flex-col">
+  <header class="w-full bg-gray-800 h-16 flex items-center px-6 shadow-md">
+    <img src="/images/image.png" width="60" class="h-12 rounded-lg shadow-sm" alt="logo">
+  </header>
+
+  <section class="flex w-full">
+    <!-- Image Section -->
+    <div class="hidden md:flex w-1/2 items-center justify-center bg-cover bg-center mt-12 ml-12"
+      style="background-image: url('/images/adminloginpic.jpg');">
+    </div>
+
+    <!-- Login Form Section -->
+    <div class="w-full md:w-1/2 flex items-center justify-center p-10 mt-12 ">
+      <div class="bg-gray-170 p-8 rounded-lg shadow-lg w-full max-w-sm border border-gray-400 ">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Admin Login</h1>
+
+        <% if (locals.error) { %>
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 shadow-sm" role="alert">
+            <span class="block sm:inline">
+              <%= error %>
+            </span>
+          </div>
+          <% } %>
+
+            <form action="/admin/login" method="POST" class="space-y-6" id="loginForm">
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" name="email" required
+                  class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-gray-600 focus:ring-gray-600 p-3 bg-gray-50"
+                  placeholder="Enter your email" />
+                <p id="emailError" class="mt-1 text-sm text-red-600 hidden">Please enter a valid email address</p>
+              </div>
+
+              <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" id="password" name="password" required
+                  class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-gray-600 focus:ring-gray-600 p-3 bg-gray-50"
+                  placeholder="Enter your password" />
+                <p id="passwordError" class="mt-1 text-sm text-red-600 hidden">Password must be at least 6 characters
+                </p>
+              </div>
+
+              <div class="flex items-center">
+                <input type="checkbox" id="remember" name="remember"
+                  class="h-4 w-4 text-gray-600 focus:ring-gray-500 border-gray-300 rounded" />
+                <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+              </div>
+
+              <div>
+                <button type="submit"
+                  class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700">
+                  Sign in
+                </button>
+              </div>
+            </form>
+
+            <script>
+              const loginForm = document.getElementById('loginForm');
+              const emailInput = document.getElementById('email');
+              const passwordInput = document.getElementById('password');
+              const emailError = document.getElementById('emailError');
+              const passwordError = document.getElementById('passwordError');
+
+              // Function to validate email format
+              function validateEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+              }
+
+              // Function to show error message
+              function showError(element, show) {
+                if (show) {
+                  element.classList.remove('hidden');
+                } else {
+                  element.classList.add('hidden');
+                }
+              }
+
+              // Form submission validation
+              loginForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const email = document.querySelector('#email').value;
+                const password = document.querySelector('#password').value;
+                let isValid = true;
+
+                // Check if fields are empty
+                if (!emailInput.value.trim()) {
+                  showError(emailError, true);
+                  emailError.textContent = 'Email is required';
+                  isValid = false;
+                }
+                // Email format validation
+                else if (!validateEmail(emailInput.value)) {
+                  showError(emailError, true);
+                  emailError.textContent = 'Please enter a valid email address';
+                  isValid = false;
+                } else {
+                  showError(emailError, false);
+                }
+
+                // Password validation
+                if (!passwordInput.value) {
+                  showError(passwordError, true);
+                  passwordError.textContent = 'Password is required';
+                  isValid = false;
+                }
+                else if (passwordInput.value.length < 6) {
+                  showError(passwordError, true);
+                  passwordError.textContent = 'Password must be at least 6 characters';
+                  isValid = false;
+                } else {
+                  showError(passwordError, false);
+                }
+
+                if (isValid) {
+                  try {
+                    const response = await fetch('/admin/login', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (!data.success) {
+                      const errorMessage = document.createElement('p');
+                      errorMessage.className = 'text-red-600 mb-4';
+                      errorMessage.textContent = data.message || 'Invalid email or password';
+                      
+                      const form = document.querySelector('form');
+                      const existingError = form.querySelector('.text-red-600');
+                      if (existingError) {
+                        existingError.remove();
+                      }
+                      form.insertBefore(errorMessage, form.firstChild);
+                      return;
+                    }
+                    window.location.href = data.redirectUrl;
+                  } catch (error) {
+                    console.log(error);
+                    const errorMessage = document.createElement('p');
+                    errorMessage.className = 'text-red-600 mb-4';
+                    errorMessage.textContent = 'An error occurred. Please try again.';
+                    
+                    const form = document.querySelector('form');
+                    const existingError = form.querySelector('.text-red-600');
+                    if (existingError) {
+                      existingError.remove();
+                    }
+                    form.insertBefore(errorMessage, form.firstChild);
+                  }
+                }
+              });
+
+              // Real-time validation
+              emailInput.addEventListener('input', function () {
+                if (this.value.trim() === '') {
+                  showError(emailError, true);
+                  emailError.textContent = 'Email is required';
+                } else if (!validateEmail(this.value)) {
+                  showError(emailError, true);
+                  emailError.textContent = 'Please enter a valid email address';
+                } else {
+                  showError(emailError, false);
+                }
+              });
+
+              passwordInput.addEventListener('input', function () {
+                if (this.value === '') {
+                  showError(passwordError, true);
+                  passwordError.textContent = 'Password is required';
+                } else if (this.value.length < 6) {
+                  showError(passwordError, true);
+                  passwordError.textContent = 'Password must be at least 6 characters';
+                } else {
+                  showError(passwordError, false);
+                }
+              });
+            </script>
+      </div>
+    </div>
+  </section>
+</main>
