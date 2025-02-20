@@ -11,7 +11,7 @@
         <div class="relative h-[60vh] mybg-green">
           <!-- Mobile Content -->
           <div class="container mx-auto px-4 h-full flex flex-col justify-center">
-            <span class="text-gray-300 text-sm tracking-wider mb-4">WELCOME TO LACIFY</span>
+            <span class="text-gray-300 text-sm tracking-wider mb-4">WELCOME TO GymVault</span>
             <h1 class="text-3xl font-bold text-white mb-4">
               Discover Your Perfect Shoes
             </h1>
@@ -44,23 +44,30 @@
           </div>
         </div>
       </div>
-
       <!-- Desktop Hero (hidden on small screens) -->
       <div class="hidden sm:block h-[80vh] relative overflow-hidden">
-        <img 
-          src="/images/banner1.jpg" 
-          alt="Shoes" 
-          class="w-full h-full object-cover object-center" 
-        />
+        <!-- Slideshow container -->
+        <div class="relative w-full h-full" id="slideshow">
+          <div class="slide absolute inset-0 opacity-100 transition-opacity duration-1000">
+            <img src="/images/Banner.webp" alt="Gym Equipment" class="w-full h-full object-cover object-center transform scale-[1.02]" />
+          </div>
+          <div class="slide absolute inset-0 opacity-0 transition-opacity duration-1000">
+            <img src="/images/Website-Banner-_Anniversary-Loot-Deal_-_1242x400_V2.webp" alt="Workout" class="w-full h-full object-cover object-center transform scale-[1.02]" />
+          </div>
+          <div class="slide absolute inset-0 opacity-0 transition-opacity duration-1000">
+            <img src="/images/mt-brand-athlete-banner.webp" alt="Supplements" class="w-full h-full object-cover object-center transform scale-[1.02]" />
+          </div>
+        </div>
+
         <div class="absolute inset-0 bg-gradient-to-l from-black/70 via-black/50 to-transparent">
           <div class="container mx-auto px-4 h-full flex items-center sm:justify-end">
             <div class="max-w-2xl mx-4 sm:mx-0">
-              <span class="text-gray-300 text-sm tracking-wider mb-4 block">WELCOME TO LACIFY</span>
+              <span class="text-gray-300 text-sm tracking-wider mb-4 block">WELCOME TO GymVault</span>
               <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-                Discover Your Perfect Shoes
+                "No Pain, No Gain – Power Up!"
               </h1>
               <p class="text-gray-200 text-lg mb-8 max-w-lg">
-                Explore our collection of premium Shoes for every occasion
+                "Explore our collection of premium gym gear for every workout." 💪🔥
               </p>
               <div class="flex gap-4">
                 <a href="/shop" class="bg-white text-gray-900 px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
@@ -73,6 +80,24 @@
             </div>
           </div>
         </div>
+
+        <script>
+          let currentSlide = 0;
+          const slides = document.querySelectorAll('.slide');
+          
+          function showSlide(n) {
+            slides.forEach(slide => slide.style.opacity = '0');
+            slides[n].style.opacity = '1';
+          }
+          
+          function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+          }
+          
+          // Auto advance slides every 3 seconds
+          setInterval(nextSlide, 3000);
+        </script>
       </div>
     </section>
 
@@ -81,35 +106,35 @@
   <div class="container mx-auto px-4">
     <div class="text-center mb-12">
       <h2 class="text-3xl font-bold text-gray-900 mb-4">Shop by Category</h2>
-      <p class="text-gray-600">Find the perfect Shoe for every style</p>
+      <p class="text-gray-600">Find the perfect gym gear for every workout</p>
     </div>
     <div class="flex overflow-x-auto gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 pb-4 sm:pb-0">
-      <!-- Sneakers -->
-      <a href="/shop?category=sneakers" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
-        <img src="/images/sneaker.png" alt="Sneakers" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      <!-- Proteins -->
+      <a href="/shop?category=Proteins" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
+        <img src="/images/Artboard_2_d935a1f7-41fa-462f-b939-79c8ef84da7d.avif" alt="Proteins" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div class="absolute inset-0 bg-black/40 flex items-end p-6">
           <div>
-            <h3 class="text-white text-xl font-semibold mb-2">Sneakers</h3>
+            <h3 class="text-white text-xl font-semibold mb-2">Proteins</h3>
             <span class="text-gray-200 text-sm">Explore →</span>
           </div>
         </div>
       </a>
-      <!-- Casuals -->
-      <a href="/shop?category=casuals" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
-        <img src="/images/casual.png" alt="Casuals" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      <!-- cuffine -->
+      <a href="/shop?category=cuffine" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
+        <img src="/images/casual.png" alt="cuffine" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div class="absolute inset-0 bg-black/40 flex items-end p-6">
           <div>
-            <h3 class="text-white text-xl font-semibold mb-2">Casuals</h3>
+            <h3 class="text-white text-xl font-semibold mb-2">cuffine</h3>
             <span class="text-gray-200 text-sm">Explore →</span>
           </div>
         </div>
       </a>
       <!-- Runners -->
-      <a href="/shop?category=runners" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
-        <img src="/images/runner.png" alt="Runners" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      <a href="/shop?category=Creatine" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
+        <img src="/images/runner.png" alt="Creatine" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div class="absolute inset-0 bg-black/40 flex items-end p-6">
           <div>
-            <h3 class="text-white text-xl font-semibold mb-2">Runners</h3>
+            <h3 class="text-white text-xl font-semibold mb-2">Creatine</h3>
             <span class="text-gray-200 text-sm">Explore →</span>
           </div>
         </div>

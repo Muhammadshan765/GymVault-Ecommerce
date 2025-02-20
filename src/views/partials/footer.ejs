@@ -1,77 +1,86 @@
-<footer class="mybg-green relative overflow-hidden">
-    <!-- Decorative Dots (Optional) -->
-    <div class="absolute top-0 right-0 w-24 h-24 opacity-10">
-      <div class="grid grid-cols-3 gap-2">
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-        <div class="w-2 h-2 bg-white rounded-full"></div>
-      </div>
+<footer class="bg-gray-900 text-white relative overflow-hidden">
+    <!-- Wave SVG Background -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden">
+        <svg class="relative block w-full h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="fill-red-500/10"></path>
+        </svg>
     </div>
-  
+
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8 sm:py-12">
-      <!-- Top Section -->
-      <div class="flex flex-col items-center mb-12">
-        <img src="/images/image.png" alt="GymVault" class="h-12 sm:h-16 mb-6" />
-        <div class="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm text-slate-400">
-          <a href="/home" class="hover:text-white transition-colors">Home</a>
-          <span class="hidden sm:block text-slate-600">•</span>
-          <a href="/shop" class="hover:text-white transition-colors">Shop</a>
-          <span class="hidden sm:block text-slate-600">•</span>
-          <a href="#" class="hover:text-white transition-colors">About</a>
-          <span class="hidden sm:block text-slate-600">•</span>
-          <a href="#" class="hover:text-white transition-colors">Contact</a>
+    <div class="container mx-auto px-6 pt-12 pb-8">
+        <!-- Top Section with Logo and Links -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
+            <!-- Logo and Description -->
+            <div class="col-span-1 lg:col-span-2">
+                <div class="flex items-center mb-4">
+                    <img src="/images/image.png" alt="GymVault" class="h-12" />
+                    <span class="ml-3 text-2xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">GymVault</span>
+                </div>
+                <p class="text-gray-400 mb-6">Your ultimate destination for premium fitness equipment and accessories. Transform your fitness journey with GymVault.</p>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-span-1">
+                <h3 class="text-lg font-semibold mb-4 text-red-500">Quick Links</h3>
+                <ul class="space-y-3">
+                    <li><a href="/home" class="text-gray-400 hover:text-red-500 transition-colors duration-300">Home</a></li>
+                    <li><a href="/shop" class="text-gray-400 hover:text-red-500 transition-colors duration-300">Shop</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-red-500 transition-colors duration-300">About Us</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-red-500 transition-colors duration-300">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-span-1">
+                <h3 class="text-lg font-semibold mb-4 text-red-500">Contact Us</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-center text-gray-400">
+                        <i class="fas fa-envelope mr-3 text-red-500"></i>
+                        <a href="mailto:GymVault@gmail.com" class="hover:text-red-500 transition-colors duration-300">GymVault@gmail.com</a>
+                    </li>
+                    <li class="flex items-center text-gray-400">
+                        <i class="fas fa-phone mr-3 text-red-500"></i>
+                        <a href="tel:+918888888888" class="hover:text-red-500 transition-colors duration-300">+91 8888888888</a>
+                    </li>
+                    <li class="flex items-center text-gray-400">
+                        <i class="fas fa-map-marker-alt mr-3 text-red-500"></i>
+                        <span>123 Fitness Street, Gym City</span>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </div>
-  
-      <!-- Middle Section - Contact & Social (Visible on all screens) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto mb-12">
-        <!-- Contact Info -->
-        <div class="flex flex-col items-center sm:items-end space-y-3">
-          <a href="mailto:GymVault @gmail.com" 
-             class="flex items-center text-slate-400 hover:text-white transition-colors group">
-            <span class="text-sm">GymVault@gmail.com</span>
-            <i class="far fa-envelope ml-2 transform group-hover:translate-x-1 transition-transform"></i>
-          </a>
-          <a href="tel:+918888888888" 
-             class="flex items-center text-slate-400 hover:text-white transition-colors group">
-            <span class="text-sm">+91 8888888888</span>
-            <i class="fas fa-phone ml-2 transform group-hover:translate-x-1 transition-transform"></i>
-          </a>
+
+        <!-- Social Media Links -->
+        <div class="border-t border-gray-800 pt-8 pb-4">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-red-500 transform hover:scale-110 transition-all duration-300">
+                        <i class="fab fa-facebook text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-red-500 transform hover:scale-110 transition-all duration-300">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-red-500 transform hover:scale-110 transition-all duration-300">
+                        <i class="fab fa-instagram text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-red-500 transform hover:scale-110 transition-all duration-300">
+                        <i class="fab fa-youtube text-2xl"></i>
+                    </a>
+                </div>
+                
+                <div class="flex space-x-4 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-red-500 transition-colors duration-300">Privacy Policy</a>
+                    <span class="text-gray-600">•</span>
+                    <a href="#" class="text-gray-400 hover:text-red-500 transition-colors duration-300">Terms of Service</a>
+                </div>
+            </div>
         </div>
-  
-        <!-- Social Links -->
-        <div class="flex justify-center sm:justify-start gap-6">
-          <a href="#" class="text-slate-400 hover:text-white transition-colors">
-            <i class="fab fa-instagram text-2xl hover:scale-110 transition-transform"></i>
-          </a>
-          <a href="#" class="text-slate-400 hover:text-white transition-colors">
-            <i class="fab fa-facebook text-2xl hover:scale-110 transition-transform"></i>
-          </a>
-          <a href="#" class="text-slate-400 hover:text-white transition-colors">
-            <i class="fab fa-twitter text-2xl hover:scale-110 transition-transform"></i>
-          </a>
+
+        <!-- Copyright -->
+        <div class="text-center pt-4">
+            <p class="text-gray-500 text-sm">
+                &copy; <%= new Date().getFullYear() %> GymVault. All rights reserved.
+            </p>
         </div>
-      </div>
-  
-      <!-- Bottom Section -->
-      <div class="border-t border-slate-700/30 pt-6">
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p class="text-slate-400 text-xs order-2 sm:order-1">
-            &copy; 2024 GymVault. All rights reserved.
-          </p>
-          <div class="flex gap-6 order-1 sm:order-2">
-            <a href="#" class="text-slate-400 hover:text-white text-xs transition-colors">Privacy Policy</a>
-            <a href="#" class="text-slate-400 hover:text-white text-xs transition-colors">Terms of Service</a>
-          </div>
-        </div>
-      </div>
     </div>
-  </footer>
-  
+</footer>
