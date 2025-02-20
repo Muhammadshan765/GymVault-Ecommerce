@@ -1,8 +1,7 @@
-
 import userSchema from '../../models/userModel.js'
 import bcrypt from 'bcrypt'
 import validatePassword from '../../utils/validatePaasword.js'
-// import passport from 'passport';
+import passport from 'passport';
 import { generateOTP, sendOTPEmail } from "../../utils/sendOtp.js"
 
 const saltRounds = 10;
@@ -234,16 +233,16 @@ const postResendOtp = async (req, res) => {
 };
 
 
-const getGoogle = (req, res) => {
+const getGoogle = (req, res, next) => {
     //store the trigger in session before rediretion
     req.session.authTrigger = req.query.trigger;
 
     passport.authenticate("google", {
         scope: ["email", "profile"],
-    })(req, res);
+    })(req, res, next);
 };
 
-const getGoogleCallback = (req, res) => {
+const getGoogleCallback = (req, res, next) => {
     passport.authenticate("google", { failureRedirect: "/login" }, async (err, profile) => {
         try {
             if (err || !profile) {
@@ -290,10 +289,10 @@ const getGoogleCallback = (req, res) => {
             console.error("Google authentication error", error);
             return res.redirect("/login?message=Authentication failed&alerttype=error");
         }
-    })(req, res);
+    })(req, res, next);
 };
 
-const postLogin = async (req, res) => {
+const postLogin = async (req, res,next) => {
     try {
         const { email, password } = req.body;
 
