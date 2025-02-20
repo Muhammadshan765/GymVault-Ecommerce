@@ -9,20 +9,28 @@ import expressEjsLayouts from "express-ejs-layouts";
 import connectDb from "./configs/db.js";
 import adminRoute from "./routes/adminRoute.js"
 import userRoute from "./routes/userRoute.js"
+import passport from "passport"; 
+import googleAuth from "./utils/googleAuth.js";
+
 
 const app = express()
 dotenv.config();
 app.use(nocache())
 connectDb();
 
+
 app.use(session({
-  secret: "mysecretkey",
+  secret: process.env.SECRET_KEY,
   resave: false,
   saveUninitialized: false,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24
   }
 }))
+
+//initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
