@@ -100,114 +100,168 @@
         </script>
       </div>
     </section>
-
    <!-- Categories Section -->
-<section class="py-16 bg-white">
+<section class="py-20 bg-gradient-to-b from-white to-gray-50">
   <div class="container mx-auto px-4">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-gray-900 mb-4">Shop by Category</h2>
-      <p class="text-gray-600">Find the perfect gym gear for every workout</p>
+    <div class="text-center mb-16">
+      <span class="text-blue-600 font-semibold tracking-wider uppercase text-sm">Explore Our Collection</span>
+      <h2 class="text-4xl font-bold text-gray-900 mt-3 mb-4">Shop by Category</h2>
+      <p class="text-gray-600 text-lg max-w-2xl mx-auto">Discover premium fitness supplements designed to enhance your workout performance and results</p>
     </div>
-    <div class="flex overflow-x-auto gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 pb-4 sm:pb-0">
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
       <!-- Proteins -->
-      <a href="/shop?category=Proteins" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
-        <img src="/images/Artboard_2_d935a1f7-41fa-462f-b939-79c8ef84da7d.avif" alt="Proteins" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        <div class="absolute inset-0 bg-black/40 flex items-end p-6">
-          <div>
-            <h3 class="text-white text-xl font-semibold mb-2">Proteins</h3>
-            <span class="text-gray-200 text-sm">Explore →</span>
+      <a href="/shop?category=Proteins" class="group relative rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+        <div class="aspect-[5/6]">
+          <img 
+            src="/images/Artboard_2_d935a1f7-41fa-462f-b939-79c8ef84da7d.avif" 
+            alt="Proteins" 
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col justify-end p-8">
+          <div class="transform group-hover:translate-y-[-8px] transition-transform duration-500">
+            <span class="text-blue-400 text-sm font-semibold tracking-wider uppercase block mb-2">Essential Nutrition</span>
+            <h3 class="text-white text-3xl font-bold mb-3">Proteins</h3>
+            <p class="text-gray-300 mb-4 line-clamp-2">Premium protein supplements for muscle growth and recovery</p>
+            <span class="inline-flex items-center text-white text-sm font-medium bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
+              Browse Collection
+              <svg class="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </span>
           </div>
         </div>
       </a>
-      <!-- cuffine -->
-      <a href="/shop?category=cuffine" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
-        <img src="/images/casual.png" alt="cuffine" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        <div class="absolute inset-0 bg-black/40 flex items-end p-6">
-          <div>
-            <h3 class="text-white text-xl font-semibold mb-2">cuffine</h3>
-            <span class="text-gray-200 text-sm">Explore →</span>
+
+      <!-- BCAA -->
+      <a href="/shop?category=cuffine" class="group relative rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+        <div class="aspect-[5/6]">
+          <img 
+            src="/images/BCAA.webp" 
+            alt="BCAA" 
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col justify-end p-8">
+          <div class="transform group-hover:translate-y-[-8px] transition-transform duration-500">
+            <span class="text-blue-400 text-sm font-semibold tracking-wider uppercase block mb-2">Performance Boost</span>
+            <h3 class="text-white text-3xl font-bold mb-3">BCAA</h3>
+            <p class="text-gray-300 mb-4 line-clamp-2">Essential amino acids for enhanced endurance and recovery</p>
+            <span class="inline-flex items-center text-white text-sm font-medium bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
+              Browse Collection
+              <svg class="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </span>
           </div>
         </div>
       </a>
-      <!-- Runners -->
-      <a href="/shop?category=Creatine" class="group relative h-64 min-w-[280px] sm:min-w-0 rounded-2xl overflow-hidden">
-        <img src="/images/runner.png" alt="Creatine" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-        <div class="absolute inset-0 bg-black/40 flex items-end p-6">
-          <div>
-            <h3 class="text-white text-xl font-semibold mb-2">Creatine</h3>
-            <span class="text-gray-200 text-sm">Explore →</span>
+
+      <!-- Creatine -->
+      <a href="/shop?category=Creatine" class="group relative rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+        <div class="aspect-[5/6]">
+          <img 
+            src="/images/pre-workout-.webp" 
+            alt="Creatine" 
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col justify-end p-8">
+          <div class="transform group-hover:translate-y-[-8px] transition-transform duration-500">
+            <span class="text-blue-400 text-sm font-semibold tracking-wider uppercase block mb-2">Power & Strength</span>
+            <h3 class="text-white text-3xl font-bold mb-3">Creatine</h3>
+            <p class="text-gray-300 mb-4 line-clamp-2">Advanced formulas for explosive power and muscle gains</p>
+            <span class="inline-flex items-center text-white text-sm font-medium bg-white/20 rounded-full px-4 py-2 backdrop-blur-sm">
+              Browse Collection
+              <svg class="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </span>
           </div>
         </div>
       </a>
     </div>
+
   </div>
 </section>
 
     <!-- Featured Products -->
-    <section id="featured" class="py-16 bg-gray-50">
+    <section id="featured" class="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div class="container mx-auto px-4">
         <!-- Section Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 sm:mb-12">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-12 sm:mb-16">
           <div class="mb-4 sm:mb-0">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="w-8 h-[2px] bg-gray-900"></span>
-              <span class="text-gray-500 text-sm tracking-wider uppercase">Featured</span>
+            <div class="flex items-center gap-3 mb-3">
+              <span class="w-12 h-[3px] bg-blue-600 rounded-full"></span>
+              <span class="text-blue-600 text-sm font-semibold tracking-wider uppercase">Featured Collection</span>
             </div>
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-900">Latest Arrivals</h2>
+            <h2 class="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">Latest Arrivals</h2>
           </div>
-          <a href="/shop" class="group inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-            View Collection 
-            <span class="ml-2 transform transition-transform duration-300 group-hover:translate-x-1">→</span>
+          <a href="/shop" class="group inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-all duration-300 transform hover:scale-105">
+            View All Products
+            <svg class="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
           </a>
         </div>
 
         <!-- Products Grid -->
-        <div class="flex overflow-x-auto gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-6 pb-4 sm:pb-0">
+        <div class="flex overflow-x-auto gap-6 sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 sm:gap-8 pb-4 sm:pb-0">
           <% products.forEach(product => { %>
-          <a href="/product/<%= product._id %>" class="group min-w-[240px] sm:min-w-0">
-            <div class="bg-white rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300">
+          <a href="/product/<%= product._id %>" class="group min-w-[280px] sm:min-w-0">
+            <div class="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transform transition-all duration-500 hover:-translate-y-2">
               <!-- Product Image -->
-              <div class="relative aspect-square overflow-hidden bg-gray-100">
+              <div class="relative aspect-square overflow-hidden">
                 <img
                   src="<%= product.imageUrl[0] %>"
                   alt="<%= product.productName %>"
-                  class="w-full h-full object-cover transform transition-all duration-500 group-hover:scale-105"
+                  class="w-full h-full object-cover transform transition-all duration-700 group-hover:scale-110"
                   loading="lazy"
                 />
                 <% if (product.discountPrice < product.price) { %>
-                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-xs font-medium">
+                <div class="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
                   -<%= Math.round((product.price - product.discountPrice) / product.price * 100) %>%
                 </div>
                 <% } %>
                 <!-- Quick View Button -->
-                <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
-                  <span class="text-white text-sm font-medium">Quick View</span>
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                  <span class="bg-white/90 text-gray-900 px-6 py-3 rounded-full text-sm font-semibold transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    Quick View
+                  </span>
                 </div>
               </div>
 
               <!-- Product Info -->
-              <div class="p-5">
+              <div class="p-6">
                 <!-- Brand & Rating -->
-                <div class="flex justify-between items-center mb-2">
-                  <div class="text-sm text-gray-500 font-medium"><%= product.brand %></div>
-                  <div class="flex items-center gap-1">
-                    <i class="fas fa-star text-yellow-400 text-xs"></i>
-                    <span class="text-sm text-gray-500"><%= product.rating %></span>
+                <div class="flex justify-between items-center mb-3">
+                  <div class="px-3 py-1 bg-gray-100 rounded-full">
+                    <span class="text-sm text-gray-700 font-medium"><%= product.brand %></span>
+                  </div>
+                  <div class="flex items-center gap-1.5 bg-yellow-50 px-3 py-1 rounded-full">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <span class="text-sm font-medium text-gray-700"><%= product.rating %></span>
                   </div>
                 </div>
                 
                 <!-- Product Name -->
-                <h3 class="text-gray-900 font-medium mb-2 truncate group-hover:text-gray-700 transition-colors">
+                <h3 class="text-xl text-gray-900 font-bold mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
                   <%= product.productName %>
                 </h3>
                 
                 <!-- Price -->
-                <div class="flex items-baseline gap-2">
-                  <span class="text-lg font-bold text-gray-900">₹<%= product.price %></span>
+                <div class="flex items-baseline gap-3">
+                  <span class="text-2xl font-bold text-gray-900">₹<%= product.price %></span>
                   <% if (product.discountPrice < product.price) { %>
-                  <!-- <span class="text-sm text-gray-400 line-through">₹<%= product.price %></span> -->
+                  <span class="text-base text-red-500 font-semibold">Save ₹<%= product.price - product.discountPrice %></span>
                   <% } %>
                 </div>
+
+                <!-- Action Button -->
+                <button class="w-full mt-6 bg-gray-900 text-white py-3 rounded-xl font-medium transform transition-all duration-300 hover:bg-blue-600 hover:scale-[1.02] active:scale-[0.98]">
+                  View Details
+                </button>
               </div>
             </div>
           </a>
