@@ -13,107 +13,87 @@
         <div class="flex justify-between items-center mb-4"> -->
 
             <div class=" p-6 flex-1" id="main-content">
-                <header class="flex items-center justify-between mb-8 p-4 lg:p-8 border-b border-gray-700">
+                <!-- <header class="flex items-center justify-between mb-8 p-4 lg:p-8 border-b border-gray-700">     -->
                     <button id="toggleSidebar" class="text-white lg:hidden">
 
                     </button>
-                    <h1 class="text-2xl font-semibold text-gray-200">Product Management</h1>
+                    <!-- <h1 class="text-2xl font-semibold text-gray-200">Product Management</h1> -->
                 </header>
 
                 <main class="flex justify-between items-center mb-4">
-                    <div class="overflow-x-auto">
-                        <div class="min-w-full bg-zinc-800 rounded-lg shadow-md">
+                    <div class="overflow-x-auto w-full">
+                        <div class="min-w-full bg-white rounded-lg shadow-lg">
                             <!-- Table Header with Add Product Button -->
-                            <div
-                                class="p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <h2 class="text-xl md:text-2xl font-semibold text-gray-200">Products</h2>
+                            <div class="p-4 md:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <!-- <h2 class="text-xl md:text-2xl font-semibold text-gray-800">Products</h2> -->
+                                <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Products!</h1>
                                 <button id="addProductBtn"
-                                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors w-full sm:w-auto justify-center">
+                                    class=" bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg">
                                     <i class="fas fa-plus"></i>
                                     <span>Add Product</span>
                                 </button>
                             </div>
 
                             <!-- Table Container -->
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-zinc-700">
-                                    <thead class="bg-zinc-900">
+                            <div class="overflow-x-auto  border border-gray-300 rounded-lg shadow-lg shadow-gray-900 ">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-200">
                                         <tr>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider">
-                                                Image</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider">
-                                                Product</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider hidden md:table-cell">
-                                                Brand</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider hidden lg:table-cell">
-                                                Category</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider">
-                                                Price</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">
-                                                Stock</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">
-                                                Status</th>
-                                            <th
-                                                class="px-4 py-3 text-right text-xs md:text-sm font-medium text-gray-300 uppercase tracking-wider">
-                                                Actions</th>
+                                            <th class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wider">Image</th>
+                                            <th class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wider">Product</th>
+                                            <th class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wider hidden md:table-cell">Brand</th>
+                                            <th class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wider hidden lg:table-cell">Category</th>
+                                            <th class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wider">Price</th>
+                                            <th class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wider hidden sm:table-cell">Stock</th>
+                                            <th class="px-4 py-3 text-left text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wider hidden sm:table-cell">Status</th>
+                                            <th class="px-4 py-3 text-right text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wider">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-zinc-700">
-                                        <% products.forEach(product=> { %>
-                                            <tr class="hover:bg-zinc-700/50 transition-colors">
+                                    <tbody class="divide-y divide-gray-200">
+                                        <% products.forEach(product => { %>
+                                            <tr class="hover:bg-gray-100 transition-colors">
                                                 <td class="px-4 py-3 whitespace-nowrap">
                                                     <img src="<%= product.imageUrl[0] %>"
                                                         alt="<%= product.productName %>"
-                                                        class="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg">
+                                                        class="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg shadow-md">
                                                 </td>
                                                 <td class="px-4 py-3">
                                                     <div class="flex flex-col">
-                                                        <span class="text-sm md:text-base font-medium text-gray-200">
+                                                        <span class="text-sm md:text-base font-medium text-gray-800">
                                                             <%= product.productName %>
                                                         </span>
-                                                        <span class="text-xs text-gray-400 md:hidden">
+                                                        <span class="text-xs text-gray-500 md:hidden">
                                                             <%= product.brand %>
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td
-                                                    class="px-4 py-3 text-sm md:text-base text-gray-300 hidden md:table-cell">
+                                                <td class="px-4 py-3 text-sm md:text-base text-gray-600 hidden md:table-cell">
                                                     <%= product.brand %>
                                                 </td>
-                                                <td
-                                                    class="px-4 py-3 text-sm md:text-base text-gray-300 hidden lg:table-cell">
+                                                <td class="px-4 py-3 text-sm md:text-base text-gray-600 hidden lg:table-cell">
                                                     <%= product.categoriesId.name %>
                                                 </td>
-                                                <td class="px-4 py-3 text-sm md:text-base text-gray-200">₹<%=
-                                                        product.price.toLocaleString() %>
+                                                <td class="px-4 py-3 text-sm md:text-base text-gray-800">₹<%= product.price.toLocaleString() %></td>
+                                                <td class="px-4 py-3 text-sm md:text-base text-gray-600 hidden sm:table-cell">
+                                                    <%= product.size.reduce((total, sizeObj) => total + sizeObj.stock, 0) %>
                                                 </td>
-                                                <td
-                                                    class="px-4 py-3 text-sm md:text-base text-gray-300 hidden sm:table-cell">
-                                                    <%= product.size.reduce((total, sizeObj)=> total + sizeObj.stock, 0)
-                                                        %>
-                                                </td>
-                                                <td
-                                                    class="px-4 py-3 text-sm md:text-base text-gray-300 hidden sm:table-cell">
-                                                    <%= product.isActive ? 'Active' : 'Inactive' %>
+                                                <td class="px-4 py-3 text-sm md:text-base hidden sm:table-cell">
+                                                    <button class="px-3 py-1 rounded-md text-sm transition-colors duration-200 w-full sm:w-auto 
+                                                        <%= product.isActive ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white' %>">
+                                                        <%= product.isActive ? 'Active' : 'Inactive' %>
+                                                    </button>
                                                 </td>
                                                 <td class="px-4 py-3">
                                                     <div class="flex flex-col sm:flex-row gap-2 justify-end">
                                                         <button
-                                                            class="edit-product bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200 w-full sm:w-auto"
+                                                            class="edit-product bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors duration-200 w-full sm:w-auto shadow-md"
                                                             data-id="<%= product._id %>" type="button">
                                                             Edit
                                                         </button>
 
                                                         <button
                                                             class="toggle-status px-3 py-1 rounded-md text-sm transition-colors duration-200 w-full sm:w-auto
-                                                 <%= product.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %> text-white"
+                                                 <%= product.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %> text-white shadow-md"
                                                             data-id="<%= product._id %>"
                                                             data-active="<%= product.isActive %>">
                                                             <%= product.isActive ? 'Hide' : 'Show' %>
@@ -121,18 +101,13 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <% }); %>
+                                        <% }); %>
                                     </tbody>
                                 </table>
                             </div>
-
-                            <!-- Page Info -->
-                            <!-- / -->
-
                         </div>
                     </div>
                 </main>
-            </div>
 
             <!-- Product Modal -->
             <div id="productModal"
@@ -390,7 +365,7 @@
                                 cropper = new Cropper(cropperImage, {
                                     aspectRatio: 1,
                                     viewMode: 2,
-                                    autoCropArea: 2,
+                                    autoCropArea: 1,
                                     responsive: true,
                                     restore: false,
                                     guides: true,

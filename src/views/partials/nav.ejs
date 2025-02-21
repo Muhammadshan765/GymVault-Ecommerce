@@ -43,9 +43,20 @@
             <a href="/wishlist" class="p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110">
                 <i class="fa-regular fa-heart text-xl"></i>
             </a>
-            <a href="/profile" class="p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110">
-                <i class="fa-regular fa-user text-xl"></i>
-            </a>
+            <div class="relative group">
+                <button class="p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110">
+                    <i class="fa-regular fa-user text-xl"></i>
+                </button>
+                <!-- Dropdown Menu -->
+                <div class="absolute right-0 mt-2 w-48 bg-gray-900 rounded-lg shadow-xl py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <a href="/profile" class="block px-4 py-2 text-gray-300 hover:text-red-500 hover:bg-gray-800">
+                        <i class="fa-regular fa-user mr-2"></i>Profile
+                    </a>
+                    <a href="/logout" class="block px-4 py-2 text-gray-300 hover:text-red-500 hover:bg-gray-800">
+                        <i class="fa-solid fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </div>
+            </div>
             <a href="/cart" class="p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110 relative">
                 <i class="fa-solid fa-cart-shopping text-xl"></i>
                 <% if (locals.cartCount && cartCount > 0) { %>
