@@ -382,227 +382,227 @@ const getLogout = (req, res) => {
     });
 }
 
-// const getForgotPassword = (req, res) => {
-//     try {
-//         res.render('user/forgotPassword');
-//     } catch (error) {
-//         console.error('Error rendering forgot passwordpage', error);
-//         res.status(500).render('error', {
-//             message: 'Error loading forgot password page',
-//             error: error.message
-//         });
+const getForgotPassword = (req, res) => {
+    try {
+        res.render('user/forgotPassword');
+    } catch (error) {
+        console.error('Error rendering forgot passwordpage', error);
+        res.status(500).render('error', {
+            message: 'Error loading forgot password page',
+            error: error.message
+        });
 
-//     }
-// };
+    }
+};
 
-// const sendForgotPasswordOTP = async (req, res) => {
-//     try {
-//         const { email } = req.body;
+const sendForgotPasswordOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
 
-//         //find user
-//         const user = await userSchema.findOne({ email, isVerified: true });
-//         if (!user) {
-//             return res.status(404).json({
-//                 message: 'User not found'
-//             });
-//         }
+        //find user
+        const user = await userSchema.findOne({ email, isVerified: true });
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
 
-//         if (!user.password) {
-//             return res.status(400).json({
-//                 message: 'Email linked is linked to google login .Please login with Google.'
-//             });
-//         }
+        if (!user.password) {
+            return res.status(400).json({
+                message: 'Email linked is linked to google login .Please login with Google.'
+            });
+        }
 
-//generate  and save otp
+
 // Generate and save OTP
-//         const otp = generateOTP();
-//         user.otp = otp;
-//         user.otpExpiresAt = Date.now() + 120000;
-//         user.otpAttempts = 0;
-//         await user.save();
-//         //sent otp      
-//         await sendOTPEmail(email, otp);
-//         res.status(200).json({
-//             message: 'OTP sent succesfully'
-//         });
-//     } catch (error) {
-//         console.error('Send OTP error', error);
-//         res.status(500).json({
-//             message: 'Failed to sent OTP'
-//         });
+        const otp = generateOTP();
+        user.otp = otp;
+        user.otpExpiresAt = Date.now() + 120000;
+        user.otpAttempts = 0;
+        await user.save();
+        //sent otp      
+        await sendOTPEmail(email, otp);
+        res.status(200).json({
+            message: 'OTP sent succesfully'
+        });
+    } catch (error) {
+        console.error('Send OTP error', error);
+        res.status(500).json({
+            message: 'Failed to sent OTP'
+        });
 
-//     }
-// };
-
-
-// const verifyForgotPasswordOTP = async (req, res) => {
-//     try {
-//         const { email, otp } = req.body;
-
-//         const user = await userSchema.findOne({
-//             email,
-//             otp,
-//             otpExpiresAt: { $gt: Date.now() }
-//         });
-
-//         if (!user) {
-//             return res.status(400).json({
-//                 message: 'invalid or expired otp'
-//             });
-//         }
-
-//         //increment attept
-//         user.otpAttempts += 1;
-//         if (user.otpAttempts >= 3) {
-//             await userSchema.findByIdAndUpdate(user._id, {
-//                 $unset: { otp: 1, otpExpiresAt: 1, otpAttempts: 1 }
-//             });
-//             return res.status(400).json({
-//                 mesage: "Too many attempts please try again"
-//             });
-//         }
-//         await user.save();
-
-//         if (user.otp !== otp) {
-//             return res.status(400).json({
-//                 message: 'Invalid OTP'
-//             });
-//         }
-
-//         res.status(200).json({
-//             message: 'OTP verified successfully'
-//         });
+    }
+};
 
 
-//     } catch (error) {
-//         console.error('verify OTP error:', error);
-//         res.status(500).json({
-//             message: 'Failed to verify OTP'
-//         });
+const verifyForgotPasswordOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
 
-//     }
-// };
+        const user = await userSchema.findOne({
+            email,
+            otp,
+            otpExpiresAt: { $gt: Date.now() }
+        });
 
+        if (!user) {
+            return res.status(400).json({
+                message: 'invalid or expired otp'
+            });
+        }
 
-// const resetPassword = async (req, res) => {
-//     try {
-//         const { email, newPassword } = req.body;
+        //increment attept
+        user.otpAttempts += 1;
+        if (user.otpAttempts >= 3) {
+            await userSchema.findByIdAndUpdate(user._id, {
+                $unset: { otp: 1, otpExpiresAt: 1, otpAttempts: 1 }
+            });
+            return res.status(400).json({
+                mesage: "Too many attempts please try again"
+            });
+        }
+        await user.save();
 
-//         const user = await userSchema.findOne({ email });
-//         if (!user) {
-//             return res.status(404).json({
-//                 message: 'user not found'
-//             });
-//         }
+        if (user.otp !== otp) {
+            return res.status(400).json({
+                message: 'Invalid OTP'
+            });
+        }
 
-
-
-//         //validate new password
-//         const passwordValidation = validatePassword(newPassword);
-//         if (!passwordValidation.isValid) {
-//             return res.status(400).json({
-//                 message: passwordValidation.message
-//             });
-//         }
-
-//         //hash new password
-//         const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-//         //updsate password and remove otp  fields
-//         await userSchema.findByIdAndUpdate(user._id, {
-//             $set: { password: hashedPassword },
-//             $unset: { otp: 1, otpExpiresAt: 1, otpAttempts: 1 }
-//         });
-//         res.status(200).json({
-//             message: 'Password reset successfully'
-//         });
+        res.status(200).json({
+            message: 'OTP verified successfully'
+        });
 
 
-//     } catch (error) {
-//         console.error('Reset password error', error);
-//         res.status(500).json({
-//             message: 'failed to reset password'
-//         });
+    } catch (error) {
+        console.error('verify OTP error:', error);
+        res.status(500).json({
+            message: 'Failed to verify OTP'
+        });
 
-//     }
-// };
-
-// const getChangePassword = async (req, res) => {
-//     try {
-//         //get user  from session 
-//         const userId = req.session.user;
-//         const user = await userSchema.findById(userId);
-
-//         if (!user) {
-//             return res.redirect('/login');
-//         }
+    }
+};
 
 
-//         //check if its google login by checking for password
-//         if (!user.password) {
-//             return res.redirect('/profile');
-//         }
+const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
 
-//         //pass the user object to the view
-//         res.render('user/changePassword', { user });
-//     } catch (error) {
-//         console.error('Get change password error', error);
-//         res.status(500).render('error', {
-//             message: "Error loading change password page",
-//             error: error.message
-//         });
-
-//     }
-// };
+        const user = await userSchema.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                message: 'user not found'
+            });
+        }
 
 
-// const postChangePassword = async (req, res) => {
-//     try {
-//         const { currentPassword, newPassword } = req.body;
-//         const userId = req.session.user;
 
-//         const user = await userSchema.findById(userId);
-//         if (!user) {
-//             return res.status(404).json({
-//                 message: 'User not found'
-//             });
-//         }
+        //validate new password
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.isValid) {
+            return res.status(400).json({
+                message: passwordValidation.message
+            });
+        }
 
-//         //verify current password
-//         const isMatch = await bcrypt.compare(currentPassword, user.password);
-//         if (!isMatch) {
-//             return res.status(400).json({
-//                 message: 'Current password is incorrect'
-//             });
-//         }
+        //hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-//         //validate new password
-//         const passwordValidation = validatePassword(newPassword);
-//         if (!passwordValidation.isValid) {
-//             return res.status(400).json({
-//                 message: passwordValidation.message
-//             });
-//         }
+        //updsate password and remove otp  fields
+        await userSchema.findByIdAndUpdate(user._id, {
+            $set: { password: hashedPassword },
+            $unset: { otp: 1, otpExpiresAt: 1, otpAttempts: 1 }
+        });
+        res.status(200).json({
+            message: 'Password reset successfully'
+        });
 
-//         //hash new password
-//         const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-//         //update new password
-//         await userSchema.findByIdAndUpdate(userId, {
-//             password: hashedPassword
-//         });
-//         res.status(200).json({
-//             message: 'Password Updated Succesfully'
-//         });
+    } catch (error) {
+        console.error('Reset password error', error);
+        res.status(500).json({
+            message: 'failed to reset password'
+        });
 
-//     } catch (error) {
-//         console.error('Change password Error', error);
-//         res.status(500).json({
-//             message: 'Failed to update password'
-//         });
+    }
+};
 
-//     }
-// };
+const getChangePassword = async (req, res) => {
+    try {
+        //get user  from session 
+        const userId = req.session.user;
+        const user = await userSchema.findById(userId);
+
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+
+        //check if its google login by checking for password
+        if (!user.password) {
+            return res.redirect('/profile');
+        }
+
+        //pass the user object to the view
+        res.render('user/changePassword', { user });
+    } catch (error) {
+        console.error('Get change password error', error);
+        res.status(500).render('error', {
+            message: "Error loading change password page",
+            error: error.message
+        });
+
+    }
+};
+
+
+const postChangePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.session.user;
+
+        const user = await userSchema.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        //verify current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({
+                message: 'Current password is incorrect'
+            });
+        }
+
+        //validate new password
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.isValid) {
+            return res.status(400).json({
+                message: passwordValidation.message
+            });
+        }
+
+        //hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        //update new password
+        await userSchema.findByIdAndUpdate(userId, {
+            password: hashedPassword
+        });
+        res.status(200).json({
+            message: 'Password Updated Succesfully'
+        });
+
+    } catch (error) {
+        console.error('Change password Error', error);
+        res.status(500).json({
+            message: 'Failed to update password'
+        });
+
+    }
+};
 
 
 
@@ -618,12 +618,12 @@ export default {
     getGoogleCallback,
     postLogin,
     getLogout,
-    // getForgotPassword,
-    // sendForgotPasswordOTP,
-    // verifyForgotPasswordOTP,
-    // resetPassword,
-    // getChangePassword,
-    // postChangePassword
+    getForgotPassword,
+    sendForgotPasswordOTP,
+    verifyForgotPasswordOTP,
+    resetPassword,
+    getChangePassword,
+    postChangePassword
 }
 
 

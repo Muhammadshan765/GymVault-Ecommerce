@@ -31,7 +31,16 @@ router.get("/shop",shophomeController.getShop)
 //view product
  router.get("/product/:id",userMiddleware.checkSession,viewProductController.getProductDetails)
 
-//  router.get('/product/:id', userMiddleware.checkSession, viewProductController.getProductDetails);
+//forgot password & change Password 
+router.get("/forgot-password",userController.getForgotPassword)
+router.post("/forgot-password/send-otp",userController.sendForgotPasswordOTP)
+router.post("/forgot-password/verify-otp",userController.verifyForgotPasswordOTP)
+router.post("/forgot-password/reset-password",userController.resetPassword)
+router.get("/change-password",userMiddleware.checkSession,userController.getChangePassword)
+router.post("/change-password",userMiddleware.checkSession,userController.postChangePassword)
+ 
+
+
 
 export default router;
 

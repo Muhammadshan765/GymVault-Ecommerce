@@ -359,11 +359,3 @@ export default { getproducts, addProduct, getProductDetails, updateProduct, togg
 
 
  
-
-// const getproducts =(req,res)=>{
-// res.render("admin/products")
-// }
-
-// export  default{
-//   getproducts
-// }

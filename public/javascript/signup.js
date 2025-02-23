@@ -170,8 +170,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('otpModal').classList.remove('hidden');
                 document.getElementById('otpModal').classList.add('flex');
 
-                // Start 30 second timer for OTP expiry
-                let timeLeft = 30; // 1 seconds  
+                // Start 60 second timer for OTP expiry
+                let timeLeft = 60; // 60 seconds  
                 const otpTimer = document.getElementById('otpError');
                 const resendOtpButton = document.getElementById('resendOtp');
                 otpTimer.classList.remove('hidden');
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.success) {
                 // Start countdown timer
-                let timeLeft = 30;
+                let timeLeft = 60;
                 resendTimer.classList.remove('hidden');
                 const countdownInterval = setInterval(() => {
                     resendTimer.textContent = `Resend available in ${timeLeft}s`;
