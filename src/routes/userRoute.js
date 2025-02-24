@@ -4,6 +4,9 @@ import userController from "../controllers/user/userController.js";
 import userMiddleware from "../middlewares/userMiddleware.js"
 import shophomeController from "../controllers/user/shophomeController.js";
 import viewProductController from "../controllers/user/viewProductController.js";
+import profileController from "../controllers/user/profileController.js"
+
+
 
 // user signup & login
 router.get('/signup', userMiddleware.isLogin, userController.getSignUp)
@@ -39,6 +42,9 @@ router.post("/forgot-password/reset-password",userController.resetPassword)
 router.get("/change-password",userMiddleware.checkSession,userController.getChangePassword)
 router.post("/change-password",userMiddleware.checkSession,userController.postChangePassword)
  
+//user profile
+router.get("/profile",userMiddleware.checkSession,profileController.getProfile)
+router.patch("/profile/update",userMiddleware.checkSession,profileController.updateProfile)
 
 
 
