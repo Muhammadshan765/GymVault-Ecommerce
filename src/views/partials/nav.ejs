@@ -40,6 +40,11 @@
 
         <!-- Right Side (Icons) -->
         <div class="flex items-center space-x-1 sm:space-x-4">
+
+        <%  if(locals.user) { %>
+            <span class="hidden md:block text-gray-300"> <%=locals.user.firstName%>  </span>
+        <% } %>
+
             <a href="/wishlist" class="p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110">
                 <i class="fa-regular fa-heart text-xl"></i>
             </a>
@@ -65,6 +70,7 @@
                     </span>
                 <% } %>
             </a>
+     
             <button id="menu-toggle" class="lg:hidden p-2 text-gray-300 hover:text-red-500 transition-all duration-300">
                 <i class="fa-solid fa-bars text-2xl"></i>
             </button>

@@ -292,7 +292,7 @@ const getGoogleCallback = (req, res, next) => {
     })(req, res, next);
 };
 
-const postLogin = async (req, res,next) => {
+const postLogin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
@@ -359,6 +359,7 @@ const postLogin = async (req, res,next) => {
         //Set session
         req.session.user = user._id;
         req.session.userEmail = user.email;
+        req.session.userName = user.firstName;
 
         //Return success response with resdirect URL
         return res.json({

@@ -22,6 +22,10 @@ const checkSession = async (req, res, next) => {
             return res.redirect('/login?message=Your+account+has+been+blocked&alertType=error');
         }
 
+        if(user){
+            res.locals.user=user
+        }
+        
         next();
 
     } catch (error) {
