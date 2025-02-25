@@ -1,11 +1,11 @@
-import express from "express"
+import express, { Router } from "express"
 const router = express.Router();
 import userController from "../controllers/user/userController.js";
 import userMiddleware from "../middlewares/userMiddleware.js"
 import shophomeController from "../controllers/user/shophomeController.js";
 import viewProductController from "../controllers/user/viewProductController.js";
 import profileController from "../controllers/user/profileController.js"
-
+import addressController from "../controllers/user/addressController.js";
 
 
 // user signup & login
@@ -45,6 +45,13 @@ router.post("/change-password",userMiddleware.checkSession,userController.postCh
 //user profile
 router.get("/profile",userMiddleware.checkSession,profileController.getProfile)
 router.patch("/profile/update",userMiddleware.checkSession,profileController.updateProfile)
+
+//user address
+router.get("/address",userMiddleware.checkSession,addressController.getAddress)
+router.post("/address/add",userMiddleware.checkSession,addressController.addAddress)
+router.put("/address/:id",userMiddleware.checkSession,addressController.editAddress)
+router.delete("/address/:id",userMiddleware.checkSession,addressController.deleteAddress)
+
 
 
 
