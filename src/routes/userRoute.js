@@ -6,6 +6,7 @@ import shophomeController from "../controllers/user/shophomeController.js";
 import viewProductController from "../controllers/user/viewProductController.js";
 import profileController from "../controllers/user/profileController.js"
 import addressController from "../controllers/user/addressController.js";
+import cartController from "../controllers/user/cartController.js";
 
 
 // user signup & login
@@ -52,8 +53,11 @@ router.post("/address/add",userMiddleware.checkSession,addressController.addAddr
 router.put("/address/:id",userMiddleware.checkSession,addressController.editAddress)
 router.delete("/address/:id",userMiddleware.checkSession,addressController.deleteAddress)
 
-
-
+//user cart
+router.get("/cart",userMiddleware.checkSession,cartController.getCart)
+router.post("/cart/add",userMiddleware.checkSession,cartController.addToCart)
+router.patch("/cart/update-quantity",userMiddleware.checkSession,cartController.updateQuantity)
+router.delete("/cart/remove/:productId",userMiddleware.checkSession,cartController.removeFromCart)
 
 export default router;
 
