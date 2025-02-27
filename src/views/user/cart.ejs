@@ -333,11 +333,18 @@
                 // Update quantity display
                 quantityDisplay.textContent = newQuantity;
 
-                // Update subtotal
-                const subtotalElement = cartItem.querySelector(`#subtotal-${productId}`);
-                if (subtotalElement) {
-                    subtotalElement.textContent = `₹${data.subtotal}`;
-                }
+                //   // Update subtotal
+                //   const subtotalElement = cartItem.querySelector(`#subtotal-${productId}`);
+                // if (subtotalElement) {
+                //     subtotalElement.textContent = `₹${data.subtotal}`;
+                // }
+
+
+                // Update subtotal 
+                const subtotalElements = document.querySelectorAll(`#subtotal-${productId}, #cart-item-${productId} #subtotal`);
+                subtotalElements.forEach(el => {
+                    el.textContent = `₹${data.subtotal}`;
+                });
 
                 // Update all total elements
                 const totalElements = document.querySelectorAll('#total, #total-amount, #subtotal-amount');
@@ -348,6 +355,12 @@
                         el.textContent = `₹${data.total}`;
                     }
                 });
+
+                // Update items count
+                const itemsCount = document.getElementById('items-count');
+                if (itemsCount) {
+                    itemsCount.textContent = `Subtotal (${data.itemCount} items)`;
+                }
 
                 // Update button states
                 const minusBtn = cartItem.querySelector('.quantity-btn:first-child');

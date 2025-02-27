@@ -7,7 +7,8 @@ import viewProductController from "../controllers/user/viewProductController.js"
 import profileController from "../controllers/user/profileController.js"
 import addressController from "../controllers/user/addressController.js";
 import cartController from "../controllers/user/cartController.js";
-
+import checkoutController from "../controllers/user/checkoutController.js";
+import orderController from "../controllers/user/orderController.js";
 
 // user signup & login
 router.get('/signup', userMiddleware.isLogin, userController.getSignUp)
@@ -58,6 +59,13 @@ router.get("/cart",userMiddleware.checkSession,cartController.getCart)
 router.post("/cart/add",userMiddleware.checkSession,cartController.addToCart)
 router.patch("/cart/update-quantity",userMiddleware.checkSession,cartController.updateQuantity)
 router.delete("/cart/remove/:productId",userMiddleware.checkSession,cartController.removeFromCart)
+
+//checkout
+router.get("/checkout",userMiddleware.checkSession,checkoutController.getCheckoutPage)
+router.post("/checkout/place-order",userMiddleware.checkSession,checkoutController.placeOrder)
+
+//view order
+router.get("/orders",userMiddleware.checkSession,orderController.getOrders )
 
 export default router;
 
