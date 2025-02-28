@@ -6,6 +6,7 @@ import productsController from "../controllers/admin/productsController.js"
 import customersController from "../controllers/admin/customersController.js";
 import categoryController from "../controllers/admin/categoryController.js";
 import adminMiddleware from "../middlewares/adminMiddleware.js";
+// import orderController from "../controllers/admin/orderController.js";
 // import User from "../models/userModel.js";
 
 //Admin Routes
@@ -30,7 +31,8 @@ router.get("/products/:id", adminMiddleware.checkSession, adminMiddleware.errorH
 router.post("/products/edit/:id", adminMiddleware.checkSession, adminMiddleware.errorHandler, productsController.updateProduct)
 router.post("/products/toggle-status/:id", adminMiddleware.checkSession, adminMiddleware.errorHandler, productsController.toggleProductStatus)
 
-
+//order routes
+// router.get("/orders",adminMiddleware.checkSession,orderController.getOrders)
 
 
 
