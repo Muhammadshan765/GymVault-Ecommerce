@@ -67,7 +67,7 @@ router.post("/checkout/place-order", userMiddleware.checkSession, checkoutContro
 //view order
 router.get("/orders", userMiddleware.checkSession, orderController.getOrders)
 router.patch("/orders/:orderId/items/:productId/cancel", userMiddleware.checkSession, orderController.cancelOrder)
-
+router.post("/orders/:orderId/items/:productId/return", userMiddleware.checkSession, orderController.requestReturnItem)
 
 export default router;
 

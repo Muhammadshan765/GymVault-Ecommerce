@@ -3,6 +3,7 @@ import userModel from "../models/userModel.js";
 const checkSession = async (req, res, next) => {
     try {
         // Check if session exists
+        
         if (!req.session.user) {
             return res.redirect('/login?message=Please+login+to+continue&alertType=info');
         }
