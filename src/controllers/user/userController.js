@@ -7,7 +7,7 @@ import { generateOTP, sendOTPEmail } from "../../utils/sendOtp.js"
 const saltRounds = 10;
 
 const loadLogin = (req, res) => {
-    res.render('user/login', { message: req.query.mesage, alertType: req.query.alertType });
+    res.render('user/login', { message: req.query.message, alertType: req.query.alertType });
 };
 
 
@@ -257,7 +257,7 @@ const getGoogleCallback = (req, res, next) => {
             //if user exists check if blocked
             if (existingUser) {
                 if (existingUser.blocked) {
-                    return res.redirect('/login?message=Your account has been blocked&alertType=error');
+                    return res.redirect('/login?message=Your account has been blocked.&alertType=error');
                 }
 
                 //update googleId if it dosent exist ans unset otp attempts

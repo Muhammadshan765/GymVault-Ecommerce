@@ -97,9 +97,3 @@ export default{
 
 
 
-
-// const getcustomers=(req,res)=>res.render("admin/customers")
-
-// export default{
-//   getcustomers
-// }

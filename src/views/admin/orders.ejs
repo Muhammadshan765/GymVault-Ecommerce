@@ -15,40 +15,40 @@
         <!-- </header> -->
         <div class="p-4 mt-7">
             <!-- Orders Table -->
-            <div class="bg-zinc-700 rounded-lg shadow-md overflow-hidden">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-600">
-                        <thead class="bg-zinc-800">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-200">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Order Details</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Customer Info</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Items</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Payment</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Actions</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Order Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Customer Info</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Items</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Payment</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-600">
+                        <tbody class="divide-y divide-gray-200">
                             <% orders.forEach(order => { %>
                                 <% 
                                 // Check if any item in the order has a non-pending status
                                 const hasNonPendingItems = order.items.some(item => item.order.status !== 'pending');
                                 if (hasNonPendingItems) { 
                                 %>
-                                    <tr class="hover:bg-zinc-600" data-order="<%= order._id %>">
+                                    <tr class="hover:bg-gray-50" data-order="<%= order._id %>">
                                         <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-200">#<%= order.orderCode %></div>
-                                            <div class="text-xs text-gray-400">
+                                            <div class="text-sm text-black">#<%= order.orderCode %></div>
+                                            <div class="text-xs text-gray-600">
                                                 <%= new Date(order.orderDate).toLocaleDateString() %>
                                             </div>
-                                            <div class="text-sm text-gray-200 mt-1">₹<%= order.totalAmount %></div>
+                                            <div class="text-sm text-black mt-1">₹<%= order.totalAmount %></div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-200">
+                                            <div class="text-sm text-black">
                                                 <%= order.userId.firstName %> <%= order.userId.lastName %>
                                             </div>
-                                            <div class="text-xs text-gray-400"><%= order.userId.email %></div>
+                                            <div class="text-xs text-gray-600"><%= order.userId.email %></div>
                                             <button onclick="showAddressDetails('<%= JSON.stringify(order.shippingAddress).replace(/'/g, '\\\'') %>')"
-                                                    class="text-xs text-blue-400 hover:text-blue-300 mt-1">
+                                                    class="text-xs text-blue-600 hover:text-blue-800 mt-1">
                                                 View Address
                                             </button>
                                         </td>
@@ -56,17 +56,17 @@
                                             <div class="space-y-2">
                                                 <% order.items.forEach(item => { %>
                                                     <% if (item.order.status !== 'pending') { %>
-                                                        <div class="flex items-center justify-between gap-2 p-2 bg-zinc-800 rounded" 
+                                                        <div class="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded" 
                                                              data-order="<%= order._id %>" 
                                                              data-product="<%= item.product._id %>">
                                                             <div class="flex-1">
                                                                 <button onclick="showProductDetails(
                                                                     '<%= JSON.stringify(item).replace(/'/g, '\\\'') %>', 
                                                                     '<%= JSON.stringify(order).replace(/'/g, '\\\'') %>'
-                                                                )" class="text-sm text-blue-400 hover:text-blue-300">
+                                                                )" class="text-sm text-blue-600 hover:text-blue-800">
                                                                     <%= item.product.productName %> (×<%= item.quantity %>)
                                                                 </button>
-                                                                <div class="text-xs text-gray-400">₹<%= item.subtotal %></div>
+                                                                <div class="text-xs text-gray-600">₹<%= item.subtotal %></div>
                                                             </div>
                                                             <!-- Status and Actions -->
                                                             <div class="flex flex-col items-end gap-2">
@@ -80,7 +80,7 @@
                                                                 
                                                                 <% if (!['delivered', 'cancelled', 'returned', 'refund processing'].includes(item.order.status)) { %>
                                                                     <select onchange="updateItemStatus(event, '<%= order._id %>', '<%= item.product._id %>')"
-                                                                            class="status-select text-xs rounded bg-zinc-600 text-white border-gray-500">
+                                                                            class="status-select text-xs rounded bg-gray-100 text-gray-800 border border-black-300">
                                                                             <option value="">Update Status</option>
                                                                             <option value="shipped">Ship</option>
                                                                             <option value="delivered">Deliver</option>
@@ -107,12 +107,12 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-200"><%= order.payment.method.toUpperCase() %></div>
-                                            <div class="text-xs text-gray-400"><%= order.payment.paymentStatus %></div>
+                                            <div class="text-sm text-black"><%= order.payment.method.toUpperCase() %></div>
+                                            <div class="text-xs text-gray-600"><%= order.payment.paymentStatus %></div>
                                         </td>
                                         <td class="px-6 py-4">
                                             <button onclick="showOrderHistory('<%= JSON.stringify(order.items).replace(/'/g, '\\\'') %>')"
-                                                    class="px-3 py-1 bg-zinc-600 text-white rounded hover:bg-zinc-500">
+                                                    class="px-3 py-1 bg-yellow-400 text-gray-800 rounded hover:bg-yellow-600">
                                                 View History
                                             </button>
                                         </td>
@@ -160,22 +160,22 @@
 
     <!-- Product Details Modal -->
     <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-zinc-800 p-6 rounded-lg shadow-xl max-w-2xl w-full mx-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-2xl w-full mx-4">
             <div class="flex justify-between items-start mb-4">
-                <h3 class="text-lg font-semibold text-white" id="productModalTitle">Product Details</h3>
-                <button onclick="closeProductModal()" class="text-gray-400 hover:text-white">
+                <h3 class="text-lg font-semibold text-gray-800" id="productModalTitle">Product Details</h3>
+                <button onclick="closeProductModal()" class="text-gray-600 hover:text-gray-800">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div id="productModalImage" class="aspect-square bg-zinc-700 rounded-lg overflow-hidden">
+                <div id="productModalImage" class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                     <!-- Product image will be inserted here -->
                 </div>
                 <div class="space-y-4">
-                    <div id="productModalDetails" class="text-gray-300 space-y-2">
+                    <div id="productModalDetails" class="text-gray-600 space-y-2">
                         <!-- Product details will be inserted here -->
                     </div>
-                    <div id="productModalStatus" class="border-t border-zinc-600 pt-4 mt-4">
+                    <div id="productModalStatus" class="border-t border-gray-200 pt-4 mt-4">
                         <!-- Order status history will be inserted here -->
                     </div>
                 </div>
@@ -185,14 +185,14 @@
 
     <!-- Address Modal -->
     <div id="addressModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-zinc-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div class="flex justify-between items-start mb-4">
-                <h3 class="text-lg font-semibold text-white">Shipping Address</h3>
-                <button onclick="closeAddressModal()" class="text-gray-400 hover:text-white">
+                <h3 class="text-lg font-semibold text-gray-800">Shipping Address</h3>
+                <button onclick="closeAddressModal()" class="text-gray-600 hover:text-gray-800">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="addressModalContent" class="text-gray-300">
+            <div id="addressModalContent" class="text-gray-600">
                 <!-- Address details will be inserted here -->
             </div>
         </div>
@@ -200,14 +200,14 @@
 
     <!-- Order History Modal -->
     <div id="historyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-zinc-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div class="flex justify-between items-start mb-4">
-                <h3 class="text-lg font-semibold text-white">Order History</h3>
-                <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-white">
+                <h3 class="text-lg font-semibold text-gray-800">Order History</h3>
+                <button onclick="closeHistoryModal()" class="text-gray-600 hover:text-gray-800">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="historyModalContent" class="text-gray-300">
+            <div id="historyModalContent" class="text-gray-600">
                 <!-- History details will be inserted here -->
             </div>
         </div>
@@ -216,23 +216,23 @@
     <!-- Return Request Modal -->
     <div id="returnModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-zinc-800 rounded-lg shadow-xl max-w-md w-full p-6">
-                <h3 id="returnModalTitle" class="text-xl font-semibold text-white mb-4"></h3>
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                <h3 id="returnModalTitle" class="text-xl font-semibold text-gray-800 mb-4"></h3>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm text-gray-400 mb-1">Admin Comment</label>
+                        <label class="block text-sm text-gray-600 mb-1">Admin Comment</label>
                         <textarea id="returnModalComment" 
-                                class="w-full bg-zinc-700 text-white rounded border border-zinc-600 p-2"
+                                class="w-full bg-gray-50 text-gray-800 rounded border border-gray-300 p-2"
                                 rows="3"
                                 placeholder="Enter comment for customer..."></textarea>
                     </div>
                     <div class="flex justify-end gap-3">
                         <button onclick="closeReturnModal()" 
-                                class="px-4 py-2 bg-zinc-600 text-white rounded hover:bg-zinc-500">
+                                class="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200">
                             Cancel
                         </button>
                         <button id="returnModalConfirm"
-                                class="px-4 py-2 rounded text-white">
+                                class="px-4 py-2 rounded text-white bg-blue-600 hover:bg-blue-700">
                             Confirm
                         </button>
                     </div>
@@ -560,38 +560,38 @@
 
             // Set product details
             modalDetails.innerHTML = `
-                <h4 class="text-xl font-semibold text-white">${item.product.productName}</h4>
-                <p class="text-gray-400">${item.product.description}</p>
+                <h4 class="text-xl font-semibold text-gray-800">${item.product.productName}</h4>
+                <p class="text-gray-600">${item.product.description}</p>
                 <div class="grid grid-cols-2 gap-4 mt-4">
                     <div>
-                        <p class="text-gray-400">Quantity</p>
-                        <p class="text-white">${item.quantity}</p>
+                        <p class="text-gray-600">Quantity</p>
+                        <p class="text-gray-800">${item.quantity}</p>
                     </div>
                     <div>
-                        <p class="text-gray-400">Price</p>
-                        <p class="text-white">₹${item.price}</p>
+                        <p class="text-gray-600">Price</p>
+                        <p class="text-gray-800">₹${item.price}</p>
                     </div>
                     <div>
-                        <p class="text-gray-400">Subtotal</p>
-                        <p class="text-white">₹${item.subtotal}</p>
+                        <p class="text-gray-600">Subtotal</p>
+                        <p class="text-gray-800">₹${item.subtotal}</p>
                     </div>
                     <div>
-                        <p class="text-gray-400">Status</p>
-                        <p class="text-white">${item.order.status}</p>
+                        <p class="text-gray-600">Status</p>
+                        <p class="text-gray-800">${item.order.status}</p>
                     </div>
                 </div>
             `;
 
             // Set status history
             modalStatus.innerHTML = `
-                <h5 class="text-white font-semibold mb-2">Status History</h5>
+                <h5 class="text-gray-800 font-semibold mb-2">Status History</h5>
                 <div class="space-y-2">
                     ${item.order.statusHistory.map(history => `
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-400">${new Date(history.date).toLocaleString()}</span>
-                            <span class="text-white">${history.status}</span>
+                            <span class="text-gray-600">${new Date(history.date).toLocaleString()}</span>
+                            <span class="text-gray-800">${history.status}</span>
                         </div>
-                        ${history.comment ? `<p class="text-xs text-gray-400">${history.comment}</p>` : ''}
+                        ${history.comment ? `<p class="text-xs text-gray-600">${history.comment}</p>` : ''}
                     `).join('')}
                 </div>
             `;
@@ -607,9 +607,9 @@
 
             content.innerHTML = `
                 <div class="space-y-2">
-                    <p><span class="text-gray-400">Name:</span> ${address.fullName}</p>
-                    <p><span class="text-gray-400">Mobile:</span> ${address.mobileNumber}</p>
-                    <p><span class="text-gray-400">Address:</span> ${address.addressLine1}</p>
+                    <p><span class="text-gray-600">Name:</span> ${address.fullName}</p>
+                    <p><span class="text-gray-600">Mobile:</span> ${address.mobileNumber}</p>
+                    <p><span class="text-gray-600">Address:</span> ${address.addressLine1}</p>
                     ${address.addressLine2 ? `<p>${address.addressLine2}</p>` : ''}
                     <p>${address.city}, ${address.state} - ${address.pincode}</p>
                 </div>
@@ -625,16 +625,16 @@
             const content = document.getElementById('historyModalContent');
 
             content.innerHTML = items.map(item => `
-                <div class="mb-4 pb-4 border-b border-zinc-700">
-                    <h6 class="font-semibold text-white mb-2">${item.product.productName}</h6>
+                <div class="mb-4 pb-4 border-b border-gray-700">
+                    <h6 class="font-semibold text-gray-800 mb-2">${item.product.productName}</h6>
                     <div class="space-y-2">
                         ${item.order.statusHistory.map(history => `
                             <div>
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-gray-400">${new Date(history.date).toLocaleString()}</span>
-                                    <span class="text-white">${history.status}</span>
+                                    <span class="text-gray-600">${new Date(history.date).toLocaleString()}</span>
+                                    <span class="text-gray-800">${history.status}</span>
                                 </div>
-                                ${history.comment ? `<p class="text-xs text-gray-400">${history.comment}</p>` : ''}
+                                ${history.comment ? `<p class="text-xs text-gray-600">${history.comment}</p>` : ''}
                             </div>
                         `).join('')}
                     </div>
