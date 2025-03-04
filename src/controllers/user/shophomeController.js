@@ -84,6 +84,12 @@ const getShop = async (req, res) => {
         // Build sort options
         let sortOptions = {};
         switch (sort) {
+            case 'nameAZ':
+                sortOptions.productName = 1;
+                break;
+            case 'nameZA':
+                sortOptions.productName = -1;
+                break;
             case 'priceLowToHigh':
                 sortOptions.price = 1;
                 break;
