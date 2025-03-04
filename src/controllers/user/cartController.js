@@ -1,6 +1,7 @@
 import cartSchema from '../../models/cartModel.js'
 import productSchema from '../../models/productModel.js'
 import Category from '../../models/categoryModel.js'
+import wishlistController from './wishlistController.js'
 
 const getCart  = async (req,res)=>{
     try{
@@ -185,8 +186,10 @@ const addToCart = async (req, res) => {
         }
 
         const savedCart = await cart.save();
+
+        // Remove from wishlist after successfully adding to cart
+        await wishlistController.removeFromWishlistAfterCart(userId, productId);
        
-        
         res.json({ success: true, message: 'Item added to cart' });
 
     } catch (error) {

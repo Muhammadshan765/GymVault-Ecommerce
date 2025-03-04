@@ -9,6 +9,9 @@ import addressController from "../controllers/user/addressController.js";
 import cartController from "../controllers/user/cartController.js";
 import checkoutController from "../controllers/user/checkoutController.js";
 import orderController from "../controllers/user/orderController.js";
+import wishlistController from "../controllers/user/wishlistController.js";
+
+
 
 // user signup & login
 router.get('/signup', userMiddleware.isLogin, userController.getSignUp)
@@ -68,6 +71,16 @@ router.post("/checkout/place-order", userMiddleware.checkSession, checkoutContro
 router.get("/orders", userMiddleware.checkSession, orderController.getOrders)
 router.patch("/orders/:orderId/items/:productId/cancel", userMiddleware.checkSession, orderController.cancelOrder)
 router.post("/orders/:orderId/items/:productId/return", userMiddleware.checkSession, orderController.requestReturnItem)
+
+//wishlist
+router.get("/wishlist", userMiddleware.checkSession,userMiddleware.errorHandler,wishlistController.getWishlist)
+router.post("/wishlist/add", userMiddleware.checkSession, userMiddleware.errorHandler,wishlistController.addToWishlist)
+router.delete("/wishlist/remove/:productId", userMiddleware.checkSession, userMiddleware.errorHandler,wishlistController.removeWishlist)
+
+
+
+
+
 
 export default router;
 

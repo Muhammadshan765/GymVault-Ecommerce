@@ -214,6 +214,11 @@
                                   </span>
                                 </div>
                               <% } %>
+                              <!-- Wishlist Button -->
+                              <button onclick="event.preventDefault(); toggleWishlist('<%= product._id %>')" 
+                                      class="absolute top-3 left-3 p-2 bg-white/80 hover:bg-white rounded-full shadow-sm transition-all duration-200">
+                                <i class="fas fa-heart text-lg <%= product.isInWishlist ? 'text-red-500' : 'text-gray-400' %>"></i>
+                              </button>
                             </div>
             
                             <!-- Product Info -->
@@ -296,6 +301,34 @@
                       // Store original products data
                       let products = <%- JSON.stringify(products) %>;
                       const originalProducts = [...products];
+
+                      // Function to toggle wishlist
+                      async function toggleWishlist(productId) {
+                          try {
+                              const response = await fetch(`/wishlist/toggle/${productId}`, {
+                                  method: 'POST',
+                                  headers: {
+                                      'Content-Type': 'application/json'
+                                  }
+                              });
+
+                              if (!response.ok) throw new Error('Failed to toggle wishlist');
+
+                              const data = await response.json();
+                              
+                              // Update UI based on response
+                              const wishlistBtn = document.querySelector(`[onclick*="${productId}"] i`);
+                              if (data.added) {
+                                  wishlistBtn.classList.remove('text-gray-400');
+                                  wishlistBtn.classList.add('text-red-500');
+                              } else {
+                                  wishlistBtn.classList.remove('text-red-500');
+                                  wishlistBtn.classList.add('text-gray-400');
+                              }
+                          } catch (error) {
+                              console.error('Error toggling wishlist:', error);
+                          }
+                      }
             
                       // Function to apply all filters
                       async function applyFilters() {
@@ -336,6 +369,10 @@
                                               </span>
                                           </div>
                                       ` : ''}
+                                      <button onclick="event.preventDefault(); toggleWishlist('${product._id}')" 
+                                              class="absolute top-2 left-2 p-2 bg-white/80 hover:bg-white rounded-full shadow-sm transition-all duration-200">
+                                          <i class="fas fa-heart text-lg ${product.isInWishlist ? 'text-red-500' : 'text-gray-400'}"></i>
+                                      </button>
                                   </div>
                                   <div class="p-2">
                                       <h2 class="text-gray-800 text-sm font-medium truncate">
