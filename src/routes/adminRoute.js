@@ -7,7 +7,7 @@ import customersController from "../controllers/admin/customersController.js";
 import categoryController from "../controllers/admin/categoryController.js";
 import adminMiddleware from "../middlewares/adminMiddleware.js";
 import orderController from "../controllers/admin/orderController.js";
-// import User from "../models/userModel.js";
+import couponController from "../controllers/admin/couponController.js";
 
 //Admin Routes
 router.get("/login", adminMiddleware.isLogin, adminController.loadLogin);
@@ -35,5 +35,10 @@ router.post("/products/toggle-status/:id", adminMiddleware.checkSession, adminMi
 router.get("/orders",adminMiddleware.checkSession,orderController.getOrders)
 router.patch("/orders/:orderId/items/:productId/status",adminMiddleware.checkSession,adminMiddleware.errorHandler,orderController.updateItemStatus)
 router.post("/orders/:orderId/items/:productId/return",adminMiddleware.checkSession,adminMiddleware.errorHandler,orderController.handleReturnRequest)
+
+//coupon routes
+router.get("/coupon",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.getCoupons)
+router.post("/coupons/add",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.addCoupons)
+router.delete("/coupons/delete/:id",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.deleteCoupon)
 
 export default router;

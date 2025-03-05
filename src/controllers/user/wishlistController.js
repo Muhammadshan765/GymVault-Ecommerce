@@ -86,7 +86,7 @@ const addToWishlist = async (req, res, next) => {
     }
 };
 
-// Helper function to remove item from wishlist
+//   remove item from wishlist
 const removeFromWishlist = async (userId, productId) => {
     try {
         const wish = await Wishlist.updateOne(
@@ -126,7 +126,8 @@ const removeWishlist = async (req, res, next) => {
 // Function to remove item from wishlist when added to cart
 const removeFromWishlistAfterCart = async (userId, productId) => {
     try {
-        const removed = await removeFromWishlist(userId, productId);
+        // const removed = 
+        await removeFromWishlist(userId, productId);
         // if (removed) {
         //     console.log(`Product ${productId} removed from wishlist after adding to cart`);
         // }
