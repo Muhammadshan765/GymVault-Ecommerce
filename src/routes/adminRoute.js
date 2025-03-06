@@ -8,6 +8,8 @@ import categoryController from "../controllers/admin/categoryController.js";
 import adminMiddleware from "../middlewares/adminMiddleware.js";
 import orderController from "../controllers/admin/orderController.js";
 import couponController from "../controllers/admin/couponController.js";
+import offerController from "../controllers/admin/offerController.js";
+
 
 //Admin Routes
 router.get("/login", adminMiddleware.isLogin, adminController.loadLogin);
@@ -40,5 +42,9 @@ router.post("/orders/:orderId/items/:productId/return",adminMiddleware.checkSess
 router.get("/coupon",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.getCoupons)
 router.post("/coupons/add",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.addCoupons)
 router.delete("/coupons/delete/:id",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.deleteCoupon)
+
+//offer routes
+router.get("/offers",adminMiddleware.checkSession,adminMiddleware.errorHandler,offerController.getOffers)
+router.post("/offers",adminMiddleware.checkSession,adminMiddleware.errorHandler,offerController.createOffer)
 
 export default router;
