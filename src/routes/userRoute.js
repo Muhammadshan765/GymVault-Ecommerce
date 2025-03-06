@@ -11,7 +11,7 @@ import checkoutController from "../controllers/user/checkoutController.js";
 import orderController from "../controllers/user/orderController.js";
 import wishlistController from "../controllers/user/wishlistController.js";
 import walletController from "../controllers/user/walletController.js";
-
+import couponController from "../controllers/user/couponController.js";
 
 // user signup & login
 router.get('/signup', userMiddleware.isLogin, userController.getSignUp)
@@ -82,6 +82,9 @@ router.get("/wallet",userMiddleware.checkSession,userMiddleware.errorHandler,wal
 
 
 
+
+//coupon 
+router.get("/coupons",userMiddleware.checkSession,userMiddleware.errorHandler,couponController.getCoupons)
 
 
 export default router;

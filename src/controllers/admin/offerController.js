@@ -36,7 +36,7 @@ const createOffer = async (req, res, next) => {
             endDate,
         } = req.body;
 
-        //validate required fields
+        // Validate required fields
         if (!name || !type || !itemIds || !discount || !startDate || !endDate) {
             return res.status(400).json({
                 success: false,
@@ -44,14 +44,10 @@ const createOffer = async (req, res, next) => {
             });
         }
 
-        //validate dates\
+        // Validate dates - remove the manual timezone adjustment
         const start = new Date(startDate);
         const end = new Date(endDate);
         const now = new Date();
-
-        start.setMinutes(start.getMinutes() - 330);
-        end.setMinutes(end.getMinutes() - 330);
-        now.setMinutes(now.getMinutes() - 330);
 
         if (start < now) {
             return res.status(400).json({
@@ -167,14 +163,10 @@ const updateOffer = async (req, res, next) => {
             endDate
         } = req.body;
 
-        //validate dates
+        // Validate dates - remove the manual timezone adjustment
         const start = new Date(startDate);
         const end = new Date(endDate);
         const now = new Date();
-
-        start.setMinutes(start.getMinutes() - 330);
-        end.setMinutes(end.getMinutes() - 330);
-        now.setMinutes(now.getMinutes() - 330);
 
         if (start < now) {
             return res.status(400).json({

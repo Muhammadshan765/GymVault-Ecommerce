@@ -527,24 +527,14 @@
                 const type = offer.categoryId ? 'category' : 'product';
                 document.getElementById('offerType').value = type;
                 
-                // Format dates with IST timezone
-                const startDate = new Date(offer.startDate);
-                const endDate = new Date(offer.endDate);
-
-                // Convert to IST and format for datetime-local input
-                const formatToIST = (date) => {
-                    const istDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-                    return istDate.toLocaleString('sv-SE', { 
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    }).replace(' ', 'T');
+                // Format dates properly for datetime-local input
+                const formatDateForInput = (dateString) => {
+                    const date = new Date(dateString);
+                    return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
                 };
 
-                document.getElementById('startDate').value = formatToIST(startDate);
-                document.getElementById('endDate').value = formatToIST(endDate);
+                document.getElementById('startDate').value = formatDateForInput(offer.startDate);
+                document.getElementById('endDate').value = formatDateForInput(offer.endDate);
                 
                 // Setup UI based on type
                 handleTypeChange();
