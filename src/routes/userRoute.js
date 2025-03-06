@@ -10,7 +10,7 @@ import cartController from "../controllers/user/cartController.js";
 import checkoutController from "../controllers/user/checkoutController.js";
 import orderController from "../controllers/user/orderController.js";
 import wishlistController from "../controllers/user/wishlistController.js";
-
+import walletController from "../controllers/user/walletController.js";
 
 
 // user signup & login
@@ -77,6 +77,8 @@ router.get("/wishlist", userMiddleware.checkSession,userMiddleware.errorHandler,
 router.post("/wishlist/add", userMiddleware.checkSession, userMiddleware.errorHandler,wishlistController.addToWishlist)
 router.delete("/wishlist/remove/:productId", userMiddleware.checkSession, userMiddleware.errorHandler,wishlistController.removeWishlist)
 
+//wallet 
+router.get("/wallet",userMiddleware.checkSession,userMiddleware.errorHandler,walletController.getWallet)
 
 
 
