@@ -2,29 +2,34 @@ import cartSchema from '../../models/cartModel.js'
 import productSchema from '../../models/productModel.js'
 import Category from '../../models/categoryModel.js'
 import wishlistController from './wishlistController.js'
+import Offer from '../../models/offerModel.js'
+import { calculateFinalPrice } from '../../utils/calculateOffer.js'
 
 const getCart  = async (req,res)=>{
     try{
         const userId = req.session.user;
         
-       
         // Add error handling for stock issues
         let errorMessage = null;
         if (req.query.error === 'stock') {
-           
-            
             if (req.session.stockError) {
                 errorMessage = req.session.stockError.map(error => 
                     `${error.productName} has only ${error.available} units available (you requested ${error.requested})`
                 ).join('\n');
-               
-                // Clear the error after displaying
                 delete req.session.stockError;
             }
         }
 
-        //Get active categoris
+        //Get active categories
         const activeCategories = await Category.find({isActive:true}).distinct('_id');
+
+        // Get active offers
+        const currentDate = new Date();
+        const activeOffers = await Offer.find({
+            status: 'active',
+            startDate: { $lte: currentDate },
+            endDate: { $gte: currentDate }
+        });
 
         const cart = await cartSchema.findOne({
             userId
@@ -39,7 +44,9 @@ const getCart  = async (req,res)=>{
         if(!cart){
             return res.render('user/cart',{
                 cartItems:[],
-                total:0
+                total:0,
+                originalTotal: 0,
+                totalDiscount: 0
             });
         }
 
@@ -57,60 +64,88 @@ const getCart  = async (req,res)=>{
             await cart.save();
         }
 
-        //process remaining items (removed offer processing)
-        const updatedItems = await Promise.all(validItems.map(async item=>{
+        // Process items with offers
+        const updatedItems = await Promise.all(validItems.map(async item => {
             const product = item.productId;
             const quantity = parseInt(item.quantity) || 1;
-            const currentPrice = product.price; // Use product price directly
-            const subtotal = currentPrice * quantity;
+            
+            // Find applicable offers for this product
+            const categoryOffer = activeOffers.find(offer => 
+                offer.categoryId && offer.categoryId.equals(product.categoriesId._id)
+            );
+            const productOffer = activeOffers.find(offer => 
+                offer.productIds && offer.productIds.some(id => id.equals(product._id))
+            );
+
+            // Calculate final price with offers
+            const { finalPrice, appliedDiscount, discountPercentage, appliedOffer } = 
+                calculateFinalPrice(product, categoryOffer, productOffer);
+
+            const originalSubtotal = product.price * quantity;
+            const finalSubtotal = finalPrice * quantity;
+            const itemDiscount = originalSubtotal - finalSubtotal;
 
             // Update item in cart
-            item.price = currentPrice;
-            item.subtotal = subtotal;
+            item.price = finalPrice;
+            item.subtotal = finalSubtotal;
+            item.originalPrice = product.price;
+            item.discount = itemDiscount;
+            item.discountPercentage = discountPercentage;
+            item.appliedOffer = appliedOffer;
 
             return {
-                product:{
-                    _id:product._id,
-                    productName:product.productName,
-                    imageUrl:product.imageUrl,
-                    stock:product.stock,
-                    size:product.size
+                product: {
+                    _id: product._id,
+                    productName: product.productName,
+                    imageUrl: product.imageUrl,
+                    stock: product.stock,
+                    size: product.size
                 },
-                quantity:quantity,
-                price:currentPrice,
-                subtotal:subtotal
+                quantity: quantity,
+                price: finalPrice,
+                originalPrice: product.price,
+                subtotal: finalSubtotal,
+                originalSubtotal: originalSubtotal,
+                discount: itemDiscount,
+                discountPercentage: discountPercentage,
+                appliedOffer: appliedOffer
             };
         }));
 
-        //calculate total
-        const total = updatedItems.reduce((sum,item)=>{
-            return sum+(parseFloat(item.subtotal)||0);
-        },0);
+        // Calculate totals
+        const total = updatedItems.reduce((sum, item) => sum + (parseFloat(item.subtotal) || 0), 0);
+        const originalTotal = updatedItems.reduce((sum, item) => sum + (parseFloat(item.originalSubtotal) || 0), 0);
+        const totalDiscount = originalTotal - total;
 
-        //updatr cart in database
-        cart.items = cart.items.map((item,index)=>({
+        // Update cart in database
+        cart.items = cart.items.map((item, index) => ({
             ...item,
-            price:updatedItems[index].price,
-            subtotal:updatedItems[index].subtotal
+            price: updatedItems[index].price,
+            subtotal: updatedItems[index].subtotal
         }));
 
-        cart.total =total;
+        cart.total = total;
         await cart.save();
 
-        res.render('user/cart',{
-            cartItems:updatedItems,total:total,errorMessage,user:req.session.user
-        });
-        
-
-    }catch(error){
-        console.error('Error fetching cart:',error);
-        res.status(500).render('user/cart',{
-            cartItems:[],
-            total:0,
-            error:'Failed to load cart',
+        res.render('user/cart', {
+            cartItems: updatedItems,
+            total: total,
+            originalTotal: originalTotal,
+            totalDiscount: totalDiscount,
+            errorMessage,
             user: req.session.user
         });
-        
+
+    } catch(error) {
+        console.error('Error fetching cart:', error);
+        res.status(500).render('user/cart', {
+            cartItems: [],
+            total: 0,
+            originalTotal: 0,
+            totalDiscount: 0,
+            error: 'Failed to load cart',
+            user: req.session.user
+        });
     }
 };
 
@@ -214,6 +249,14 @@ const updateQuantity = async (req,res)=>{
             });
         }
 
+        // Get active offers
+        const currentDate = new Date();
+        const activeOffers = await Offer.find({
+            status: 'active',
+            startDate: { $lte: currentDate },
+            endDate: { $gte: currentDate }
+        });
+
         //check product availability and stock
         const product = await productSchema.findById(productId).populate({
             path: 'categoriesId',
@@ -233,43 +276,76 @@ const updateQuantity = async (req,res)=>{
         }
 
         //find and update cart
-        const cart  =  await cartSchema.findOne({userId});
+        const cart = await cartSchema.findOne({userId}).populate({
+            path: 'items.productId',
+            populate: {
+                path: 'categoriesId',
+                match: { isActive: true }
+            }
+        });
+
         if(!cart){
             return res.status(404).json({
                 message:'Cart not found'
             });
         }
 
-        const cartItem = cart.items.find(item=>item.productId.toString()===productId);
+        const cartItem = cart.items.find(item=>item.productId._id.toString()===productId);
         if(!cartItem){
             return res.status(404).json({
                 message:'Product not found in cart'
             });
         }
 
+        // Calculate prices with offers
+        const categoryOffer = activeOffers.find(offer => 
+            offer.categoryId && offer.categoryId.equals(product.categoriesId._id)
+        );
+        const productOffer = activeOffers.find(offer => 
+            offer.productIds && offer.productIds.some(id => id.equals(product._id))
+        );
+
+        const { finalPrice, appliedDiscount, discountPercentage } = 
+            calculateFinalPrice(product, categoryOffer, productOffer);
+
+        // Update cart item
         cartItem.quantity = quantity;
+        cartItem.price = finalPrice;
+        cartItem.subtotal = finalPrice * quantity;
         await cart.save();
 
+        // Calculate totals for all items
+        let total = 0;
+        let originalTotal = 0;
 
-
-        //Calculat new total
-        const updatedCart = await cartSchema.findOne({userId}).populate('items.productId');
-        const cartItems = updatedCart.items.map(item=>({
-            product:item.productId,
-            quantity:item.quantity,
-            price:item.price,
-            subtotal:item.quantity*item.price
-        }));
-
-        const total = cartItems.reduce((sum,item)=>sum+item.subtotal,0);
+        cart.items.forEach(item => {
+            const itemProduct = item.productId;
+            const itemQuantity = item.quantity;
+            const { finalPrice } = calculateFinalPrice(
+                itemProduct, 
+                activeOffers.find(o => o.categoryId && o.categoryId.equals(itemProduct.categoriesId._id)),
+                activeOffers.find(o => o.productIds && o.productIds.some(id => id.equals(itemProduct._id)))
+            );
+            
+            total += finalPrice * itemQuantity;
+            originalTotal += itemProduct.price * itemQuantity;
+        });
 
         res.status(200).json({ 
             success: true,
             message: 'Quantity updated successfully',
             quantity: quantity,
-            subtotal: quantity * cartItem.price,
-            total: total
+            price: finalPrice,
+            originalPrice: product.price,
+            subtotal: finalPrice * quantity,
+            originalSubtotal: product.price * quantity,
+            discountPercentage: discountPercentage,
+            total: total,
+            originalTotal: originalTotal,
+            totalDiscount: originalTotal - total,
+            itemCount: cart.items.length
         });
+
     }catch(error){
         console.error('Error updating quantity:', error);
         res.status(500).json({ 

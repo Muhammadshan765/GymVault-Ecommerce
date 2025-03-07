@@ -58,6 +58,11 @@
                     </div>
                     <p class="text-sm text-gray-500">Size: <%= item.product.size %></p>
                     <p class="text-sm text-green-500"><%= item.product.stock > 0 ? 'In Stock' : '' %></p>
+                    <% if (item.discountPercentage > 0) { %>
+                      <p class="text-sm text-green-600">
+                        <i class="fas fa-tag"></i> <%= item.discountPercentage %>% OFF
+                      </p>
+                    <% } %>
                     <div class="mt-2 flex justify-between items-center">
                       <div class="flex items-center bg-gray-100 rounded-lg">
                         <button 
@@ -78,7 +83,12 @@
                       </div>
                       <div class="text-right">
                         <div class="font-semibold" id="subtotal-<%= item.product._id %>">₹<%= item.subtotal %></div>
-                        <div class="text-sm text-gray-500">₹<%= item.price %> each</div>
+                        <div class="text-sm text-gray-500">
+                          <% if (item.originalPrice !== item.price) { %>
+                            <span class="line-through">₹<%= item.originalPrice %></span>
+                          <% } %>
+                          ₹<%= item.price %> each
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -119,11 +129,16 @@
                             <%= item.product.productName %>
                           </h3>
                           <p class="text-gray-500 text-sm mt-1">
-                            <!-- Size: <%= item.product.size.size %> -->
+                            Size: <%= item.product.size %>
                           </p>
                           <p class="text-green-500 text-sm mt-1">
                             <%= item.product.stock > 0 ? 'In Stock' : '' %>
                           </p>
+                          <% if (item.discountPercentage > 0) { %>
+                            <p class="text-green-600 text-sm mt-1">
+                              <i class="fas fa-tag"></i> <%= item.discountPercentage %>% OFF
+                            </p>
+                          <% } %>
                         </div>
                         <button 
                             onclick="removeFromCart(this, '<%= item.product._id %>')" 
@@ -157,6 +172,9 @@
                             ₹<%= item.subtotal %>
                           </div>
                           <div class="text-sm text-gray-500">
+                            <% if (item.originalPrice !== item.price) { %>
+                              <span class="line-through">₹<%= item.originalPrice %></span>
+                            <% } %>
                             ₹<%= item.price %> each
                           </div>
                         </div>
@@ -191,8 +209,14 @@
             <div class="space-y-4 mb-6">
               <div class="flex justify-between text-gray-600">
                 <span id="items-count">Subtotal (<%= cartItems.length %> items)</span>
-                <span id="subtotal-amount">₹<%= total %></span>
+                <span id="subtotal-amount">₹<%= originalTotal %></span>
               </div>
+              <% if (totalDiscount > 0) { %>
+                <div class="flex justify-between text-green-600">
+                  <span>Discount</span>
+                  <span>-₹<%= totalDiscount %></span>
+                </div>
+              <% } %>
               <div class="flex justify-between text-gray-600">
                 <span>Shipping</span>
                 <span class="text-green-500">Free</span>
@@ -203,7 +227,12 @@
             <div class="border-t border-b py-4 mb-6">
               <div class="flex justify-between items-center">
                 <span class="text-base font-medium text-gray-800">Total Amount</span>
-                <span class="text-xl font-bold text-gray-800" id="total-amount">₹<%= total %></span>
+                <div class="text-right">
+                  <% if (totalDiscount > 0) { %>
+                    <div class="text-sm text-gray-500 line-through">₹<%= originalTotal %></div>
+                  <% } %>
+                  <span class="text-xl font-bold text-gray-800" id="total-amount">₹<%= total %></span>
+                </div>
               </div>
             </div>
 
@@ -333,33 +362,76 @@
                 // Update quantity display
                 quantityDisplay.textContent = newQuantity;
 
-                //   // Update subtotal
-                //   const subtotalElement = cartItem.querySelector(`#subtotal-${productId}`);
-                // if (subtotalElement) {
-                //     subtotalElement.textContent = `₹${data.subtotal}`;
-                // }
+                // Update price display with original price if there's a discount
+                const priceDisplay = cartItem.querySelector('.text-sm.text-gray-500');
+                if (priceDisplay) {
+                    priceDisplay.innerHTML = `
+                        ${data.originalPrice !== data.price ? 
+                            `<span class="line-through">₹${data.originalPrice}</span> ` : 
+                            ''}
+                        ₹${data.price} each
+                    `;
+                }
 
-
-                // Update subtotal 
+                // Update subtotal displays
                 const subtotalElements = document.querySelectorAll(`#subtotal-${productId}, #cart-item-${productId} #subtotal`);
                 subtotalElements.forEach(el => {
                     el.textContent = `₹${data.subtotal}`;
                 });
 
-                // Update all total elements
-                const totalElements = document.querySelectorAll('#total, #total-amount, #subtotal-amount');
-                totalElements.forEach(el => {
-                    if (el.id === 'total') {
-                        el.textContent = `Total: ₹${data.total}`;
+                // Update discount badge
+                const discountBadge = cartItem.querySelector('.text-green-600');
+                if (data.discountPercentage > 0) {
+                    if (discountBadge) {
+                        discountBadge.innerHTML = `<i class="fas fa-tag"></i> ${data.discountPercentage}% OFF`;
                     } else {
-                        el.textContent = `₹${data.total}`;
+                        const newBadge = document.createElement('p');
+                        newBadge.className = 'text-sm text-green-600';
+                        newBadge.innerHTML = `<i class="fas fa-tag"></i> ${data.discountPercentage}% OFF`;
+                        cartItem.querySelector('.text-green-500').after(newBadge);
                     }
-                });
+                } else if (discountBadge) {
+                    discountBadge.remove();
+                }
 
-                // Update items count
-                const itemsCount = document.getElementById('items-count');
-                if (itemsCount) {
-                    itemsCount.textContent = `Subtotal (${data.itemCount} items)`;
+                // Update order summary
+                const subtotalAmount = document.getElementById('subtotal-amount');
+                if (subtotalAmount) {
+                    subtotalAmount.textContent = `₹${data.originalTotal}`;
+                }
+
+                // Update discount in summary if exists
+                let discountElement = document.querySelector('.text-green-600.flex.justify-between');
+                if (data.totalDiscount > 0) {
+                    if (!discountElement) {
+                        const summaryContainer = document.querySelector('.space-y-4.mb-6');
+                        const discountHtml = `
+                            <div class="flex justify-between text-green-600">
+                                <span>Discount</span>
+                                <span>-₹${data.totalDiscount}</span>
+                            </div>
+                        `;
+                        summaryContainer.insertAdjacentHTML('beforeend', discountHtml);
+                    } else {
+                        discountElement.querySelector('span:last-child').textContent = `-₹${data.totalDiscount}`;
+                    }
+                } else if (discountElement) {
+                    discountElement.remove();
+                }
+
+                // Update final total with original price if discounted
+                const totalAmountContainer = document.getElementById('total-amount').parentElement;
+                totalAmountContainer.innerHTML = `
+                    ${data.totalDiscount > 0 ? 
+                        `<div class="text-sm text-gray-500 line-through">₹${data.originalTotal}</div>` : 
+                        ''}
+                    <span class="text-xl font-bold text-gray-800" id="total-amount">₹${data.total}</span>
+                `;
+
+                // Update total display
+                const totalDisplay = document.getElementById('total');
+                if (totalDisplay) {
+                    totalDisplay.textContent = `Total: ₹${data.total}`;
                 }
 
                 // Update button states
