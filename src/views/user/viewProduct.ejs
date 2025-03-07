@@ -121,17 +121,32 @@
                 <span class="text-gray-500">(<%= product.rating || 'No rating' %>)</span>
               </div>
 
-             <!-- Price -->
-             <div class="space-y-2">
-              <% if (product.price) { %>
-                <div class="flex items-baseline gap-3">
-                  <span class="text-4xl font-bold text-gray-900">₹<%= product.price %></span>
-                </div>
-              <% } else { %>
-                <span class="text-4xl font-bold text-gray-900">Price not available</span>
-              <% } %>
-            </div>
-
+              <!-- Price Section -->
+              <div class="space-y-2">
+                <% if (product.offerApplied) { %>
+                  <div class="flex items-center gap-3">
+                    <div>
+                      <div class="flex items-baseline gap-3">
+                        <span class="text-4xl font-bold text-gray-900">₹<%= product.discountPrice.toLocaleString() %></span>
+                        <span class="text-xl text-gray-500 line-through">₹<%= product.originalPrice.toLocaleString() %></span>
+                      </div>
+                      <% if (product.appliedOffer) { %>
+                        <div class="text-sm text-green-600 flex items-center gap-1 mt-1">
+                          <i class="fas fa-tag"></i>
+                          <span><%= product.appliedOffer.name %> (<%= product.offerPercentage %>% OFF)</span>
+                        </div>
+                      <% } %>
+                    </div>
+                    <div class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium self-start">
+                      Save ₹<%= (product.originalPrice - product.discountPrice).toLocaleString() %>
+                    </div>
+                  </div>
+                <% } else { %>
+                  <div class="flex items-baseline gap-3">
+                    <span class="text-4xl font-bold text-gray-900">₹<%= product.originalPrice.toLocaleString() %></span>
+                  </div>
+                <% } %>
+              </div>
 
               <!-- Stock Status -->
               <div>
@@ -226,44 +241,45 @@
             </div>
           </div>
 
-          <div class="flex overflow-x-auto gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-6 pb-4 sm:pb-0 ">
-            <% relatedProducts.forEach(product => { %>
-              <a href="/product/<%= product._id %>" class="group min-w-[240px] sm:min-w-0">
+          <div class="flex overflow-x-auto gap-4 sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-6 pb-4 sm:pb-0">
+            <% relatedProducts.forEach(relProduct => { %>
+              <a href="/product/<%= relProduct._id %>" class="group min-w-[240px] sm:min-w-0">
                 <div class="bg-white rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 border border-gray-200">
                   <!-- Product Image -->
                   <div class="relative aspect-square overflow-hidden bg-gray-100">
                     <img
-                      src="<%= product.imageUrl[0] %>"
-                      alt="<%= product.productName %>"
+                      src="<%= relProduct.imageUrl[0] %>"
+                      alt="<%= relProduct.productName %>"
                       class="w-full h-full object-cover transform transition-all duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
-                    <% if (product.discountPrice < product.originalPrice) { %>
-                      <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-900 px-3 py-1 rounded-full text-xs font-medium">
-                        -<%= Math.round((product.originalPrice - product.discountPrice) / product.originalPrice * 100) %>%
+                    <% if (relProduct.offerApplied) { %>
+                      <div class="absolute top-3 right-3 bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
+                        <%= relProduct.offerPercentage %>% OFF
                       </div>
                     <% } %>
                   </div>
 
                   <!-- Product Info -->
                   <div class="p-5">
-                    <!-- Brand & Rating -->
                     <div class="flex justify-between items-center mb-2">
-                      <div class="text-sm text-gray-500 font-medium"><%= product.brand ? product.brand.toUpperCase() : '' %></div>
-                      <div class="flex items-center gap-1">
-                        <i class="fas fa-star text-yellow-400 text-xs"></i>
-                        <span class="text-sm text-gray-500"><%= product.rating %></span>
+                      <div class="text-sm text-gray-500 font-medium">
+                        <%= relProduct.brand ? relProduct.brand.toUpperCase() : '' %>
                       </div>
                     </div>
                     
-                    <!-- Product Name -->
                     <h3 class="text-gray-900 font-medium mb-2 truncate group-hover:text-gray-700 transition-colors">
-                      <%= product.productName %>
+                      <%= relProduct.productName %>
                     </h3>
                     
                     <!-- Price -->
                     <div class="flex items-baseline gap-2">
-                      <span class="text-lg font-bold text-gray-900">₹<%= product.price.toLocaleString() %></span>
+                      <% if (relProduct.offerApplied) { %>
+                        <span class="text-lg font-bold text-gray-900">₹<%= relProduct.discountPrice.toLocaleString() %></span>
+                        <span class="text-sm text-gray-500 line-through">₹<%= relProduct.originalPrice.toLocaleString() %></span>
+                      <% } else { %>
+                        <span class="text-lg font-bold text-gray-900">₹<%= relProduct.originalPrice.toLocaleString() %></span>
+                      <% } %>
                     </div>
                   </div>
                 </div>
