@@ -127,8 +127,11 @@
                   <div class="flex items-center gap-3">
                     <div>
                       <div class="flex items-baseline gap-3">
-                        <span class="text-4xl font-bold text-gray-900">₹<%= product.discountPrice.toLocaleString() %></span>
-                        <span class="text-xl text-gray-500 line-through">₹<%= product.originalPrice.toLocaleString() %></span>
+                        <% const selectedSizeData = selectedSize ? product.size.find(size => size.size === selectedSize) : null; %>
+                        <% const selectedSizePrice = selectedSizeData ? selectedSizeData.price : product.originalPrice; %>
+                        <% const selectedSizeOfferPrice = selectedSizeData ? selectedSizeData.offerPrice : product.discountPrice; %>
+                        <span class="text-4xl font-bold text-gray-900">₹<%= selectedSizeOfferPrice.toLocaleString() %></span>
+                        <span class="text-xl text-gray-500 line-through">₹<%= selectedSizePrice.toLocaleString() %></span>
                       </div>
                       <% if (product.appliedOffer) { %>
                         <div class="text-sm text-green-600 flex items-center gap-1 mt-1">
@@ -138,12 +141,15 @@
                       <% } %>
                     </div>
                     <div class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium self-start">
-                      Save ₹<%= (product.originalPrice - product.discountPrice).toLocaleString() %>
+                      <% const savings = selectedSizePrice - selectedSizeOfferPrice; %>
+                      Save ₹<%= savings.toLocaleString() %>
                     </div>
                   </div>
                 <% } else { %>
                   <div class="flex items-baseline gap-3">
-                    <span class="text-4xl font-bold text-gray-900">₹<%= product.originalPrice.toLocaleString() %></span>
+                    <% const selectedSizeData = selectedSize ? product.size.find(size => size.size === selectedSize) : null; %>
+                    <% const selectedSizePrice = selectedSizeData ? selectedSizeData.price : product.originalPrice; %>
+                    <span class="text-4xl font-bold text-gray-900">₹<%= selectedSizePrice.toLocaleString() %></span>
                   </div>
                 <% } %>
               </div>
@@ -191,6 +197,8 @@
                             onclick="selectSize('<%= sizeObj.size %>', <%= sizeObj.stock %>)"
                             class="size-button px-4 py-2 border-2 border-gray-200 rounded-lg text-gray-800 hover:border-gray-900 transition-colors relative <%= sizeObj.stock === 0 ? 'opacity-50 cursor-not-allowed' : '' %>"
                             data-size="<%= sizeObj.size %>"
+                            data-price="<%= sizeObj.price %>"
+                            data-offer-price="<%= sizeObj.offerPrice %>"
                             <%= sizeObj.stock === 0 ? 'disabled' : '' %>
                         >
                             <%= sizeObj.size %>
@@ -281,6 +289,20 @@
                         <span class="text-lg font-bold text-gray-900">₹<%= relProduct.originalPrice.toLocaleString() %></span>
                       <% } %>
                     </div>
+                    <!-- Size Selection -->
+                    <div class="mt-2 flex gap-1 overflow-x-auto pb-1">
+                      <% relProduct.size.forEach(sizeObj => { %>
+                        <button 
+                          class="size-button px-2 py-1 text-xs border border-gray-200 rounded-md hover:border-gray-900 transition-colors <%= sizeObj.stock === 0 ? 'opacity-50 cursor-not-allowed' : '' %>"
+                          data-size="<%= sizeObj.size %>"
+                          data-price="<%= sizeObj.price %>"
+                          data-stock="<%= sizeObj.stock %>"
+                          <%= sizeObj.stock === 0 ? 'disabled' : '' %>
+                        >
+                          <%= sizeObj.size %>
+                        </button>
+                      <% }) %>
+                    </div>
                   </div>
                 </div>
               </a>
@@ -341,6 +363,9 @@
     <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2"></div>
 
     <script>
+      // Make product data available to JavaScript
+      const product = <%- JSON.stringify(product) %>;
+      
       // Image zoom functionality
       const imageZoom = document.getElementById('imageZoom');
 
@@ -476,6 +501,34 @@
         selectedSizeStock = stock;
         document.getElementById('sizeError').classList.add('hidden');
         document.getElementById('stockError').classList.add('hidden');
+
+        // Get the selected size data from the product data
+        const selectedSizeData = product.size.find(s => s.size === size);
+        if (selectedSizeData) {
+          const selectedSizePrice = selectedSizeData.price;
+          const selectedSizeOfferPrice = selectedSizeData.offerPrice;
+
+          // Update price elements
+          const priceElements = document.querySelectorAll('.text-4xl.font-bold');
+          priceElements.forEach(element => {
+            element.textContent = `₹${selectedSizeOfferPrice.toLocaleString()}`;
+          });
+
+          // Update original price if offer is applied
+          if (product.offerApplied) {
+            const originalPriceElements = document.querySelectorAll('.line-through');
+            originalPriceElements.forEach(element => {
+              element.textContent = `₹${selectedSizePrice.toLocaleString()}`;
+            });
+
+            // Update savings
+            const savings = selectedSizePrice - selectedSizeOfferPrice;
+            const savingsElement = document.querySelector('.bg-red-100');
+            if (savingsElement) {
+              savingsElement.textContent = `Save ₹${savings.toLocaleString()}`;
+            }
+          }
+        }
       }
 
       function showToast(type, message) {
@@ -599,5 +652,42 @@
             showToast('error', error.message || 'Failed to add item to cart');
         }
       }
+
+      // Handle related product size selection
+      document.addEventListener('DOMContentLoaded', () => {
+        // Add click handlers to all related product size buttons
+        document.querySelectorAll('.size-button').forEach(button => {
+          button.addEventListener('click', (e) => {
+            if (button.disabled) return;
+            
+            // Remove active class from all buttons in the same product card
+            const productCard = button.closest('.p-5');
+            productCard.querySelectorAll('.size-button').forEach(btn => {
+              btn.classList.remove('border-gray-900', 'bg-gray-900', 'text-white');
+              btn.classList.add('border-gray-200', 'text-gray-800');
+            });
+            
+            // Add active class to selected button
+            button.classList.remove('border-gray-200', 'text-gray-800');
+            button.classList.add('border-gray-900', 'bg-gray-900', 'text-white');
+            
+            // Update price display
+            const price = button.dataset.price;
+            const priceElements = productCard.querySelectorAll('.text-lg.font-bold, .text-sm.text-gray-500');
+            
+            if (priceElements.length > 0) {
+              // If there's an offer applied
+              if (priceElements.length === 2) {
+                const discountPrice = price * (1 - (relProduct.offerPercentage / 100));
+                priceElements[0].textContent = `₹${Math.round(discountPrice).toLocaleString()}`;
+                priceElements[1].textContent = `₹${Number(price).toLocaleString()}`;
+              } else {
+                // If no offer is applied
+                priceElements[0].textContent = `₹${Number(price).toLocaleString()}`;
+              }
+            }
+          });
+        });
+      });
     </script>
   </div>

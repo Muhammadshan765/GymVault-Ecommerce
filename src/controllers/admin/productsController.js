@@ -86,7 +86,7 @@ const getproducts = async (req, res,next) => {
 };
 
 // Add New Product
-const addProduct = async (req, res,next) => {
+const addProduct = async (req, res, next) => {
     const uploadMultiple = upload.array('images', 3);
 
     uploadMultiple(req, res, async (err) => {
@@ -117,12 +117,11 @@ const addProduct = async (req, res,next) => {
                 brand,
                 categoriesId,
                 description,
-                price,
                 sizeStock // This will be a JSON string from the form
             } = req.body;
 
             // Validate required fields
-            if (!productName || !brand || !categoriesId || !price || !sizeStock) {
+            if (!productName || !brand || !categoriesId || !description || !sizeStock) {
                 return res.status(400).json({ message: 'All fields are required' });
             }
 
@@ -134,14 +133,17 @@ const addProduct = async (req, res,next) => {
                     throw new Error('Invalid size and stock data');
                 }
 
-                // Validate each size-stock pair
-                sizeStockArray.forEach(({ size, stock }) => {
+                // Validate each size-stock-price pair
+                sizeStockArray.forEach(({ size, stock, price }) => {
                     if (!size || typeof stock !== 'number' || stock < 0 || stock > 1000) {
                         throw new Error('Invalid stock value for size ' + size);
                     }
+                    if (typeof price !== 'number' || price < 0 || price > 100000) {
+                        throw new Error('Invalid price value for size ' + size);
+                    }
                 });
             } catch (error) {
-                next(error)
+                return res.status(400).json({ message: error.message });
             }
 
             // Validate product name and brand
@@ -155,8 +157,7 @@ const addProduct = async (req, res,next) => {
 
             // Check for duplicate product name
             const existingProduct = await Product.findOne({
-                productName: validatedName,
-                _id: { $ne: req.params.id } // Exclude current product when updating
+                productName: validatedName
             });
             
             if (existingProduct) {
@@ -166,14 +167,17 @@ const addProduct = async (req, res,next) => {
             // Process and save the images
             const imageUrls = req.files.map(file => `/static/uploads/products/${file.filename}`);
 
+            // Calculate total stock
+            const totalStock = sizeStockArray.reduce((sum, item) => sum + item.stock, 0);
+
             const newProduct = new Product({
                 productName: validatedName,
                 brand: validatedBrand,
                 categoriesId,
                 description: description.trim(),
-                price: parseFloat(price),
-                size: sizeStockArray, // Use the parsed and validated size-stock array
+                size: sizeStockArray,
                 imageUrl: imageUrls,
+                stock: totalStock,
                 isActive: true
             });
 
@@ -198,7 +202,7 @@ const addProduct = async (req, res,next) => {
 };
 
 // Get Product Details for Editing
-const getProductDetails = async (req, res,next) => {
+const getProductDetails = async (req, res, next) => {
     try {
         const product = await Product.findById(req.params.id)
             .populate('categoriesId');
@@ -215,21 +219,22 @@ const getProductDetails = async (req, res,next) => {
                 _id: product.categoriesId._id.toString(),
                 name: product.categoriesId.name
             },
-            // Ensure size array is properly formatted
+            // Ensure size array is properly formatted with all required fields
             size: product.size.map(sizeItem => ({
                 size: sizeItem.size,
-                stock: sizeItem.stock
+                stock: sizeItem.stock,
+                price: sizeItem.price
             })),
             imageUrl: product.imageUrl || [],
-            isActive: product.isActive
+            isActive: product.isActive,
+            productName: product.productName,
+            brand: product.brand,
+            description: product.description
         };
-
-        // Log the response for debugging
-       
 
         res.json(sanitizedProduct);
     } catch (error) {
-        next(error)
+        next(error);
     }
 };
 
@@ -267,10 +272,13 @@ const updateProduct = async (req, res,next) => {
                     throw new Error('Invalid size and stock data');
                 }
 
-                // Validate each size-stock pair
-                sizeStockArray.forEach(({ size, stock }) => {
+                // Validate each size-stock-price pair
+                sizeStockArray.forEach(({ size, stock, price }) => {
                     if (!size || typeof stock !== 'number' || stock < 0 || stock > 1000) {
                         throw new Error('Invalid stock value for size ' + size);
+                    }
+                    if (typeof price !== 'number' || price < 0 || price > 100000) {
+                        throw new Error('Invalid price value for size ' + size);
                     }
                 });
             } catch (error) {

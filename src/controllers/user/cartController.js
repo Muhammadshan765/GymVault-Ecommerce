@@ -78,17 +78,17 @@ const getCart  = async (req,res)=>{
             );
 
             // Calculate final price with offers
-            const { finalPrice, appliedDiscount, discountPercentage, appliedOffer } = 
-                calculateFinalPrice(product, categoryOffer, productOffer);
+            const { finalPrice, appliedDiscount, discountPercentage, appliedOffer, originalPrice } = 
+                calculateFinalPrice(product, categoryOffer, productOffer, item.size);
 
-            const originalSubtotal = product.price * quantity;
+            const originalSubtotal = originalPrice * quantity;
             const finalSubtotal = finalPrice * quantity;
             const itemDiscount = originalSubtotal - finalSubtotal;
 
             // Update item in cart
             item.price = finalPrice;
             item.subtotal = finalSubtotal;
-            item.originalPrice = product.price;
+            item.originalPrice = originalPrice;
             item.discount = itemDiscount;
             item.discountPercentage = discountPercentage;
             item.appliedOffer = appliedOffer;
@@ -99,11 +99,11 @@ const getCart  = async (req,res)=>{
                     productName: product.productName,
                     imageUrl: product.imageUrl,
                     stock: product.stock,
-                    size: product.size
+                    size: item.size
                 },
                 quantity: quantity,
                 price: finalPrice,
-                originalPrice: product.price,
+                originalPrice: originalPrice,
                 subtotal: finalSubtotal,
                 originalSubtotal: originalSubtotal,
                 discount: itemDiscount,
@@ -154,7 +154,6 @@ const addToCart = async (req, res) => {
     try {
         const userId = req.session.user;
        
-        
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -164,7 +163,6 @@ const addToCart = async (req, res) => {
 
         const { productId, quantity, size } = req.body;
        
-        
         // Validate size is provided
         if (!size) {
             return res.status(400).json({
@@ -173,59 +171,128 @@ const addToCart = async (req, res) => {
             });
         }
 
-        let cart = await cartSchema.findOne({ userId });
-        const product = await productSchema.findById(productId);
+        // Get product with populated category
+        const product = await productSchema.findById(productId).populate('categoriesId');
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
 
+        // Check if product is active and category is active
+        if (!product.isActive || !product.categoriesId || !product.categoriesId.isActive) {
+            return res.status(400).json({
+                success: false,
+                message: 'Product is not available'
+            });
+        }
+
+        // Validate size exists and has stock
+        const sizeObj = product.size.find(s => s.size === size);
+        if (!sizeObj) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid size selected'
+            });
+        }
+
+        if (sizeObj.stock < quantity) {
+            return res.status(400).json({
+                success: false,
+                message: 'Not enough stock available'
+            });
+        }
+
+        // Get active offers
+        const currentDate = new Date();
+        const activeOffers = await Offer.find({
+            status: 'active',
+            startDate: { $lte: currentDate },
+            endDate: { $gte: currentDate }
+        });
+
+        // Find applicable offers
+        const categoryOffer = activeOffers.find(offer => 
+            offer.categoryId && offer.categoryId.equals(product.categoriesId._id)
+        );
+        const productOffer = activeOffers.find(offer => 
+            offer.productIds && offer.productIds.some(id => id.equals(product._id))
+        );
+
+        // Calculate final price with offers
+        const { finalPrice, appliedDiscount, discountPercentage, appliedOffer } = 
+            calculateFinalPrice(product, categoryOffer, productOffer);
+
+        let cart = await cartSchema.findOne({ userId });
         if (!cart) {
             cart = new cartSchema({
                 userId,
                 items: [{
                     productId,
                     quantity: parseInt(quantity),
-                    price: product.price,
-                    size: size  // Make sure size is included
+                    price: finalPrice,
+                    size: size,
+                    subtotal: finalPrice * parseInt(quantity),
+                    originalPrice: sizeObj.price,
+                    discountPercentage: discountPercentage,
+                    appliedOffer: appliedOffer
                 }]
             });
         } else {
-            //check if the product already exists in the cart with same size
-            const existingItem = cart.items.find(item=>
+            // Check if product with same size exists in cart
+            const existingItem = cart.items.find(item =>
                 item.productId.toString() === productId &&
                 item.size === size
             );
 
-            if(existingItem){
-                //calculate new quantity
+            if (existingItem) {
+                // Calculate new quantity
                 const newQuantity = existingItem.quantity + parseInt(quantity);
 
-                //check if new quantity exceeds limit
-                if(newQuantity > 3){
+                // Check if new quantity exceeds limit
+                if (newQuantity > 3) {
                     return res.status(400).json({
+                        success: false,
                         message: `Cannot add more items. Maximum limit is 3 (Current quantity: ${existingItem.quantity})`
                     });
                 }
 
-                //update quantity and price
+                // Update quantity and price
                 existingItem.quantity = newQuantity;
-                existingItem.price = product.price;
-                existingItem.subtotal = newQuantity * product.price;
+                existingItem.price = finalPrice;
+                existingItem.subtotal = finalPrice * newQuantity;
+                existingItem.originalPrice = sizeObj.price;
+                existingItem.discountPercentage = discountPercentage;
+                existingItem.appliedOffer = appliedOffer;
             } else {
-                //add new item if product doesn't exist in the cart
+                // Add new item
                 cart.items.push({
                     productId,
                     quantity: parseInt(quantity),
-                    price: product.price,
-                    size: size,  // Make sure size is included
-                    subtotal: parseInt(quantity) * product.price
+                    price: finalPrice,
+                    size: size,
+                    subtotal: finalPrice * parseInt(quantity),
+                    originalPrice: sizeObj.price,
+                    discountPercentage: discountPercentage,
+                    appliedOffer: appliedOffer
                 });
             }
         }
 
-        const savedCart = await cart.save();
+        // Calculate cart totals
+        const total = cart.items.reduce((sum, item) => sum + item.subtotal, 0);
+        cart.total = total;
+        await cart.save();
 
         // Remove from wishlist after successfully adding to cart
         await wishlistController.removeFromWishlistAfterCart(userId, productId);
        
-        res.json({ success: true, message: 'Item added to cart' });
+        res.json({ 
+            success: true, 
+            message: 'Item added to cart',
+            cartCount: cart.items.length
+        });
 
     } catch (error) {
         console.error('Error adding to cart:', error);
@@ -269,12 +336,6 @@ const updateQuantity = async (req,res)=>{
             });
         }
 
-        if(product.stock<quantity){
-            return res.status(400).json({
-                message:'Not enough stock available'
-            });
-        }
-
         //find and update cart
         const cart = await cartSchema.findOne({userId}).populate({
             path: 'items.productId',
@@ -297,6 +358,14 @@ const updateQuantity = async (req,res)=>{
             });
         }
 
+        // Check stock for the specific size
+        const sizeObj = product.size.find(s => s.size === cartItem.size);
+        if (!sizeObj || sizeObj.stock < quantity) {
+            return res.status(400).json({
+                message: 'Not enough stock available for this size'
+            });
+        }
+
         // Calculate prices with offers
         const categoryOffer = activeOffers.find(offer => 
             offer.categoryId && offer.categoryId.equals(product.categoriesId._id)
@@ -305,13 +374,14 @@ const updateQuantity = async (req,res)=>{
             offer.productIds && offer.productIds.some(id => id.equals(product._id))
         );
 
-        const { finalPrice, appliedDiscount, discountPercentage } = 
-            calculateFinalPrice(product, categoryOffer, productOffer);
+        const { finalPrice, appliedDiscount, discountPercentage, originalPrice } = 
+            calculateFinalPrice(product, categoryOffer, productOffer, cartItem.size);
 
         // Update cart item
         cartItem.quantity = quantity;
         cartItem.price = finalPrice;
         cartItem.subtotal = finalPrice * quantity;
+        cartItem.originalPrice = originalPrice;
         await cart.save();
 
         // Calculate totals for all items
@@ -321,14 +391,15 @@ const updateQuantity = async (req,res)=>{
         cart.items.forEach(item => {
             const itemProduct = item.productId;
             const itemQuantity = item.quantity;
-            const { finalPrice } = calculateFinalPrice(
+            const { finalPrice, originalPrice } = calculateFinalPrice(
                 itemProduct, 
                 activeOffers.find(o => o.categoryId && o.categoryId.equals(itemProduct.categoriesId._id)),
-                activeOffers.find(o => o.productIds && o.productIds.some(id => id.equals(itemProduct._id)))
+                activeOffers.find(o => o.productIds && o.productIds.some(id => id.equals(itemProduct._id))),
+                item.size
             );
             
             total += finalPrice * itemQuantity;
-            originalTotal += itemProduct.price * itemQuantity;
+            originalTotal += originalPrice * itemQuantity;
         });
 
         res.status(200).json({ 
@@ -336,9 +407,9 @@ const updateQuantity = async (req,res)=>{
             message: 'Quantity updated successfully',
             quantity: quantity,
             price: finalPrice,
-            originalPrice: product.price,
+            originalPrice: originalPrice,
             subtotal: finalPrice * quantity,
-            originalSubtotal: product.price * quantity,
+            originalSubtotal: originalPrice * quantity,
             discountPercentage: discountPercentage,
             total: total,
             originalTotal: originalTotal,

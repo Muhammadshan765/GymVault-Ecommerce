@@ -73,7 +73,9 @@
                                                 <td class="px-4 py-3 text-sm md:text-base text-gray-600 hidden lg:table-cell">
                                                     <%= product.categoriesId.name %>
                                                 </td>
-                                                <td class="px-4 py-3 text-sm md:text-base text-gray-800">₹<%= product.price.toLocaleString() %></td>
+                                                <td class="px-4 py-3 text-sm md:text-base text-gray-800">
+                                                    ₹<%= Math.min(...product.size.map(size => size.price)).toLocaleString() %>
+                                                </td>
                                                 <td class="px-4 py-3 text-sm md:text-base text-gray-600 hidden sm:table-cell">
                                                     <%= product.size.reduce((total, sizeObj) => total + sizeObj.stock, 0) %>
                                                 </td>
@@ -150,7 +152,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-gray-400 mb-1">Sizes and Stock</label>
+                                <label class="block text-gray-400 mb-1">Sizes, Stock and Prices</label>
                                 <div class="grid grid-cols-3 gap-4">
                                     <% const availableSizes=['250gm', '500gm' , '1Kg' , '2Kg' , '3kg' ]; %>
                                         <% availableSizes.forEach(size=> { %>
@@ -160,20 +162,18 @@
                                                         class="size-checkbox form-checkbox text-green-500">
                                                     <span class="text-gray-200">Size <%= size %></span>
                                                 </label>
-                                                <input type="number" name="size-stock-<%= size %>"
-                                                    class="size-stock w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200"
-                                                    min="0" max="1000" disabled placeholder="Stock">
+                                                <div class="space-y-2">
+                                                    <input type="number" name="size-stock-<%= size %>"
+                                                        class="size-stock w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200"
+                                                        min="0" max="1000" disabled placeholder="Stock">
+                                                    <input type="number" name="size-price-<%= size %>"
+                                                        class="size-price w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200"
+                                                        min="0" max="100000" disabled placeholder="Price (₹)">
+                                                </div>
                                             </div>
                                             <% }); %>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1">Select sizes and enter stock for each</p>
-                            </div>
-
-                            <div>
-                                <label class="block text-gray-400 mb-1">Price (₹)</label>
-                                <input type="number" name="price" id="price" min="0" max="100000"
-                                    class="w-full bg-zinc-800 border border-gray-700 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none text-gray-200">
-                                <p class="text-xs text-gray-500 mt-1">Enter price between ₹0 and ₹100,000</p>
+                                <p class="text-xs text-gray-500 mt-1">Select sizes and enter stock and price for each</p>
                             </div>
 
                             <div>
@@ -565,18 +565,13 @@
                         button.addEventListener('click', async function () {
                             try {
                                 const productId = this.getAttribute('data-id');
-
-
                                 const response = await fetch(`/admin/products/${productId}`);
 
-
                                 if (!response.ok) {
-                                    const errorData = await response.json();
-                                    throw new Error(errorData.message || 'Failed to fetch product details');
+                                    throw new Error('Failed to fetch product details');
                                 }
 
                                 const product = await response.json();
-
 
                                 // Reset form and populate data
                                 document.getElementById('productId').value = product._id;
@@ -584,7 +579,41 @@
                                 document.getElementById('brand').value = product.brand;
                                 document.getElementById('categoriesId').value = product.categoriesId._id;
                                 document.getElementById('variantDescription').value = product.description;
-                                document.getElementById('price').value = product.price;
+
+                                // Reset all size-stock-price inputs
+                                document.querySelectorAll('.size-checkbox').forEach(checkbox => {
+                                    checkbox.checked = false;
+                                    const stockInput = document.querySelector(`[name="size-stock-${checkbox.value}"]`);
+                                    const priceInput = document.querySelector(`[name="size-price-${checkbox.value}"]`);
+                                    if (stockInput) {
+                                        stockInput.disabled = true;
+                                        stockInput.value = '';
+                                    }
+                                    if (priceInput) {
+                                        priceInput.disabled = true;
+                                        priceInput.value = '';
+                                    }
+                                });
+
+                                // Populate the size-stock-price data
+                                if (product.size && Array.isArray(product.size)) {
+                                    product.size.forEach(({ size, stock, price }) => {
+                                        const checkbox = document.querySelector(`.size-checkbox[value="${size}"]`);
+                                        if (checkbox) {
+                                            checkbox.checked = true;
+                                            const stockInput = document.querySelector(`[name="size-stock-${size}"]`);
+                                            const priceInput = document.querySelector(`[name="size-price-${size}"]`);
+                                            if (stockInput) {
+                                                stockInput.disabled = false;
+                                                stockInput.value = stock;
+                                            }
+                                            if (priceInput) {
+                                                priceInput.disabled = false;
+                                                priceInput.value = price;
+                                            }
+                                        }
+                                    });
+                                }
 
                                 // Reset and populate image previews
                                 const imageContainers = document.querySelectorAll('.image-upload-container');
@@ -592,35 +621,10 @@
                                     if (index < imageContainers.length) {
                                         const preview = imageContainers[index].querySelector('.image-preview');
                                         preview.innerHTML = `
-                                          <img src="${url}" class="w-full h-full object-cover rounded">
-                                      `;
+                                            <img src="${url}" class="w-full h-full object-cover rounded">
+                                        `;
                                     }
                                 });
-
-                                // Reset all size-stock inputs
-                                document.querySelectorAll('.size-checkbox').forEach(checkbox => {
-                                    checkbox.checked = false;
-                                    const stockInput = document.querySelector(`[name="size-stock-${checkbox.value}"]`);
-                                    if (stockInput) {
-                                        stockInput.disabled = true;
-                                        stockInput.value = '';
-                                    }
-                                });
-
-                                // Populate the size-stock data
-                                if (product.size && Array.isArray(product.size)) {
-                                    product.size.forEach(({ size, stock }) => {
-                                        const checkbox = document.querySelector(`.size-checkbox[value="${size}"]`);
-                                        if (checkbox) {
-                                            checkbox.checked = true;
-                                            const stockInput = document.querySelector(`[name="size-stock-${size}"]`);
-                                            if (stockInput) {
-                                                stockInput.disabled = false;
-                                                stockInput.value = stock;
-                                            }
-                                        }
-                                    });
-                                }
 
                                 // Update modal title
                                 document.getElementById('modalTitle').textContent = 'Edit Product';
@@ -629,7 +633,7 @@
                                 document.getElementById('productModal').classList.remove('hidden');
 
                             } catch (error) {
-                                console.error('Error fetching product details:', error);
+                                console.error('Error:', error);
                                 await Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
@@ -925,16 +929,31 @@
                         variantCharCount.textContent = this.value.length;
                     });
 
-                    // Enable/disable stock inputs when size checkboxes change
+                    // Enable/disable stock and price inputs when size checkboxes change
                     document.querySelectorAll('.size-checkbox').forEach(checkbox => {
                         checkbox.addEventListener('change', function () {
                             const stockInput = document.querySelector(`[name="size-stock-${this.value}"]`);
+                            const priceInput = document.querySelector(`[name="size-price-${this.value}"]`);
                             stockInput.disabled = !this.checked;
+                            priceInput.disabled = !this.checked;
                             if (this.checked) {
                                 stockInput.value = '0';
+                                priceInput.value = '0';
                             } else {
                                 stockInput.value = '';
+                                priceInput.value = '';
                             }
+                        });
+                    });
+
+                    // Add price validation for size-specific prices
+                    document.querySelectorAll('.size-price').forEach(input => {
+                        input.addEventListener('input', function () {
+                            let value = parseFloat(this.value);
+                            if (value < 0) this.value = 0;
+                            if (value > 100000) this.value = 100000;
+                            // Ensure only 2 decimal places
+                            this.value = parseFloat(this.value).toFixed(2);
                         });
                     });
 
@@ -943,7 +962,7 @@
                         e.preventDefault();
 
                         try {
-                            // Collect size and stock data
+                            // Collect size, stock and price data
                             const sizeStockData = [];
                             const checkedSizes = document.querySelectorAll('.size-checkbox:checked');
 
@@ -954,13 +973,19 @@
                             checkedSizes.forEach(checkbox => {
                                 const size = checkbox.value;
                                 const stockInput = document.querySelector(`[name="size-stock-${size}"]`);
+                                const priceInput = document.querySelector(`[name="size-price-${size}"]`);
                                 const stock = parseInt(stockInput.value);
+                                const price = parseFloat(priceInput.value);
 
                                 if (isNaN(stock) || stock < 0) {
                                     throw new Error(`Please enter a valid stock number for size ${size}`);
                                 }
 
-                                sizeStockData.push({ size, stock });
+                                if (isNaN(price) || price < 0) {
+                                    throw new Error(`Please enter a valid price for size ${size}`);
+                                }
+
+                                sizeStockData.push({ size, stock, price });
                             });
 
                             // Create FormData object
@@ -969,7 +994,7 @@
                             // Remove any existing sizeStock data
                             formData.delete('sizeStock');
 
-                            // Add the size-stock data as JSON string
+                            // Add the size-stock-price data as JSON string
                             formData.append('sizeStock', JSON.stringify(sizeStockData));
 
                             // Show loading state
@@ -1016,18 +1041,23 @@
                         }
                     });
 
-                    // Add this function to populate size-stock data when editing
+                    // Update the populateSizeStock function to handle prices
                     function populateSizeStock(sizes) {
                         if (!sizes || !Array.isArray(sizes)) return;
 
-                        sizes.forEach(({ size, stock }) => {
+                        sizes.forEach(({ size, stock, price }) => {
                             const checkbox = document.querySelector(`.size-checkbox[value="${size}"]`);
                             if (checkbox) {
                                 checkbox.checked = true;
                                 const stockInput = document.querySelector(`[name="size-stock-${size}"]`);
+                                const priceInput = document.querySelector(`[name="size-price-${size}"]`);
                                 if (stockInput) {
                                     stockInput.disabled = false;
                                     stockInput.value = stock;
+                                }
+                                if (priceInput) {
+                                    priceInput.disabled = false;
+                                    priceInput.value = price;
                                 }
                             }
                         });
@@ -1046,20 +1076,61 @@
 
                                 const product = await response.json();
 
-                                // Reset all size-stock inputs
+                                // Reset form and populate data
+                                document.getElementById('productId').value = product._id;
+                                document.getElementById('productName').value = product.productName;
+                                document.getElementById('brand').value = product.brand;
+                                document.getElementById('categoriesId').value = product.categoriesId._id;
+                                document.getElementById('variantDescription').value = product.description;
+
+                                // Reset all size-stock-price inputs
                                 document.querySelectorAll('.size-checkbox').forEach(checkbox => {
                                     checkbox.checked = false;
                                     const stockInput = document.querySelector(`[name="size-stock-${checkbox.value}"]`);
+                                    const priceInput = document.querySelector(`[name="size-price-${checkbox.value}"]`);
                                     if (stockInput) {
                                         stockInput.disabled = true;
                                         stockInput.value = '';
                                     }
+                                    if (priceInput) {
+                                        priceInput.disabled = true;
+                                        priceInput.value = '';
+                                    }
                                 });
 
-                                // Populate the size-stock data
+                                // Populate the size-stock-price data
                                 if (product.size && Array.isArray(product.size)) {
-                                    populateSizeStock(product.size);
+                                    product.size.forEach(({ size, stock, price }) => {
+                                        const checkbox = document.querySelector(`.size-checkbox[value="${size}"]`);
+                                        if (checkbox) {
+                                            checkbox.checked = true;
+                                            const stockInput = document.querySelector(`[name="size-stock-${size}"]`);
+                                            const priceInput = document.querySelector(`[name="size-price-${size}"]`);
+                                            if (stockInput) {
+                                                stockInput.disabled = false;
+                                                stockInput.value = stock;
+                                            }
+                                            if (priceInput) {
+                                                priceInput.disabled = false;
+                                                priceInput.value = price;
+                                            }
+                                        }
+                                    });
                                 }
+
+                                // Reset and populate image previews
+                                const imageContainers = document.querySelectorAll('.image-upload-container');
+                                product.imageUrl.forEach((url, index) => {
+                                    if (index < imageContainers.length) {
+                                        const preview = imageContainers[index].querySelector('.image-preview');
+                                        preview.innerHTML = `
+                                            <img src="${url}" class="w-full h-full object-cover rounded">
+                                        `;
+                                    }
+                                });
+
+                                // Update modal title
+                                document.getElementById('modalTitle').textContent = 'Edit Product';
 
                                 // Show modal
                                 document.getElementById('productModal').classList.remove('hidden');

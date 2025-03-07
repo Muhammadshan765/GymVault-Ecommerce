@@ -10,7 +10,8 @@ const getHome = async (req, res) => {
         // Get active offers
         const activeOffers = await Offer.find({
             startDate: { $lte: new Date() },
-            endDate: { $gte: new Date() }
+            endDate: { $gte: new Date() },
+            status: 'active'
         }).populate('categoryId');
 
         // Create maps for offers
@@ -18,7 +19,7 @@ const getHome = async (req, res) => {
         const categoryOfferMap = new Map();
 
         activeOffers.forEach(offer => {
-            if (offer.productIds && offer.productIds.length > 0) {
+            if (offer.offerType === 'product' && offer.productIds && offer.productIds.length > 0) {
                 offer.productIds.forEach(productId => {
                     const productIdStr = productId.toString();
                     if (!productOfferMap.has(productIdStr) ||
@@ -26,7 +27,7 @@ const getHome = async (req, res) => {
                         productOfferMap.set(productIdStr, offer);
                     }
                 });
-            } else if (offer.categoryId) {
+            } else if (offer.offerType === 'category' && offer.categoryId) {
                 const categoryIdStr = offer.categoryId._id.toString();
                 if (!categoryOfferMap.has(categoryIdStr) ||
                     categoryOfferMap.get(categoryIdStr).discount < offer.discount) {
@@ -51,30 +52,57 @@ const getHome = async (req, res) => {
         const processedProducts = products.map(product => {
             const productData = product.toObject();
 
-            // Check for product-specific offer
+            // Get product-specific offer
             const productOffer = productOfferMap.get(product._id.toString());
 
-            // Check for category offer
+            // Get category offer
             const categoryOffer = product.categoriesId ?
                 categoryOfferMap.get(product.categoriesId._id.toString()) : null;
 
             // Calculate best discount
             let bestDiscount = 0;
+            let appliedOffer = null;
+
             if (productOffer) {
                 bestDiscount = Math.max(bestDiscount, productOffer.discount);
+                appliedOffer = productOffer;
             }
             if (categoryOffer) {
                 bestDiscount = Math.max(bestDiscount, categoryOffer.discount);
+                appliedOffer = categoryOffer;
             }
 
-            // Apply discount if available
-            if (bestDiscount > 0) {
-                productData.offerPrice = Math.round(product.price * (1 - bestDiscount / 100));
-                productData.offerApplied = true;
-                productData.discountPercentage = bestDiscount;
-            }
+            // Get minimum and maximum prices from sizes
+            const minPrice = Math.min(...product.size.map(size => size.price));
+            const maxPrice = Math.max(...product.size.map(size => size.price));
 
-            return productData;
+            // Calculate discounted price
+            const discountedPrice = bestDiscount > 0 
+                ? Math.round(minPrice * (1 - bestDiscount / 100))
+                : minPrice;
+
+            // Process each size with its own price and offer
+            const processedSizes = product.size.map(size => ({
+                size: size.size,
+                stock: size.stock,
+                price: size.price,
+                offerPrice: Math.round(size.price * (1 - bestDiscount / 100))
+            }));
+
+            // Calculate total stock
+            const totalStock = product.size.reduce((sum, size) => sum + size.stock, 0);
+
+            return {
+                ...productData,
+                price: minPrice, // Original price
+                maxPrice: maxPrice,
+                offerPrice: discountedPrice, // Discounted price
+                offerApplied: bestDiscount > 0,
+                discountPercentage: bestDiscount,
+                appliedOffer: appliedOffer,
+                stock: totalStock,
+                size: processedSizes
+            };
         });
 
         res.render('user/home', {
@@ -222,38 +250,62 @@ const getShop = async (req, res) => {
             const categoryOffer = product.categoriesId ?
                 categoryOfferMap.get(product.categoriesId.toString()) : null;
 
-            let finalPrice = product.price;
-            let appliedDiscount = 0;
+            // Calculate best discount
+            let bestDiscount = 0;
             let appliedOffer = null;
 
-            // Check product-specific offer
             if (productOffer) {
-                const discountAmount = (product.price * productOffer.discount) / 100;
-                if (discountAmount > appliedDiscount) {
-                    appliedDiscount = discountAmount;
-                    appliedOffer = productOffer;
-                }
+                bestDiscount = Math.max(bestDiscount, productOffer.discount);
+                appliedOffer = productOffer;
             }
-
-            // Check category offer
             if (categoryOffer) {
-                const discountAmount = (product.price * categoryOffer.discount) / 100;
-                if (discountAmount > appliedDiscount) {
-                    appliedDiscount = discountAmount;
-                    appliedOffer = categoryOffer;
-                }
+                bestDiscount = Math.max(bestDiscount, categoryOffer.discount);
+                appliedOffer = categoryOffer;
             }
 
-            // Calculate final price
-            finalPrice = Math.round(product.price - appliedDiscount);
+            // Get minimum and maximum prices from sizes
+            const minPrice = Math.min(...product.size.map(size => size.price));
+            const maxPrice = Math.max(...product.size.map(size => size.price));
+
+            // Calculate discounted price
+            const discountedPrice = bestDiscount > 0 
+                ? Math.round(minPrice * (1 - bestDiscount / 100))
+                : minPrice;
+
+            // Process each size with its own price and offer
+            const processedSizes = product.size.map(size => ({
+                size: size.size,
+                stock: size.stock,
+                price: size.price,
+                offerPrice: Math.round(size.price * (1 - bestDiscount / 100))
+            }));
+
+            // Calculate total stock
+            const totalStock = product.size.reduce((sum, size) => sum + size.stock, 0);
 
             return {
                 ...productData,
-                offerPrice: finalPrice,
-                offerApplied: finalPrice < product.price,
-                discountPercentage: appliedOffer ? appliedOffer.discount : 0
+                price: minPrice, // Original price
+                maxPrice: maxPrice,
+                offerPrice: discountedPrice, // Discounted price
+                offerApplied: bestDiscount > 0,
+                discountPercentage: bestDiscount,
+                appliedOffer: appliedOffer,
+                stock: totalStock,
+                size: processedSizes
             };
         });
+
+        // Filter by price range after processing offers
+        let filteredProducts = productsWithPrices;
+        if (minPrice || maxPrice) {
+            filteredProducts = productsWithPrices.filter(product => {
+                const price = product.offerApplied ? product.offerPrice : product.price;
+                if (minPrice && price < minPrice) return false;
+                if (maxPrice && price > maxPrice) return false;
+                return true;
+            });
+        }
 
         const pagination = {
             currentPage: page,
@@ -265,14 +317,14 @@ const getShop = async (req, res) => {
         // Handle AJAX requests
         if (req.xhr) {
             return res.json({
-                products: productsWithPrices,
+                products: filteredProducts,
                 pagination
             });
         }
 
         // Regular page load
         res.render('user/shop', {
-            products: productsWithPrices,
+            products: filteredProducts,
             pagination,
             search,
             sort

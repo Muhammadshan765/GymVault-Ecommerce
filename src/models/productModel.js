@@ -27,11 +27,6 @@ const productSchema = new mongoose.Schema({
         minLength: 10,
         maxLength: 250
     },
-    price: {
-        type: Number,
-        required: true,
-        min: 0
-    },
     rating: {
         type: Number,
         default: 0,
@@ -45,6 +40,11 @@ const productSchema = new mongoose.Schema({
                 required: true
             },
             stock: {
+                type: Number,
+                required: true,
+                min: 0
+            },
+            price: {
                 type: Number,
                 required: true,
                 min: 0

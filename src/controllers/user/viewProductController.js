@@ -41,18 +41,27 @@ const getProductDetails = async (req, res) => {
             productName: product.productName || '',
             brand: product.brand || '',
             description: product.description || '',
-            originalPrice: product.price || 0,
+            originalPrice: priceDetails.minPrice,
+            maxPrice: priceDetails.maxPrice,
             discountPrice: priceDetails.finalPrice,
             offerApplied: priceDetails.appliedDiscount > 0,
             offerPercentage: priceDetails.discountPercentage,
             appliedOffer: priceDetails.appliedOffer,
-            size: product.size || [],
+            size: product.size.map(size => ({
+                size: size.size,
+                stock: size.stock,
+                price: size.price,
+                offerPrice: Math.round(size.price * (1 - (priceDetails.discountPercentage / 100)))
+            })),
             imageUrl: product.imageUrl || [],
             rating: product.rating || 0
         };
 
         // Calculate total stock
         processedProduct.stock = processedProduct.size.reduce((total, item) => total + (item.stock || 0), 0);
+
+        // Initialize selectedSize with the first available size
+        const selectedSize = processedProduct.size.length > 0 ? processedProduct.size[0].size : null;
 
         // Find related products from the same category
         const relatedProducts = await Product.find({
@@ -84,23 +93,34 @@ const getProductDetails = async (req, res) => {
 
             const pPriceDetails = calculateFinalPrice(p, pCategoryOffer, pProductOffer);
 
+            // Process each size with its own price and offer
+            const processedSizes = p.size.map(size => ({
+                size: size.size,
+                stock: size.stock,
+                price: size.price,
+                offerPrice: Math.round(size.price * (1 - (pPriceDetails.discountPercentage / 100)))
+            }));
+
             return {
                 ...p.toObject(),
                 productName: p.productName || '',
                 brand: p.brand || '',
-                originalPrice: p.price || 0,
+                originalPrice: pPriceDetails.minPrice,
+                maxPrice: pPriceDetails.maxPrice,
                 discountPrice: pPriceDetails.finalPrice,
                 offerApplied: pPriceDetails.appliedDiscount > 0,
                 offerPercentage: pPriceDetails.discountPercentage,
                 appliedOffer: pPriceDetails.appliedOffer,
-                imageUrl: p.imageUrl || []
+                imageUrl: p.imageUrl || [],
+                size: processedSizes
             };
         }));
 
         res.render('user/viewProduct', {
             product: processedProduct,
             relatedProducts: processedRelatedProducts,
-            title: processedProduct.productName
+            title: processedProduct.productName,
+            selectedSize: selectedSize
         });
 
     } catch (error) {

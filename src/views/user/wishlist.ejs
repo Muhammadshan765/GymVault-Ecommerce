@@ -63,7 +63,20 @@
                                     <h3 class="text-base font-medium text-gray-800 mb-2 line-clamp-2">
                                         <%= item.productId.productName %>
                                     </h3>
-                                    <p class="text-lg font-bold text-gray-900">₹<%= item.productId.price %></p>
+                                    <% if (item.productId.offerApplied) { %>
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="text-lg font-bold text-gray-900">₹<%= item.productId.discountPrice.toLocaleString() %></span>
+                                            <span class="text-sm text-gray-500 line-through">₹<%= item.productId.originalPrice.toLocaleString() %></span>
+                                        </div>
+                                        <% if (item.productId.appliedOffer) { %>
+                                            <div class="text-sm text-green-600 flex items-center gap-1 mt-1">
+                                                <i class="fas fa-tag"></i>
+                                                <span><%= item.productId.appliedOffer.name %> (<%= item.productId.offerPercentage %>% OFF)</span>
+                                            </div>
+                                        <% } %>
+                                    <% } else { %>
+                                        <p class="text-lg font-bold text-gray-900">₹<%= item.productId.originalPrice.toLocaleString() %></p>
+                                    <% } %>
                                 </div>
 
                                 <!-- Mobile Actions -->
@@ -75,7 +88,7 @@
                                         </button>
                                     <% } else if (item.productId.size.some(sizeObj => sizeObj.stock > 0)) { %>
                                         <button 
-                                            onclick="addToCart('<%= item.productId._id %>', '<%= item.size %>')"
+                                            onclick="addToCart('<%= item.productId._id %>', '<%= item.size %>', '<%= item.productId.productName %>')"
                                             class="flex-1 bg-black text-white px-4 py-2.5 rounded-lg font-medium hover:bg-gray-800 transition-all flex items-center justify-center gap-2">
                                             <i class="fas fa-shopping-cart"></i>
                                             Add to Cart
@@ -113,13 +126,31 @@
                                         alt="<%= item.productId.productName %>"
                                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                                     >
+                                    <% if (item.productId.offerApplied) { %>
+                                        <div class="absolute top-3 right-3 bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-medium">
+                                            <%= item.productId.offerPercentage %>% OFF
+                                        </div>
+                                    <% } %>
                                 </div>
                                 
                                 <div class="p-4">
                                     <h3 class="text-base font-medium text-gray-800 line-clamp-2 mb-2">
                                         <%= item.productId.productName %>
                                     </h3>
-                                    <p class="text-lg font-bold text-gray-900">₹<%= item.productId.price %></p>
+                                    <% if (item.productId.offerApplied) { %>
+                                        <div class="flex items-baseline gap-2">
+                                            <span class="text-lg font-bold text-gray-900">₹<%= item.productId.discountPrice.toLocaleString() %></span>
+                                            <span class="text-sm text-gray-500 line-through">₹<%= item.productId.originalPrice.toLocaleString() %></span>
+                                        </div>
+                                        <% if (item.productId.appliedOffer) { %>
+                                            <div class="text-sm text-green-600 flex items-center gap-1 mt-1">
+                                                <i class="fas fa-tag"></i>
+                                                <span><%= item.productId.appliedOffer.name %> (<%= item.productId.offerPercentage %>% OFF)</span>
+                                            </div>
+                                        <% } %>
+                                    <% } else { %>
+                                        <p class="text-lg font-bold text-gray-900">₹<%= item.productId.originalPrice.toLocaleString() %></p>
+                                    <% } %>
                                 </div>
                             <% if (item.productId && item.productId.categoriesId && item.productId.isActive) { %>
                                 </a>
@@ -138,7 +169,7 @@
                                         </button>
                                     <% } else if (item.productId.size.some(sizeObj => sizeObj.stock > 0)) { %>
                                         <button 
-                                            onclick="addToCart('<%= item.productId._id %>', '<%= item.size %>')"
+                                            onclick="addToCart('<%= item.productId._id %>', '<%= item.size %>', '<%= item.productId.productName %>')"
                                             class="bg-gray-800 text-white px-4 py-3 rounded-lg font-medium hover:bg-gray-900 transition-all flex-1 flex items-center justify-center gap-2"
                                         >
                                             <i class="fas fa-shopping-cart"></i>
@@ -296,9 +327,9 @@
             }
         }
 
-        async function addToCart(productId, size) {
+        async function addToCart(productId, size, productName) {
             try {
-                const loadingToastId = showToast('info', 'Adding to cart...', 'Please wait');
+                const loadingId = showToast('loading', 'Adding to cart...');
 
                 const response = await fetch('/cart/add', {
                     method: 'POST',
@@ -313,9 +344,7 @@
                 });
 
                 const data = await response.json();
-                
-                // Remove loading toast
-                removeToast(loadingToastId);
+                removeToast(loadingId);
 
                 if (response.ok && data.success) {
                     showToast('success', 'Added to cart successfully');
@@ -326,7 +355,7 @@
                         cartCountElement.textContent = data.cartCount;
                     }
 
-                    // Remove item from wishlist UI since it will be automatically removed from wishlist
+                    // Remove item from wishlist UI
                     const wishlistItem = document.getElementById(`wishlist-item-${productId}`);
                     if (wishlistItem) {
                         wishlistItem.style.opacity = '0';

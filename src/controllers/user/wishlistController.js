@@ -1,11 +1,13 @@
 import Wishlist from "../../models/wishlistModel.js";
 import Product from "../../models/productModel.js";
+import Offer from "../../models/offerModel.js";
+import { calculateFinalPrice } from "../../utils/calculateOffer.js";
 
 const getWishlist = async (req, res, next) => {
     try {
         const userId = req.session.user;
 
-        //get wishlist 
+        // Get wishlist with populated products
         const wishlist = await Wishlist.findOne({ userId })
             .populate({
                 path: 'items.productId',
@@ -14,13 +16,68 @@ const getWishlist = async (req, res, next) => {
                 }
             });
 
-        //dont filter out inactive products 
+        if (!wishlist) {
+            return res.render('user/wishlist', {
+                wishlist: [],
+                user: req.session.user
+            });
+        }
+
+        // Process each product with offers and discounts
+        const processedItems = await Promise.all(wishlist.items.map(async (item) => {
+            const product = item.productId;
+
+            // Fetch active offers for this product and its category
+            const offers = await Offer.find({
+                status: 'active',
+                startDate: { $lte: new Date() },
+                endDate: { $gte: new Date() },
+                $or: [
+                    { productIds: product._id },
+                    { categoryId: product.categoriesId._id }
+                ]
+            });
+
+            const productOffer = offers.find(offer =>
+                offer.productIds && offer.productIds.some(id => id.equals(product._id))
+            );
+
+            const categoryOffer = offers.find(offer =>
+                offer.categoryId && offer.categoryId.equals(product.categoriesId._id)
+            );
+
+            // Calculate final price with offers
+            const priceDetails = calculateFinalPrice(product, categoryOffer, productOffer);
+
+            // Process each size with its own price and offer
+            const processedSizes = product.size.map(size => ({
+                size: size.size,
+                stock: size.stock,
+                price: size.price,
+                offerPrice: Math.round(size.price * (1 - (priceDetails.discountPercentage / 100)))
+            }));
+
+            return {
+                ...item.toObject(),
+                productId: {
+                    ...product.toObject(),
+                    originalPrice: priceDetails.minPrice,
+                    maxPrice: priceDetails.maxPrice,
+                    discountPrice: priceDetails.finalPrice,
+                    offerApplied: priceDetails.appliedDiscount > 0,
+                    offerPercentage: priceDetails.discountPercentage,
+                    appliedOffer: priceDetails.appliedOffer,
+                    size: processedSizes
+                }
+            };
+        }));
+
         res.render('user/wishlist', {
-            wishlist: wishlist?.items || [],
+            wishlist: processedItems,
             user: req.session.user
         });
     } catch (error) {
-        next(error)
+        next(error);
     }
 };
 
