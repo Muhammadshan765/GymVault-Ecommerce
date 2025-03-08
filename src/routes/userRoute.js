@@ -87,6 +87,11 @@ router.get("/wallet",userMiddleware.checkSession,userMiddleware.errorHandler,wal
 router.get("/coupons",userMiddleware.checkSession,userMiddleware.errorHandler,couponController.getCoupons)
 
 
+//Razorpay
+router.post('/checkout/create-razorpay-order',userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.createRazorpayOrder)
+router.post('/checkout/verify-payment',userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.verifyPayment)
+
+
 export default router;
 
 
