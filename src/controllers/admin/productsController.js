@@ -40,10 +40,10 @@ const validateBrand = (brand) => {
 };
 
 // Render Product Management Page
-const getproducts = async (req, res,next) => {
+const getproducts = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10; // Items per page
+        const limit = 6; // Changed to 6 items per page
         const skip = (page - 1) * limit;
 
         // Get total count for pagination
@@ -71,17 +71,28 @@ const getproducts = async (req, res,next) => {
             };
         });
 
+        // Calculate pagination info
+        const hasNextPage = page < totalPages;
+        const hasPrevPage = page > 1;
+        const nextPage = hasNextPage ? page + 1 : null;
+        const prevPage = hasPrevPage ? page - 1 : null;
+
         res.render('admin/products', {
             products: sanitizedProducts,
             categories: await Category.find(),
-            currentPage: page,
-            totalPages,
-            totalProducts,
-            startIndex: skip,
-            endIndex: skip + products.length
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalProducts,
+                hasNextPage,
+                hasPrevPage,
+                nextPage,
+                prevPage,
+                pages: Array.from({ length: totalPages }, (_, i) => i + 1)
+            }
         });
     } catch (error) {
-        next(error)
+        next(error);
     }
 };
 

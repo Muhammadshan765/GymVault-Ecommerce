@@ -107,6 +107,34 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- Pagination -->
+                            <div class="mt-6 flex justify-center items-center space-x-2">
+                                <% if (pagination.hasPrevPage) { %>
+                                    <a href="?page=<%= pagination.prevPage %>" 
+                                       class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                        Previous
+                                    </a>
+                                <% } %>
+                                
+                                <% pagination.pages.forEach(pageNum => { %>
+                                    <a href="?page=<%= pageNum %>" 
+                                       class="px-4 py-2 rounded-lg <%= pageNum === pagination.currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %> transition-colors">
+                                        <%= pageNum %>
+                                    </a>
+                                <% }) %>
+                                
+                                <% if (pagination.hasNextPage) { %>
+                                    <a href="?page=<%= pagination.nextPage %>" 
+                                       class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                        Next
+                                    </a>
+                                <% } %>
+                                
+                                <span class="ml-4 text-gray-600">
+                                    Total Products: <%= pagination.totalProducts %>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </main>
