@@ -1,20 +1,19 @@
  
  
+    <%- include("../partials/nav") %>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
  
-<div class="bg-gray-100">
-    <%- include("../partials/nav") %>
-    <div class="h-10"></div>
-
+<div class="bg-gray-100 ">
+   
     <!-- Main Content -->
-    <main class="container mx-auto flex flex-col md:flex-row py-10 px-6 gap-6">
+    <main class="container mx-auto flex flex-col md:flex-row py-10 px-6 gap-6 h-screen">
         <!-- Profile Sidebar -->
         <%- include("../partials/profileSidebar") %>
 
         <!-- Orders Section -->
-        <section class="w-full md:w-3/4">
+        <section class="w-full md:w-3/4 mt-9">
             <% if (orders && orders.length > 0) { %>
                 <div class="space-y-6">
                     <% orders.forEach(order => { %>
@@ -194,19 +193,19 @@
 
                 <!-- Pagination -->
                 <% if (totalPages > 1) { %>
-                    <div class="mt-8 flex justify-center items-center space-x-4">
-                        <% if (hasPrevPage) { %>
+                    <div class="mt-12 flex justify-center items-center space-x-6">
+                        <% if (hasPreviousPage) { %>
                             <a href="?page=<%= currentPage - 1 %>" 
-                               class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                                <i class="fas fa-chevron-left mr-2"></i>
-                                Previous
+                               class="group flex items-center px-5 py-2.5 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+                                <i class="fas fa-chevron-left mr-2 text-gray-400 group-hover:text-gray-600"></i>
+                                <span class="font-medium text-gray-600 group-hover:text-gray-800">Previous</span>
                             </a>
                         <% } %>
 
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-3">
                             <% for(let i = 1; i <= totalPages; i++) { %>
                                 <% if (i === currentPage) { %>
-                                    <span class="px-4 py-2 bg-black text-white rounded-lg">
+                                    <span class="flex items-center justify-center w-10 h-10 bg-black text-white rounded-full shadow-lg font-medium">
                                         <%= i %>
                                     </span>
                                 <% } else if (
@@ -215,30 +214,34 @@
                                     (i >= currentPage - 1 && i <= currentPage + 1)
                                 ) { %>
                                     <a href="?page=<%= i %>" 
-                                       class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                                       class="flex items-center justify-center w-10 h-10 bg-white border border-gray-200 text-gray-600 rounded-full hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 transition-all duration-200 font-medium">
                                         <%= i %>
                                     </a>
                                 <% } else if (
                                     i === currentPage - 2 || 
                                     i === currentPage + 2
                                 ) { %>
-                                    <span class="px-2">...</span>
+                                    <span class="flex items-center justify-center w-10 h-10 text-gray-400">...</span>
                                 <% } %>
                             <% } %>
                         </div>
 
                         <% if (hasNextPage) { %>
                             <a href="?page=<%= currentPage + 1 %>" 
-                               class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                                Next
-                                <i class="fas fa-chevron-right ml-2"></i>
+                               class="group flex items-center px-5 py-2.5 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+                                <span class="font-medium text-gray-600 group-hover:text-gray-800">Next</span>
+                                <i class="fas fa-chevron-right ml-2 text-gray-400 group-hover:text-gray-600"></i>
                             </a>
                         <% } %>
                     </div>
                 <% } %>
             <% } else { %>
-                <div class="bg-white rounded-lg shadow-md p-8 text-center">
-                    <p class="text-gray-500">No orders found</p>
+                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-shopping-bag text-3xl text-gray-400"></i>
+                    </div>
+                    <p class="text-xl text-gray-600 font-medium">No orders found</p>
+                    <p class="text-gray-400 mt-2">Start shopping to see your orders here</p>
                 </div>
             <% } %>
         </section>

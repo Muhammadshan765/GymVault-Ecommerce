@@ -140,18 +140,18 @@
             <% if (totalPages > 1) { %>
                 <div class="mt-6 flex justify-center gap-2">
                     <% if (hasPrevPage) { %>
-                        <a href="?page=<%= currentPage - 1 %>" class="px-3 py-1 bg-zinc-700 text-white rounded">Previous</a>
+                        <a href="?page=<%= currentPage - 1 %>" class="px-3 py-1 bg-gray-300 text-black rounded">Previous</a>
                     <% } %>
                     
                     <% for(let i = 1; i <= totalPages; i++) { %>
                         <a href="?page=<%= i %>" 
-                           class="px-3 py-1 rounded <%= currentPage === i ? 'bg-black text-white' : 'bg-zinc-700 text-white' %>">
+                           class="px-3 py-1 rounded <%= currentPage === i ? 'bg-blue-600 text-white' : 'bg-gray-300 text-black' %>">
                             <%= i %>
                         </a>
                     <% } %>
                     
                     <% if (hasNextPage) { %>
-                        <a href="?page=<%= currentPage + 1 %>" class="px-3 py-1 bg-zinc-700 text-white rounded">Next</a>
+                        <a href="?page=<%= currentPage + 1 %>" class="px-3 py-1 bg-gray-300 text-black rounded">Next</a>
                     <% } %>
                 </div>
             <% } %>
