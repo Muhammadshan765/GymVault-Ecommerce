@@ -87,32 +87,31 @@
             <div class="space-y-4">
               <!-- Payment Options -->
               <div class="grid gap-4">
-                <div class="grid gap-4">
-                  <!-- Wallet Payment -->
-                  <label
-                  id="walletOption"
-                  class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all duration-300 <%= wallet.balance < total ? 'opacity-60' : 'hover:bg-gray-50' %>"
-                  data-balance="<%= wallet.balance %>"
-                >
-                  <input type="radio" name="paymentMethod" value="wallet"
-                  id="walletPayment" <%= wallet.balance < total ? 'disabled' :
-                  '' %>>
-                  <div class="flex flex-col">
-                    <span class="flex items-center gap-2">
-                      <i class="fas fa-wallet"></i> Wallet
-                      <span
-                        id="walletAvailability"
-                        class="text-xs px-2 py-1 rounded <%= wallet.balance >= total ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>"
-                      >
-                        <%= wallet.balance >= total ? 'Available' :
-                        'Insufficient Balance' %>
-                      </span>
-                    </span>
-                    <span class="text-sm text-gray-500">
-                      Available balance: ₹<%= wallet.balance.toFixed(2) %>
-                    </span>
-                  </div>
-                </label>
+                 <!-- Wallet Payment -->
+                 <label
+                 id="walletOption"
+                 class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all duration-300 <%= wallet.balance < total ? 'opacity-60' : 'hover:bg-gray-50' %>"
+                 data-balance="<%= wallet.balance %>"
+               >
+                 <input type="radio" name="paymentMethod" value="wallet"
+                 id="walletPayment" <%= wallet.balance < total ? 'disabled' :
+                 '' %>>
+                 <div class="flex flex-col">
+                   <span class="flex items-center gap-2">
+                     <i class="fas fa-wallet"></i> Wallet
+                     <span
+                       id="walletAvailability"
+                       class="text-xs px-2 py-1 rounded <%= wallet.balance >= total ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>"
+                     >
+                       <%= wallet.balance >= total ? 'Available' :
+                       'Insufficient Balance' %>
+                     </span>
+                   </span>
+                   <span class="text-sm text-gray-500">
+                     Available balance: ₹<%= wallet.balance.toFixed(2) %>
+                   </span>
+                 </div>
+               </label>
                 <!-- COD Payment Option -->
                 <label
                   id="codOption"
