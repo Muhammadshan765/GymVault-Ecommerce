@@ -3,6 +3,8 @@
     <link rel="stylesheet" href="/tailwindcss/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
  
 <!-- <div class="mybg-green"> -->
     <div class=" p-6 flex-1" id="main-content">
@@ -481,41 +483,74 @@
 
         // Updated return handling function
         async function handleReturn(orderId, productId, returnStatus) {
-            const title = `${returnStatus === 'approved' ? 'Approve' : 'Reject'} Return Request`;
-            const message = `Are you sure you want to ${returnStatus} this return request?`;
-            
-            showAlert('confirm', message, title);
-            
-            document.getElementById('confirmProceed').onclick = async () => {
-                try {
-                    hideAlert();
-                    showAlert('loading');
+            try {
+                // Show SweetAlert2 confirmation dialog
+                const result = await Swal.fire({
+                    title: `${returnStatus === 'approved' ? 'Approve' : 'Reject'} Return Request`,
+                    text: `Are you sure you want to ${returnStatus} this return request?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: returnStatus === 'approved' ? '#10B981' : '#EF4444',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: returnStatus === 'approved' ? 'Approve' : 'Reject',
+                    cancelButtonText: 'Cancel'
+                });
 
-                    const response = await fetch(`/admin/orders/${orderId}/items/${productId}/return`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            returnStatus,
-                            adminComment: document.getElementById('returnModalComment')?.value || `Return request ${returnStatus}`
-                        })
-                    });
-
-                    const data = await response.json();
-                    
-                    hideAlert();
-                    if (response.ok) {
-                        updateUIReturn(orderId, productId, returnStatus);
-                        showAlert('success', 'Return request processed successfully');
-                    } else {
-                        throw new Error(data.message || 'Failed to process return request');
-                    }
-                } catch (error) {
-                    hideAlert();
-                    showAlert('error', error.message);
+                if (!result.isConfirmed) {
+                    return;
                 }
-            };
 
-            document.getElementById('confirmCancel').onclick = hideAlert;
+                // Show loading state
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait while we process your request',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const response = await fetch(`/admin/orders/${orderId}/items/${productId}/return`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        returnStatus,
+                        adminComment: `Return request ${returnStatus} by admin`
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to process return request');
+                }
+
+                // Show success message
+                await Swal.fire({
+                    title: 'Success!',
+                    text: 'Return request processed successfully',
+                    icon: 'success',
+                    confirmButtonColor: '#10B981'
+                });
+
+                // Reload the page
+                window.location.reload();
+
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Show error message
+                await Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'An error occurred while processing the return request',
+                    icon: 'error',
+                    confirmButtonColor: '#EF4444'
+                });
+            }
         }
 
         function closeReturnModal() {

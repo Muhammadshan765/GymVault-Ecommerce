@@ -29,6 +29,14 @@ const getOrders = async (req, res) => {
             if (dateTo) filter.orderDate.$lte = new Date(dateTo);
         }
 
+        // Add filter to also show orders with return requests
+        filter = {
+            $or: [
+                { 'items.order.status': { $ne: 'pending' } },
+                { 'items.return.isReturnRequested': true }
+            ]
+        };
+
         const totalOrders = await orderSchema.countDocuments(filter);
         const totalPages = Math.ceil(totalOrders / limit);
 
@@ -39,7 +47,7 @@ const getOrders = async (req, res) => {
             .skip(skip)
             .limit(limit);
 
-        // Process orders to handle null products
+        // Process orders to handle null products and add return information
         const processedOrders = orders.map(order => {
             const orderObj = order.toObject();
             orderObj.items = orderObj.items.map(item => ({
@@ -49,6 +57,12 @@ const getOrders = async (req, res) => {
                     productName: 'Product Unavailable',
                     imageUrl: ['/images/placeholder.jpg'],
                     price: item.price || 0
+                },
+                // Add return status information
+                return: item.return || {
+                    isReturnRequested: false,
+                    status: null,
+                    requestDate: null
                 }
             }));
             return orderObj;
@@ -165,31 +179,19 @@ const handleReturnRequest = async (req, res, next) => {
             });
         }
 
+        // Update return status and related fields
         if (returnStatus === 'approved') {
-            // Update only the necessary fields
-            const updateResult = await orderSchema.findOneAndUpdate(
-                {
-                    _id: orderId,
-                    'items.product': productId
-                },
-                {
-                    $set: {
-                        'items.$.order.status': 'returned',
-                        'items.$.return.status': returnStatus,
-                        'items.$.return.adminComment': adminComment,
-                        'items.$.return.isReturnAccepted': true,
-                        'payment.paymentStatus': 'refunded'
-                    },
-                    $push: {
-                        'items.$.order.statusHistory': {
-                            status: 'returned',
-                            date: new Date(),
-                            comment: `return approved by admin:${adminComment}`
-                        }
-                    }
-                },
-                { new: true }
-            );
+            item.order.status = 'returned';
+            item.return.status = 'approved';
+            item.return.adminComment = adminComment;
+            item.return.isReturnAccepted = true;
+            
+            // Add to status history
+            item.order.statusHistory.push({
+                status: 'returned',
+                date: new Date(),
+                comment: `Return approved by admin: ${adminComment}`
+            });
 
             // Update product stock
             await productSchema.findOneAndUpdate(
@@ -201,7 +203,30 @@ const handleReturnRequest = async (req, res, next) => {
                     $inc: { 'size.$.stock': item.quantity }
                 }
             );
+
+            // Update payment status if payment was made
+            if (['wallet', 'online', 'razorpay'].includes(order.payment.method)) {
+                order.payment.paymentStatus = 'refunded';
+            }
+        } else if (returnStatus === 'rejected') {
+            item.order.status = 'delivered';
+            item.return.status = 'rejected';
+            item.return.adminComment = adminComment;
+            item.return.isReturnAccepted = false;
+
+            // Add to status history
+            item.order.statusHistory.push({
+                status: 'delivered',
+                date: new Date(),
+                comment: `Return rejected by admin: ${adminComment}`
+            });
         }
+
+        // Mark modified paths
+        order.markModified('items');
+        order.markModified('payment');
+
+        await order.save();
 
         res.json({
             success: true,

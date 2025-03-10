@@ -146,8 +146,6 @@ const cancelOrder = async (req, res) => {
 
 const requestReturnItem = async (req, res, next) => {
     try {
-        console.log("requested ITem Route");
-        
         const { orderId, productId } = req.params;
         const { reason } = req.body;
         const userId = req.session.user;
@@ -243,8 +241,7 @@ const requestReturnItem = async (req, res, next) => {
         order.markModified('payment');
 
         await order.save();
-        console.log(order,"retrun requested");
-        
+
         res.json({
             success: true,
             message: 'Return requested successfully'
