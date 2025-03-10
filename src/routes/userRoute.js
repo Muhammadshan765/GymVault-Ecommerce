@@ -86,10 +86,16 @@ router.get("/wallet",userMiddleware.checkSession,userMiddleware.errorHandler,wal
 //coupon 
 router.get("/coupons",userMiddleware.checkSession,userMiddleware.errorHandler,couponController.getCoupons)
 
+router.get("/checkout/available-coupons",userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.getAvailableCoupons)
+router.post("/checkout/apply-coupon",userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.applyCoupon)
+router.post("/checkout/remove-coupon",userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.removeCoupon)
 
 //Razorpay
 router.post('/checkout/create-razorpay-order',userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.createRazorpayOrder)
 router.post('/checkout/verify-payment',userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.verifyPayment)
+router.post("/checkout/payment-failed",userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.handlePaymentFailure) 
+
+
 
 
 export default router;

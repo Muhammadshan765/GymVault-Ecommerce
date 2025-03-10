@@ -2,9 +2,26 @@ import cartSchema from '../../models/cartModel.js';
 import addressSchema from '../../models/addressModel.js';
 import productSchema from '../../models/productModel.js';
 import orderSchema from '../../models/orderModel.js';
+import Coupon from '../../models/couponModel.js';
 import razorpay from '../../utils/razorpay.js';
 import crypto from 'crypto';
 
+
+// Helper function (keep this at the top of the file)
+function calculateProportionalDiscounts(items, totalDiscount) {
+    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return items.map(item => {
+        const itemTotal = item.price * item.quantity;
+        const proportionalRatio = itemTotal / totalAmount;
+        const itemDiscount = totalDiscount * proportionalRatio;
+        const discountPerUnit = itemDiscount / item.quantity;
+        return {
+            ...item,
+            discountedPrice: Number((item.price - discountPerUnit).toFixed(2)),
+            subtotal: Number((item.quantity * (item.price - discountPerUnit)).toFixed(2))
+        };
+    });
+}
 
 const getCheckoutPage = async (req, res) => {
     try {
@@ -113,7 +130,7 @@ const placeOrder = async (req, res) => {
 
         // Calculate the total amount
         const finalAmount = cart.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-        
+
         // Validate COD payment method
         if (paymentMethod === 'cod' && finalAmount > 1000) {
             return res.status(400).json({
@@ -216,21 +233,143 @@ const placeOrder = async (req, res) => {
     }
 }
 
-// Helper function (keep this at the top of the file)
-function calculateProportionalDiscounts(items, totalDiscount) {
-    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    return items.map(item => {
-        const itemTotal = item.price * item.quantity;
-        const proportionalRatio = itemTotal / totalAmount;
-        const itemDiscount = totalDiscount * proportionalRatio;
-        const discountPerUnit = itemDiscount / item.quantity;
-        return {
-            ...item,
-            discountedPrice: Number((item.price - discountPerUnit).toFixed(2)),
-            subtotal: Number((item.quantity * (item.price - discountPerUnit)).toFixed(2))
-        };
-    });
+const getAvailableCoupons = async (req, res, next) => {
+    try {
+        const userId = req.session.user;
+
+        //get only active coupons within valid date range
+        const coupons = await Coupon.find({
+            isActive: true,
+            startDate: { $lte: new Date() },
+            expiryDate: { $gte: new Date() }
+        }).select('-usedBy');
+
+        //get users cart total for minimuun purchase validation
+        const cart = await cartSchema.findOne({
+            userId
+        }).populate('items.productId');
+
+
+        const cartTotal = cart.items.reduce(
+            (sum, item) => sum + (item.quantity * item.price), 0
+        );
+
+
+        //add validation info to each coupon
+        const processedCoupons = await Promise.all(coupons.map(async (coupon) => {
+            const userUsageCount = await Coupon.countDocuments({
+                code: coupon.code,
+                'usedBy.userId': userId
+            });
+
+
+            return {
+                ...coupon.toObject(),
+                isApplicable:
+                    cartTotal >= coupon.minimumPurchase &&
+                    (!coupon.totalCoupon || coupon.usedCouponCount < coupon.totalCoupon) &&
+                    userUsageCount < coupon.userUsageLimit
+            };
+        }));
+
+        res.json({
+            success: true,
+            coupons: processedCoupons
+        });
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+const applyCoupon = async (req, res, next) => {
+    try {
+        const { code } = req.body;
+        const userId = req.session.user;
+
+        //find the coupon
+        const coupon = await Coupon.findOne({
+            code: code.toUpperCase(),
+            isActive: true,
+            startDate: { $lte: new Date() },
+            expiryDate: { $gte: new Date() }
+        });
+
+        if (!coupon) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired coupon'
+            });
+        }
+
+        // Check total coupon usage limit first
+        if (coupon.totalCoupon !== null) {
+            if (coupon.usedCouponCount >= coupon.totalCoupon) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Coupon limit has been exceeded. This coupon is no longer available.'
+                });
+            }
+        }
+
+        // Check individual user usage limit
+        const userUsageCount = coupon.usedBy.filter(
+            usage => usage.userId.toString() === userId.toString()
+        ).length;
+
+        if (userUsageCount >= coupon.userUsageLimit) {
+            return res.status(400).json({
+                success: false,
+                message: `You have exceeded the usage limit (${coupon.userUsageLimit}) for this coupon`
+            });
+        }
+
+        //get cart total 
+        const cart = await cartSchema.findOne({ userId })
+            .populate('items.productId');
+
+        const cartTotal = cart.items.reduce(
+            (sum, item) => sum + (item.quantity * item.price),
+            0
+        );
+
+        //check minimum purchase required
+        if (cartTotal < coupon.minimumPurchase) {
+            return res.status(400).json({
+                success: false,
+                message: `Minimum purchase of ₹${coupon.minimumPurchase} required`
+            });
+        }
+
+        //calculate discount 
+        let discount = (cartTotal * coupon.discountPercentage) / 100;
+        if (coupon.maximumDiscount) {
+            discount = Math.min(discount, coupon.maximumDiscount);
+        }
+
+        res.json({
+            success: true,
+            discount,
+            couponCode: coupon.code,
+            message: 'Coupon applied successfully'
+        });
+
+    } catch (error) {
+        next(error)
+    }
 }
+
+const removeCoupon = async (req, res, next) => {
+    try {
+        res.json({
+            success: true,
+            message: 'Coupon removed successfully'
+        });
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 const createRazorpayOrder = async (req, res, next) => {
     try {
@@ -499,12 +638,91 @@ const verifyPayment = async (req, res, next) => {
     }
 };
 
+const handlePaymentFailure = async (req, res, next) => {
+    try {
+        const { error, razorpay_order_id } = req.body;
+        const userId = req.session.user;
+        const pendingOrder = req.session.pendingOrder;
+
+        if (!pendingOrder) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid order session'
+            });
+        }
+
+        // Update order items with pending status
+        const orderItems = pendingOrder.orderData.items.map(item => ({
+            ...item,
+            order: {
+                status: 'pending',
+                statusHistory: [{
+                    status: 'pending',
+                    date: new Date(),
+                    comment: 'Payment failed: ' + (error.description || 'Payment was not completed')
+                }]
+            }
+        }));
+
+        // Create or update order with failed status
+        const orderData = {
+            ...pendingOrder.orderData,
+            items: orderItems,
+            payment: {
+                method: 'razorpay',
+                paymentStatus: 'failed',
+                razorpayTransaction: {
+                    razorpayOrderId: razorpay_order_id
+                }
+            }
+        };
+
+        let order;
+        if (pendingOrder.orderId) {
+            // Update existing failed order
+            order = await orderSchema.findByIdAndUpdate(
+                pendingOrder.orderId,
+                orderData,
+                { new: true }
+            );
+        } else {
+            // Create new failed order
+            order = await orderSchema.create(orderData);
+        }
+
+        // Clear the cart after creating the order
+        const cart = await cartSchema.findOne({ userId });
+        if (cart) {
+            await cartSchema.findByIdAndUpdate(cart._id, {
+                items: [],
+                totalAmount: 0
+            });
+        }
+
+        // Clear the pending order from session
+        delete req.session.pendingOrder;
+
+        res.json({
+            success: false,
+            message: 'Payment failed',
+            orderId: order.orderCode,
+            error: error.description || 'Payment was not completed'
+        });
+
+    } catch (error) {
+        next(error)
+    }
+}
+
 export default {
     getCheckoutPage,
     placeOrder,
+    getAvailableCoupons,
+    applyCoupon,
+    removeCoupon,
     createRazorpayOrder,
-    verifyPayment
-
+    verifyPayment,
+    handlePaymentFailure
 }
 
 
