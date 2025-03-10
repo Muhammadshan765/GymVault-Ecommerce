@@ -1,6 +1,10 @@
 import orderSchema from "../../models/orderModel.js";
 import userSchema from "../../models/userModel.js";
 import productSchema from "../../models/productModel.js";
+import Wallet from "../../models/walletModel.js"
+import razorpay from "../../utils/razorpay.js";
+import PDFDocument from "pdfkit"
+import crypto from "crypto"
 
 const getOrders = async (req, res) => {
     try {
@@ -127,6 +131,30 @@ const cancelOrder = async (req, res) => {
             date: new Date(),
             comment: `Item cancelled by user:${reason}`
         });
+
+        // Process refund if payment was made
+        if (['wallet', 'online', 'razorpay'].includes(order.payment.method) &&
+            order.payment.paymentStatus === 'completed') {
+
+            let wallet = await Wallet.findOne({ userId });
+            if (!wallet) {
+                wallet = await Wallet.create({ userId, balance: 0 });
+            }
+
+            // Calculate refund amount for this item
+            const refundAmount = item.subtotal;
+
+            wallet.balance += refundAmount;
+            wallet.transactions.push({
+                type: 'credit',
+                amount: refundAmount,
+                description: `Refund for cancelled item in order #${order.orderCode}`,
+                orderId: order._id,
+                date: new Date()
+            });
+             await wallet.save()
+
+        }
 
         await order.save();
 

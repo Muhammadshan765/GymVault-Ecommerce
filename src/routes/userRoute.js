@@ -79,7 +79,7 @@ router.delete("/wishlist/remove/:productId", userMiddleware.checkSession, userMi
 
 //wallet 
 router.get("/wallet",userMiddleware.checkSession,userMiddleware.errorHandler,walletController.getWallet)
-
+router.post("/checkout/wallet-payment",userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.walletPayment)
 
 
 

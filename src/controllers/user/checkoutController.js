@@ -5,7 +5,7 @@ import orderSchema from '../../models/orderModel.js';
 import Coupon from '../../models/couponModel.js';
 import razorpay from '../../utils/razorpay.js';
 import crypto from 'crypto';
-
+import  Wallet from "../../models/walletModel.js"
 
 // Helper function (keep this at the top of the file)
 function calculateProportionalDiscounts(items, totalDiscount) {
@@ -85,11 +85,15 @@ const getCheckoutPage = async (req, res) => {
         //calculate total
         const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
+           // Fetch user's wallet
+           const wallet = await Wallet.findOne({ userId: req.session.user }) || { balance: 0 };
+
         res.render('user/checkout', {
             addresses,
             cartItems,
             total,
-            user: req.session.user
+            user: req.session.user,
+            wallet : wallet // Pass the wallet data or default object with 0 balance
         });
     } catch (error) {
         console.error('Checkout page error', error);
@@ -714,6 +718,186 @@ const handlePaymentFailure = async (req, res, next) => {
     }
 }
 
+
+const walletPayment=async (req, res,next) => {
+    try {
+        const userId = req.session.user;
+        const { addressId, couponCode } = req.body;
+
+        // Get cart and validate
+        const cart = await cartSchema.findOne({ userId })
+            .populate('items.productId');
+
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cart is empty'
+            });
+        }
+
+        // Calculate cart total and coupon discount
+        const cartTotal = cart.items.reduce(
+            (sum, item) => sum + (item.quantity * item.price), 
+            0
+        );
+        
+        let couponDiscount = 0;
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode });
+            if (coupon) {
+                couponDiscount = (cartTotal * coupon.discountPercentage) / 100;
+                if (coupon.maximumDiscount) {
+                    couponDiscount = Math.min(couponDiscount, coupon.maximumDiscount);
+                }
+            }
+        }
+
+        // Prepare initial items
+        const initialItems = cart.items.map(item => ({
+            product: item.productId._id,
+            quantity: item.quantity,
+            price: item.price,
+            size: item.size,
+            subtotal: item.quantity * item.price
+        }));
+
+        // Calculate proportional discounts
+        const discountedItems = calculateProportionalDiscounts(initialItems, couponDiscount);
+
+        // Add order status and return fields to each item
+        const orderItems = discountedItems.map(item => ({
+            ...item,
+            order: {
+                status: 'processing',
+                statusHistory: [{
+                    status: 'processing',
+                    date: new Date(),
+                    comment: 'Order placed using wallet payment'
+                }]
+            },
+            return: {
+                isReturnRequested: false,
+                reason: null,
+                requestDate: null,
+                status: null,
+                adminComment: null,
+                isReturnAccepted: false
+            }
+        }));
+
+        // Calculate final total amount
+        const totalAmount = orderItems.reduce((sum, item) => sum + item.subtotal, 0);
+
+        // Get wallet and check balance
+        const wallet = await Wallet.findOne({ userId });
+        if (!wallet || wallet.balance < totalAmount) {
+            return res.status(400).json({
+                success: false,
+                message: 'Insufficient wallet balance'
+            });
+        }
+
+        // Get address details
+        const address = await addressSchema.findOne({
+            _id: addressId,
+            userId
+        });
+
+        if (!address) {
+            return res.status(400).json({
+                success: false,
+                message: 'Delivery address not found'
+            });
+        }
+
+        // Create order
+        const order = await orderSchema.create({
+            userId,
+            items: orderItems,
+            totalAmount: Math.round(totalAmount),
+            coupon: couponCode ? {
+                code: couponCode,
+                discount: couponDiscount
+            } : {},
+            shippingAddress: {
+                fullName: address.fullName,
+                mobileNumber: address.mobileNumber,
+                addressLine1: address.addressLine1,
+                addressLine2: address.addressLine2,
+                city: address.city,
+                state: address.state,
+                pincode: address.pincode
+            },
+            payment: {
+                method: 'wallet',
+                paymentStatus: 'completed',
+                walletTransaction: {
+                    amount: totalAmount
+                }
+            }
+        });
+
+        // Update product stock
+        for (const item of orderItems) {
+            await productSchema.findOneAndUpdate(
+                {
+                    _id: item.product,
+                    'size.size': item.size
+                },
+                {
+                    $inc: {
+                        'size.$.stock': -item.quantity
+                    }
+                }
+            );
+        }
+
+        // Clear cart
+        await cartSchema.findByIdAndUpdate(cart._id, {
+            items: [],
+            totalAmount: 0
+        });
+
+        // Update wallet balance and add transaction
+        const walletTransaction = {
+            type: 'debit',
+            amount: totalAmount,
+            description: `Payment for order #${order.orderCode}`,
+            orderId: order._id,
+            date: new Date()
+        };
+
+        wallet.balance -= totalAmount;
+        wallet.transactions.push(walletTransaction);
+        await wallet.save();
+
+        // Update coupon usage if applicable
+        if (couponCode) {
+            await Coupon.findOneAndUpdate(
+                { code: couponCode },
+                {
+                    $inc: { usedCouponCount: 1 },
+                    $push: {
+                        usedBy: {
+                            userId,
+                            orderId: order._id
+                        }
+                    }
+                }
+            );
+        }
+
+        res.json({
+            success: true,
+            message: 'Order placed successfully',
+            orderId: order.orderCode
+        });
+
+    } catch (error) {
+        next(error)
+    }
+};
+
 export default {
     getCheckoutPage,
     placeOrder,
@@ -722,7 +906,8 @@ export default {
     removeCoupon,
     createRazorpayOrder,
     verifyPayment,
-    handlePaymentFailure
+    handlePaymentFailure,
+    walletPayment
 }
 
 
