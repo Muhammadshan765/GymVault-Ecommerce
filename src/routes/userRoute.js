@@ -97,7 +97,8 @@ router.post("/checkout/payment-failed",userMiddleware.checkSession,userMiddlewar
 
 // invoice & retry payment
 router.get("/orders/:orderId/invoice",userMiddleware.checkSession,userMiddleware.errorHandler,orderController.generateInvoice)
-
+router.post("/orders/:orderId/retry-payment",userMiddleware.checkSession,userMiddleware.errorHandler,orderController.retryPayment)
+router.post("/orders/:orderId/verify-retry-payment",userMiddleware.checkSession,userMiddleware.errorHandler,orderController.verifyRetryPayment)
 
 
 export default router;
