@@ -9,7 +9,7 @@ const getProductDetails = async (req, res) => {
         const product = await Product.findById(productId)
             .populate('categoriesId');
 
-        if (!product) {
+        if (!product || !product.isActive) {
             return res.status(404).redirect('/home');
         }
 
