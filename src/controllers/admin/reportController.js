@@ -85,6 +85,7 @@ const getSalesReport = async (req, res, next) => {
 
             return acc;
         }, {});
+        
 
         res.render('admin/salesReport', {
             orders,
@@ -97,7 +98,6 @@ const getSalesReport = async (req, res, next) => {
         next(error)
     }
 };
-
 
 const downloadExcel = async (req, res, next) => {
     try {
@@ -233,5 +233,4 @@ export default {
     getSalesReport,
     downloadExcel,
     downloadPDF
-
 }
