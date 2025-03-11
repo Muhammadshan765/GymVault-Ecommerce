@@ -9,7 +9,7 @@ import adminMiddleware from "../middlewares/adminMiddleware.js";
 import orderController from "../controllers/admin/orderController.js";
 import couponController from "../controllers/admin/couponController.js";
 import offerController from "../controllers/admin/offerController.js";
-
+import reportController from "../controllers/admin/reportController.js";
 
 //Admin Routes
 router.get("/login", adminMiddleware.isLogin, adminController.loadLogin);
@@ -49,5 +49,9 @@ router.post("/offers",adminMiddleware.checkSession,adminMiddleware.errorHandler,
 router.put("/offers/:offerId",adminMiddleware.checkSession,adminMiddleware.errorHandler,offerController.updateOffer)
 router.delete("/offers/:offerId",adminMiddleware.checkSession,adminMiddleware.errorHandler,offerController.deleteOffer)
 
+
+router.get("/sales-report",adminMiddleware.checkSession,adminMiddleware.errorHandler,reportController.getSalesReport)
+router.get("/sales-report/download-excel",adminMiddleware.checkSession,adminMiddleware.errorHandler,reportController.downloadExcel)
+router.get("/sales-report/download-pdf",adminMiddleware.checkSession,adminMiddleware.errorHandler,reportController.downloadPDF)
 
 export default router;
