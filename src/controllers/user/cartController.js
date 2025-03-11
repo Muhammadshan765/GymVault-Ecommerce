@@ -64,10 +64,14 @@ const getCart  = async (req,res)=>{
             await cart.save();
         }
 
-        // Process items with offers
+        // Process items with offers and check stock
         const updatedItems = await Promise.all(validItems.map(async item => {
             const product = item.productId;
             const quantity = parseInt(item.quantity) || 1;
+            
+            // Check stock for the specific size
+            const sizeObj = product.size.find(s => s.size === item.size);
+            const inStock = sizeObj && sizeObj.stock >= quantity;
             
             // Find applicable offers for this product
             const categoryOffer = activeOffers.find(offer => 
@@ -98,8 +102,9 @@ const getCart  = async (req,res)=>{
                     _id: product._id,
                     productName: product.productName,
                     imageUrl: product.imageUrl,
-                    stock: product.stock,
-                    size: item.size
+                    stock: sizeObj ? sizeObj.stock : 0,
+                    size: item.size,
+                    inStock: inStock
                 },
                 quantity: quantity,
                 price: finalPrice,

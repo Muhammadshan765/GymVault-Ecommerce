@@ -29,8 +29,15 @@
             <span class="text-xl font-bold">₹<%= total %></span>
           </div>
           <% if (cartItems && cartItems.length > 0) { %>
-            <button onclick="location.href='/checkout'" class="w-full mt-4 bg-black text-white py-3 rounded-xl font-medium">
-              Checkout (<%= cartItems.length %> items)
+            <% 
+                const hasOutOfStockItems = cartItems && cartItems.some(item => !item.product.inStock);
+            %>
+            <button 
+                onclick="<%= !hasOutOfStockItems ? 'location.href=\'/checkout\'' : 'showAlert(\'error\', \'Please remove out of stock items before proceeding\')' %>" 
+                class="w-full mt-4 bg-black text-white py-3 rounded-xl font-medium <%= !hasOutOfStockItems ? '' : 'bg-gray-300 cursor-not-allowed' %>"
+                <%= hasOutOfStockItems ? 'disabled' : '' %>
+            >
+                <%= hasOutOfStockItems ? 'Remove Out of Stock Items' : 'Proceed to Checkout' %>
             </button>
           <% } %>
         </div>
@@ -57,26 +64,28 @@
                       </button>
                     </div>
                     <p class="text-sm text-gray-500">Size: <%= item.product.size %></p>
-                    <p class="text-sm text-green-500"><%= item.product.stock > 0 ? 'In Stock' : '' %></p>
+                    <p class="text-sm <%= item.product.inStock ? 'text-green-500' : 'text-red-500' %>">
+                        <%= item.product.inStock ? 'In Stock' : 'Out of Stock' %>
+                    </p>
                     <% if (item.discountPercentage > 0) { %>
                       <p class="text-sm text-green-600">
                         <i class="fas fa-tag"></i> <%= item.discountPercentage %>% OFF
                       </p>
                     <% } %>
                     <div class="mt-2 flex justify-between items-center">
-                      <div class="flex items-center bg-gray-100 rounded-lg">
+                      <div class="flex items-center bg-gray-100 rounded-lg <%= !item.product.inStock ? 'opacity-50' : '' %>">
                         <button 
-                          class="quantity-btn px-3 py-1 text-gray-600 <%= item.quantity <= 1 ? 'opacity-50' : '' %>"
+                          class="quantity-btn px-3 py-1 text-gray-600 <%= item.quantity <= 1 || !item.product.inStock ? 'opacity-50' : '' %>"
                           onclick="updateQuantity(this, '<%= item.product._id %>', 'decrease')"
-                          <%= item.quantity <= 1 ? 'disabled' : '' %>
+                          <%= item.quantity <= 1 || !item.product.inStock ? 'disabled' : '' %>
                         >
                           <i class="fas fa-minus"></i>
                         </button>
                         <span class="quantity-display px-3 font-medium"><%= item.quantity %></span>
                         <button 
-                          class="quantity-btn px-3 py-1 text-gray-600 <%= item.quantity >= 3 ? 'opacity-50' : '' %>"
+                          class="quantity-btn px-3 py-1 text-gray-600 <%= item.quantity >= 3 || !item.product.inStock ? 'opacity-50' : '' %>"
                           onclick="updateQuantity(this, '<%= item.product._id %>', 'increase')"
-                          <%= item.quantity >= 3 ? 'disabled' : '' %>
+                          <%= item.quantity >= 3 || !item.product.inStock ? 'disabled' : '' %>
                         >
                           <i class="fas fa-plus"></i>
                         </button>
@@ -131,8 +140,8 @@
                           <p class="text-gray-500 text-sm mt-1">
                             Size: <%= item.product.size %>
                           </p>
-                          <p class="text-green-500 text-sm mt-1">
-                            <%= item.product.stock > 0 ? 'In Stock' : '' %>
+                          <p class="text-sm <%= item.product.inStock ? 'text-green-500' : 'text-red-500' %>">
+                            <%= item.product.inStock ? 'In Stock' : 'Out of Stock' %>
                           </p>
                           <% if (item.discountPercentage > 0) { %>
                             <p class="text-green-600 text-sm mt-1">
@@ -148,11 +157,11 @@
                         </button>
                       </div>
                       <div class="flex justify-between items-center mt-4">
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-2 <%= !item.product.inStock ? 'opacity-50' : '' %>">
                           <button 
                             class="quantity-btn bg-gray-200 text-gray-600 w-8 h-8 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             onclick="updateQuantity(this, '<%= item.product._id %>', 'decrease')"
-                            <%= item.quantity <= 1 ? 'disabled' : '' %>
+                            <%= item.quantity <= 1 || !item.product.inStock ? 'disabled' : '' %>
                           >
                             <i class="fas fa-minus"></i>
                           </button>
@@ -162,7 +171,7 @@
                           <button 
                             class="quantity-btn bg-gray-200 text-gray-600 w-8 h-8 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             onclick="updateQuantity(this, '<%= item.product._id %>', 'increase')"
-                            <%= item.quantity >= 3 ? 'disabled' : '' %>
+                            <%= item.quantity >= 3 || !item.product.inStock ? 'disabled' : '' %>
                           >
                             <i class="fas fa-plus"></i>
                           </button>
@@ -184,6 +193,9 @@
                 <% }); %>
               </div>
               <div class="mt-8 flex justify-end">
+                <% 
+                    const hasOutOfStockItems = cartItems && cartItems.some(item => !item.product.inStock);
+                %>
                 <div class="text-xl font-bold text-gray-800" id="total">
                   Total: ₹<%= total %>
                 </div>
@@ -238,8 +250,15 @@
 
             <!-- Checkout Button -->
             <% if (cartItems && cartItems.length > 0) { %>
-              <button onclick="location.href='/checkout'" class="checkout-button w-full bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition-all duration-300 ">
-                Proceed to Checkout
+              <% 
+                  const hasOutOfStockItems = cartItems && cartItems.some(item => !item.product.inStock);
+              %>
+              <button 
+                  onclick="<%= !hasOutOfStockItems ? 'location.href=\'/checkout\'' : 'showAlert(\'error\', \'Please remove out of stock items before proceeding\')' %>" 
+                  class="checkout-button w-full <%= !hasOutOfStockItems ? 'bg-black hover:bg-gray-800' : 'bg-gray-300 cursor-not-allowed' %> text-white py-3 rounded-xl font-medium transition-all duration-300"
+                  <%= hasOutOfStockItems ? 'disabled' : '' %>
+              >
+                  <%= hasOutOfStockItems ? 'Remove Out of Stock Items' : 'Proceed to Checkout' %>
               </button>
             <% } else { %>
               <button class="checkout-button w-full bg-gray-300 text-gray-500 py-3 rounded-xl font-medium cursor-not-allowed" disabled>
