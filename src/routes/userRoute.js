@@ -95,6 +95,8 @@ router.post('/checkout/create-razorpay-order',userMiddleware.checkSession,userMi
 router.post('/checkout/verify-payment',userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.verifyPayment)
 router.post("/checkout/payment-failed",userMiddleware.checkSession,userMiddleware.errorHandler,checkoutController.handlePaymentFailure) 
 
+// invoice & retry payment
+router.get("/orders/:orderId/invoice",userMiddleware.checkSession,userMiddleware.errorHandler,orderController.generateInvoice)
 
 
 
