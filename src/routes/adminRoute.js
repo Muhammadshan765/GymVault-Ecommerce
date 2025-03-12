@@ -14,7 +14,7 @@ import reportController from "../controllers/admin/reportController.js";
 //Admin Routes
 router.get("/login", adminMiddleware.isLogin, adminController.loadLogin);
 router.post("/login", adminController.login)
-router.get("/dashboard", adminMiddleware.checkSession, dashboardController.getdashboard)
+router.get("/dashboard", adminMiddleware.checkSession, dashboardController.getDashboard)
 router.get("/customers",adminMiddleware.checkSession,adminMiddleware.errorHandler, customersController.getcustomers)
 router.post("/user/:id/toggle-block",adminMiddleware.checkSession,adminMiddleware.errorHandler,customersController.getToggle)
 router.get("/logout", adminController.logout)

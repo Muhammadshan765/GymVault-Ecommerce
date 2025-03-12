@@ -1,22 +1,543 @@
-<%- include('../partials/sidebar')%>
-    <!-- Main Content -->
-    <div class="p-6 flex-1">
-        <h1 class="text-3xl font-bold mb-4">Dashboard Overview</h1>
+ 
+ 
 
-        <!-- Dashboard Cards -->
-        <div class="grid grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-xl font-bold">Total Products</h2>
-                <p class="text-2xl mt-2">120</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-xl font-bold">Total Users</h2>
-                <p class="text-2xl mt-2">540</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-xl font-bold">Total Sales</h2>
-                <p class="text-2xl mt-2">$25,000</p>
+     <%- include("../partials/sidebar") %>
+ 
+    <link rel="stylesheet" href="/tailwindcss/output.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   
+ 
+  <div class="mybg-green text-white w-full  ml-64 ">
+
+    <main class=" p-6 flex-1 " role="main">
+      <header
+        class="flex flex-col md:flex-row md:items-center md:justify-between mb-8"
+      >
+        <h1 class="text-2xl font-semibold text-gray-700">DASHBOARD</h1>
+        
+      </header>
+
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+        <!-- Revenue Card -->
+        <div class="p-4 md:p-6 bg-zinc-800 rounded-lg shadow-md">
+            <h2 class="text-gray-400 text-base md:text-lg">Revenue</h2>
+            <div class="flex items-center justify-between mt-2">
+                <p class="text-lg md:text-xl font-bold revenue-value">₹ <%= totalRevenue.toLocaleString() %></p>
+                <p class="growth-percentage text-sm font-semibold text-gray-400">
+                    <%= growthPercentage %>%
+                </p>
             </div>
         </div>
-    </div>
-    
+
+        <!-- Orders Card -->
+        <div
+          class="p-6 bg-zinc-800 rounded-lg shadow-md"
+        >
+          <h2 class="text-gray-400 text-lg">Total Orders</h2>
+          <p class="text-xl font-bold total-orders mt-2"><%= totalOrders %></p>
+        </div>
+
+        <!-- Completed Orders Card -->
+        <div
+          class="p-6 bg-zinc-800 rounded-lg shadow-md"
+        >
+          <h2 class="text-gray-400 text-lg">Completed Orders</h2>
+          <p class="text-xl font-bold completed-orders mt-2"><%= completedOrders %></p>
+        </div>
+
+        <!-- Completion Rate Card -->
+        <div
+          class="p-6 bg-zinc-800 rounded-lg shadow-md"
+        >
+          <h2 class="text-gray-400 text-lg">Completion Rate</h2>
+          <p class="text-xl font-bold completion-rate mt-2">
+            <%= Math.round((completedOrders / totalOrders) * 100) || 0 %>%
+          </p>
+        </div>
+      </section>
+
+      <!-- Time Frame and Date Filter -->
+      <div class="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-4 mb-4">
+          <!-- Time Frame Buttons -->
+          <div class="flex flex-wrap gap-2">
+              <button onclick="changeTimeFrame('daily')" 
+                      class="timeframe-btn flex-1 sm:flex-none px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-md <%= timeFrame === 'daily' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800' %>"
+                      data-timeframe="daily">
+                  Daily
+              </button>
+              <button onclick="changeTimeFrame('weekly')" 
+                      class="timeframe-btn flex-1 sm:flex-none px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-md <%= timeFrame === 'weekly' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800' %>"
+                      data-timeframe="weekly">
+                  Weekly
+              </button>
+              <button onclick="changeTimeFrame('monthly')" 
+                      class="timeframe-btn flex-1 sm:flex-none px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-md <%= timeFrame === 'monthly' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800' %>"
+                      data-timeframe="monthly">
+                  Monthly
+              </button>
+              <button onclick="changeTimeFrame('yearly')" 
+                      class="timeframe-btn flex-1 sm:flex-none px-3 py-2 text-sm md:px-4 md:py-2 md:text-base rounded-md <%= timeFrame === 'yearly' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800' %>"
+                      data-timeframe="yearly">
+                  Yearly
+              </button>
+          </div>
+
+          <!-- Custom Date Range -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div class="flex gap-2 items-center">
+                  <input type="date" 
+                         id="startDate" 
+                         class="flex-1 px-2 py-1 md:px-3 md:py-2 text-sm md:text-base rounded-md text-gray-800 bg-gray-100">
+                  <span class="text-white">to</span>
+                  <input type="date" 
+                         id="endDate" 
+                         class="flex-1 px-2 py-1 md:px-3 md:py-2 text-sm md:text-base rounded-md text-gray-800 bg-gray-100">
+              </div>
+              <button onclick="applyCustomDateRange()"
+                      class="w-full sm:w-auto px-3 py-1 md:px-4 md:py-2 text-sm md:text-base bg-blue-500 text-white rounded-md">
+                  Apply
+              </button>
+          </div>
+      </div>
+
+      <!-- Sales Chart -->
+      <section class="bg-zinc-800 rounded-lg shadow-md p-4 md:p-6 mb-6 md:mb-8">
+        <h2 class="text-lg md:text-xl font-semibold mb-4">Sales Summary</h2>
+        <div class="relative h-[300px] md:h-[400px] lg:h-[500px]">
+          <canvas id="salesChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Top Selling Sections Container -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Top Selling Products Section -->
+          <section class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl shadow-xl p-4 md:p-6">
+              <div class="flex justify-between items-center mb-4 md:mb-6">
+                  <div>
+                      <h2 class="text-lg md:text-xl font-bold text-white">Top Products</h2>
+                      <p class="text-xs md:text-sm text-zinc-400 mt-1">Best performing products</p>
+                  </div>
+              </div>
+              <div class="space-y-3 md:space-y-4">
+                  <% topProducts.forEach((product, index) => { %>
+                      <div class="relative bg-gradient-to-r from-zinc-700/50 to-zinc-800/50 rounded-lg p-3 md:p-4">
+                          <div class="flex items-center gap-3 md:gap-4">
+                              <div class="w-16 h-16 md:w-24 md:h-24 relative flex-shrink-0">
+                                  <img src="<%= product.imageUrl %>" 
+                                       alt="<%= product.productName %>" 
+                                       class="w-full h-full object-cover rounded-lg">
+                              </div>
+                              <div class="flex-1 min-w-0">
+                                  <h3 class="text-sm md:text-base font-semibold text-white truncate">
+                                      <%= product.productName %>
+                                  </h3>
+                                  <p class="text-xs md:text-sm text-zinc-400 mt-1">
+                                      ₹<%= product.totalRevenue.toLocaleString() %>
+                                  </p>
+                                  <div class="flex items-center mt-2">
+                                      <span class="text-sm md:text-base font-semibold text-emerald-400">
+                                          <%= product.totalQuantity %> units
+                                      </span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  <% }); %>
+              </div>
+          </section>
+
+          <!-- Top Categories Section -->
+          <section class="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl shadow-xl p-4 md:p-6">
+              <div class="flex justify-between items-center mb-4 md:mb-6">
+                  <div>
+                      <h2 class="text-lg md:text-xl font-bold text-white">Top Categories</h2>
+                      <p class="text-xs md:text-sm text-zinc-400 mt-1">Best performing categories</p>
+                  </div>
+              </div>
+              <div class="space-y-3 md:space-y-4">
+                  <% topCategories.forEach((category, index) => { %>
+                      <div class="relative bg-gradient-to-r from-zinc-700/50 to-zinc-800/50 rounded-lg p-3 md:p-4">
+                          <div class="flex items-center gap-3 md:gap-4">
+                              
+                              <div class="flex-1 min-w-0">
+                                  <h3 class="text-sm md:text-base font-semibold text-white truncate">
+                                      <%= category.categoryName %>
+                                  </h3>
+                                  <div class="flex items-center mt-2">
+                                      <span class="text-sm md:text-base font-semibold text-emerald-400">
+                                          <%= category.totalQuantity %> units
+                                      </span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  <% }); %>
+              </div>
+          </section>
+      </div>
+
+     
+      
+
+      <!-- Footer -->
+      <footer class="mt-auto py-4 border-t border-zinc-700">
+          <div class="container mx-auto px-4">
+              <div class="flex flex-col sm:flex-row justify-between items-center">
+                  <div class="text-zinc-400 text-sm mb-2 sm:mb-0">
+                      © <%= new Date().getFullYear() %> GYMVAULT. All rights reserved.
+                  </div>
+                  <div class="flex items-center space-x-4">
+                      <span class="text-zinc-400 text-sm">
+                          Admin Dashboard v1.0
+                      </span>
+                  </div>
+              </div>
+          </div>
+      </footer>
+    </main>
+    <script>
+      
+      let salesChart;
+
+      async function changeTimeFrame(timeFrame) {
+        try {
+            // Update button styles
+            document.querySelectorAll('.timeframe-btn').forEach(btn => {
+                if (btn.dataset.timeframe === timeFrame) {
+                    btn.classList.remove('bg-gray-200', 'text-gray-800');
+                    btn.classList.add('bg-gray-700', 'text-white');
+                } else {
+                    btn.classList.remove('bg-gray-700', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-800');
+                }
+            });
+
+            // Fetch new data
+            const response = await fetch(`/admin/dashboard/data?timeFrame=${timeFrame}`);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+
+            // Update statistics
+            document.querySelector('.revenue-value').textContent = `₹ ${data.totalRevenue.toLocaleString()}`;
+            document.querySelector('.growth-percentage').textContent = `${data.growthPercentage}%`;
+            document.querySelector('.total-orders').textContent = data.totalOrders;
+            document.querySelector('.completed-orders').textContent = data.completedOrders;
+            document.querySelector('.completion-rate').textContent = 
+                `${Math.round((data.completedOrders / data.totalOrders) * 100) || 0}%`;
+
+            // Update chart
+            if (salesChart) {
+                salesChart.destroy();
+            }
+
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.chartData.map(item => item.time),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: data.chartData.map(item => item.revenue),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false,
+                            position: 'top',
+                            labels: {
+                                color: 'white',
+                                padding: 20,
+                                font: { size: 14 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '₹ ' + context.parsed.y.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: {
+                                color: 'white',
+                                font: { size: 12 },
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return '₹ ' + (value/1000000).toFixed(1) + 'M';
+                                    } else if (value >= 1000) {
+                                        return '₹ ' + (value/1000).toFixed(1) + 'K';
+                                    }
+                                    return '₹ ' + value.toLocaleString('en-IN');
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: {
+                                color: 'white',
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+      }
+
+      // Initialize chart with current data
+      const initialChartData = <%- chartData %>;
+      const ctx = document.getElementById('salesChart').getContext('2d');
+      salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: initialChartData.map(data => data.time),
+          datasets: [{
+            label: 'Revenue (₹)',
+            data: initialChartData.map(data => data.revenue),
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+              position: 'top',
+              labels: {
+                color: 'white',
+                padding: 20,
+                font: { size: 14 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return '₹ ' + context.parsed.y.toLocaleString('en-IN');
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255, 255, 255, 0.1)' },
+              ticks: {
+                color: 'white',
+                font: { size: 12 },
+                callback: function(value) {
+                  if (value >= 1000000) {
+                    return '₹ ' + (value/1000000).toFixed(1) + 'M';
+                  } else if (value >= 1000) {
+                    return '₹ ' + (value/1000).toFixed(1) + 'K';
+                  }
+                  return '₹ ' + value.toLocaleString('en-IN');
+                }
+              }
+            },
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.1)' },
+              ticks: {
+                color: 'white',
+                font: { size: 12 }
+              }
+            }
+          }
+        }
+      });
+
+      async function applyCustomDateRange() {
+          const startDate = document.getElementById('startDate').value;
+          const endDate = document.getElementById('endDate').value;
+
+          if (!startDate || !endDate) {
+              Swal.fire({
+                  icon: 'warning',
+                  title: 'Missing Dates',
+                  text: 'Please select both start and end dates',
+                  confirmButtonColor: '#3085d6'
+              });
+              return;
+          }
+
+          if (new Date(endDate) < new Date(startDate)) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Invalid Date Range',
+                  text: 'End date must be after start date',
+                  confirmButtonColor: '#3085d6'
+              });
+              return;
+          }
+
+          try {
+              // Reset timeframe button styles
+              document.querySelectorAll('.timeframe-btn').forEach(btn => {
+                  btn.classList.remove('bg-gray-700', 'text-white');
+                  btn.classList.add('bg-gray-200', 'text-gray-800');
+              });
+
+              const response = await fetch(`/admin/dashboard/data?timeFrame=custom&startDate=${startDate}&endDate=${endDate}`);
+              if (!response.ok) throw new Error('Network response was not ok');
+              const data = await response.json();
+
+              updateDashboard(data);
+          } catch (error) {
+              console.error('Error fetching custom date range data:', error);
+          }
+      }
+
+      function updateDashboard(data) {
+          // Update statistics
+          document.querySelector('.revenue-value').textContent = `₹ ${data.totalRevenue.toLocaleString()}`;
+          document.querySelector('.growth-percentage').textContent = `${data.growthPercentage}%`;
+          document.querySelector('.total-orders').textContent = data.totalOrders;
+          document.querySelector('.completed-orders').textContent = data.completedOrders;
+          document.querySelector('.completion-rate').textContent = 
+              `${Math.round((data.completedOrders / data.totalOrders) * 100) || 0}%`;
+
+          // Update chart
+          if (salesChart) {
+              salesChart.destroy();
+          }
+
+          const ctx = document.getElementById('salesChart').getContext('2d');
+          salesChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: data.chartData.map(item => item.time),
+                  datasets: [{
+                      label: 'Revenue (₹)',
+                      data: data.chartData.map(item => item.revenue),
+                      borderColor: 'rgb(75, 192, 192)',
+                      tension: 0.1,
+                      fill: false
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                      legend: {
+                          display: false,
+                          position: 'top',
+                          labels: {
+                              color: 'white',
+                              padding: 20,
+                              font: { size: 14 }
+                          }
+                      },
+                      tooltip: {
+                          callbacks: {
+                              label: function(context) {
+                                  return '₹ ' + context.parsed.y.toLocaleString('en-IN');
+                              }
+                          }
+                      }
+                  },
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                          ticks: {
+                              color: 'white',
+                              font: { size: 12 },
+                              callback: function(value) {
+                                  if (value >= 1000000) {
+                                      return '₹ ' + (value/1000000).toFixed(1) + 'M';
+                                  } else if (value >= 1000) {
+                                      return '₹ ' + (value/1000).toFixed(1) + 'K';
+                                  }
+                                  return '₹ ' + value.toLocaleString('en-IN');
+                              }
+                          }
+                      },
+                      x: {
+                          grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                          ticks: {
+                              color: 'white',
+                              font: { size: 12 }
+                          }
+                      }
+                  }
+              }
+          });         
+      }
+
+      function updateToggleStyle(type) {
+          const sortByUnits = document.getElementById(type === 'product' ? 'sortByUnits' : 'categorySortByUnits');
+          const sortByRevenue = document.getElementById(type === 'product' ? 'sortByRevenue' : 'categorySortByRevenue');
+          
+          // Update Units button
+          if (sortByUnits.getAttribute('data-active') === 'true') {
+              sortByUnits.classList.add('bg-emerald-500', 'text-white');
+              sortByUnits.classList.remove('text-zinc-300', 'hover:text-white');
+          } else {
+              sortByUnits.classList.remove('bg-emerald-500', 'text-white');
+              sortByUnits.classList.add('text-zinc-300', 'hover:text-white');
+          }
+          
+          // Update Revenue button
+          if (sortByRevenue.getAttribute('data-active') === 'true') {
+              sortByRevenue.classList.add('bg-emerald-500', 'text-white');
+              sortByRevenue.classList.remove('text-zinc-300', 'hover:text-white');
+          } else {
+              sortByRevenue.classList.remove('bg-emerald-500', 'text-white');
+              sortByRevenue.classList.add('text-zinc-300', 'hover:text-white');
+          }
+      }
+
+      async function updateSort(type, sortBy) {
+          try {
+              // Update active states
+              const unitsBtn = document.getElementById(type === 'product' ? 'sortByUnits' : 'categorySortByUnits');
+              const revenueBtn = document.getElementById(type === 'product' ? 'sortByRevenue' : 'categorySortByRevenue');
+              
+              unitsBtn.setAttribute('data-active', sortBy === 'units');
+              revenueBtn.setAttribute('data-active', sortBy === 'revenue');
+              updateToggleStyle(type);
+
+              const timeFrame = document.querySelector('.timeframe-btn.bg-gray-700')?.dataset.timeframe || 'yearly';
+              const startDate = document.getElementById('startDate').value;
+              const endDate = document.getElementById('endDate').value;
+              
+              // Store the sort preferences
+              localStorage.setItem(`${type}Sort`, sortBy);
+              
+              let url = `/admin/dashboard/data?timeFrame=${timeFrame}&${type}Sort=${sortBy}`;
+              if (startDate && endDate) {
+                  url += `&startDate=${startDate}&endDate=${endDate}`;
+              }
+              
+              const response = await fetch(url);
+              if (!response.ok) throw new Error('Network response was not ok');
+              const data = await response.json();
+              updateDashboard(data);
+          } catch (error) {
+              console.error(`Error updating ${type} sort:`, error);
+          }
+      }
+
+    </script>
+   
+</div>
+ 
