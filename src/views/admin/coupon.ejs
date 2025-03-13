@@ -5,36 +5,39 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
-  <div class="p-6 flex-1 mybg-green text-white min-h-screen ml-64">
+  <div class="p-6 flex-1 min-h-screen ml-64 bg-white">
 
     <!-- <div class="lg:ml-64 transition-all" id="main-content"> -->
-      <header class="flex items-center justify-between mb-2       ">
-        <button id="toggleSidebar" class="text-white lg:hidden">
-          <i class="fas fa-bars"></i>
+      <header class="flex items-center justify-between mb-8">
+        <button id="toggleSidebar" class="text-white lg:hidden hover:text-purple-200 transition-colors">
+          <i class="fas fa-bars text-2xl"></i>
         </button>
-        <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent pb-7 ">Coupon Management</h1>
-        <button id="addCouponBtn" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg">
-          Add Coupon
+        <h1 class="text-4xl font-extrabold bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent tracking-tight">Coupons</h1>
+        <button id="addCouponBtn" class="relative group px-8 py-3 bg-white rounded-2xl overflow-hidden shadow-lg shadow-white/20">
+          <span  class="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-8 py-3 rounded-xl flex items-center gap-3 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-indigo-200">
+            <i class="fas fa-plus-circle text-lg"></i>
+            New Coupon
+          </span>
         </button>
       </header>
 
       <!-- <main class="p-4 lg:p-8">  -->
         <!-- <div class="mt-2"> -->
             <!-- Table container -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-300">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-zinc-800 uppercase tracking-wider">Code</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-zinc-800 uppercase tracking-wider">Discount</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-zinc-800 uppercase tracking-wider">Duration</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-zinc-800 uppercase tracking-wider">Usage</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-zinc-800 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-4 text-left text-sm font-bold text-zinc-800 uppercase tracking-wider">Actions</th>
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-6 py-4 text-left text-sm font-bold text-indigo-600 uppercase tracking-wider">Code</th>
+                                <th class="px-6 py-4 text-left text-sm font-bold text-indigo-600 uppercase tracking-wider">Discount</th>
+                                <th class="px-6 py-4 text-left text-sm font-bold text-indigo-600 uppercase tracking-wider">Duration</th>
+                                <th class="px-6 py-4 text-left text-sm font-bold text-indigo-600 uppercase tracking-wider">Usage</th>
+                                <th class="px-6 py-4 text-left text-sm font-bold text-indigo-600 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-left text-sm font-bold text-indigo-600 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="divide-y divide-gray-100">
                             <% coupons.forEach(coupon => { %>
                                 <% 
                                 const now = new Date();
@@ -43,56 +46,56 @@
                                 const isExpired = expiryDate < now;
                                 const isScheduled = startDate > now;
                                 %>
-                                <tr class="hover:bg-gray-100">
+                                <tr class="hover:bg-gray-50/80 transition-colors duration-200">
                                     <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-800 font-medium"><%= coupon.code %></div>
+                                        <div class="text-sm font-bold text-indigo-600"><%= coupon.code %></div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="text-sm text-gray-800">
-                                            <span class="font-medium"><%= coupon.discountPercentage %>%</span>
+                                            <span class="font-bold text-purple-600"><%= coupon.discountPercentage %>%</span>
                                             <% if (coupon.maximumDiscount) { %>
                                                 <span class="text-xs text-gray-600">up to ₹<%= coupon.maximumDiscount %></span>
                                             <% } %>
                                         </div>
                                         <% if (coupon.minimumPurchase > 0) { %>
-                                            <div class="text-xs text-gray-600">Min. ₹<%= coupon.minimumPurchase %></div>
+                                            <div class="text-xs text-gray-500">Min. ₹<%= coupon.minimumPurchase %></div>
                                         <% } %>
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="text-sm text-gray-800">
                                             <%= startDate.toLocaleDateString() %> - <%= expiryDate.toLocaleDateString() %>
                                         </div>
-                                        <div class="text-xs text-gray-600">
+                                        <div class="text-xs text-gray-500">
                                             <%= startDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %> - 
                                             <%= expiryDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="text-sm text-gray-800">
-                                            <%= coupon.usedCouponCount %> used
+                                            <span class="font-bold text-purple-600"><%= coupon.usedCouponCount %></span> used
                                             <% if (coupon.totalCoupon) { %>
                                                 <span class="text-gray-600">/ <%= coupon.totalCoupon %></span>
                                             <% } %>
                                         </div>
-                                        <div class="text-xs text-gray-600">
+                                        <div class="text-xs text-gray-500">
                                             Limit: <%= coupon.userUsageLimit %>/user
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <% if (isExpired) { %>
-                                            <span class="px-2 py-1 text-xs font-medium bg-red-500 text-white rounded-full">
+                                            <span class="px-4 py-1.5 text-xs font-bold bg-red-100 text-red-600 rounded-full border border-red-200">
                                                 Expired
                                             </span>
                                         <% } else if (isScheduled) { %>
-                                            <span class="px-2 py-1 text-xs font-medium bg-yellow-300 text-zinc-800 rounded-full">
+                                            <span class="px-4 py-1.5 text-xs font-bold bg-amber-100 text-amber-600 rounded-full border border-amber-200">
                                                 Scheduled
                                             </span>
                                         <% } else if (coupon.isActive) { %>
-                                            <span class="px-2 py-1 text-xs font-medium bg-green-500 text-white rounded-full">
+                                            <span class="px-4 py-1.5 text-xs font-bold bg-emerald-100 text-emerald-600 rounded-full border border-emerald-200">
                                                 Active
                                             </span>
                                         <% } else { %>
-                                            <span class="px-2 py-1 text-xs font-medium bg-gray-500/10 text-gray-400 rounded-full">
+                                            <span class="px-4 py-1.5 text-xs font-bold bg-gray-100 text-gray-600 rounded-full border border-gray-200">
                                                 Inactive
                                             </span>
                                         <% } %>
@@ -114,9 +117,11 @@
                                             </button> -->
 
                                             <!-- Delete Button -->
-                                            <button class="delete-coupon px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                                            <button class="delete-coupon group relative px-6 py-2 overflow-hidden rounded-xl bg-red-50 hover:bg-red-100 transition-all duration-300"
                                                     data-id="<%= coupon._id %>">
-                                                Delete
+                                                <span class="relative text-red-600 font-medium group-hover:text-red-700">
+                                                    <i class="fas fa-trash-alt mr-2"></i>Delete
+                                                </span>
                                             </button>
                                         </div>
                                     </td>
@@ -131,110 +136,110 @@
     </div>
 
     <!-- Modal -->
-    <div id="couponModal" class="fixed inset-0 bg-white/10 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gradient-to-br from-white to-gray-100 rounded-xl shadow-2xl w-[480px] max-w-full border border-gray-200">
+    <div id="couponModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl w-[480px] max-w-full">
             <!-- Modal Header -->
-            <div class="flex items-center justify-between p-5 border-b border-gray-200">
-                <h3 class="text-xl font-semibold text-gray-800 tracking-wide" id="modalTitle">Add New Coupon</h3>
-                <button type="button" class="close-modal text-gray-600 hover:text-gray-800 transition-colors duration-200">
-                    <i class="fas fa-times"></i>
+            <div class="flex items-center justify-between p-6 border-b">
+                <h3 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent" id="modalTitle">Add New Coupon</h3>
+                <button type="button" class="close-modal text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
 
             <!-- Modal Body -->
-            <div class="p-5">
-                <form id="couponForm" class="space-y-5">
+            <div class="p-6">
+                <form id="couponForm" class="space-y-6">
                     <input type="hidden" id="couponId">
                     
                     <!-- Coupon Code -->
                     <div class="group">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Coupon Code</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Coupon Code</label>
                         <input type="text" id="code" placeholder="Enter code"
-                               class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                      focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 placeholder-gray-400
-                                      transition-all duration-200 hover:bg-gray-50">
+                               class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                      focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 placeholder-gray-400
+                                      transition-all duration-200 hover:bg-gray-100">
                     </div>
 
                     <!-- Description -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
                         <textarea id="description" rows="2" placeholder="Brief description"
-                                  class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                         focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 placeholder-gray-400
-                                         transition-all duration-200 hover:bg-gray-50"></textarea>
+                                  class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                         focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 placeholder-gray-400
+                                         transition-all duration-200 hover:bg-gray-100"></textarea>
                     </div>
 
                     <!-- Discount Settings -->
                     <div class="grid grid-cols-3 gap-5">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Discount (%)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Discount (%)</label>
                             <input type="number" id="discountPercentage" min="1" max="90"
-                                   class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                          focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-                                          transition-all duration-200 hover:bg-gray-50">
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                          focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
+                                          transition-all duration-200 hover:bg-gray-100">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Min. Purchase (₹)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Min. Purchase (₹)</label>
                             <input type="number" id="minimumPurchase" min="0"
-                                   class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                          focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-                                          transition-all duration-200 hover:bg-gray-50">
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                          focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
+                                          transition-all duration-200 hover:bg-gray-100">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Max. Discount (₹)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Max. Discount (₹)</label>
                             <input type="number" id="maximumDiscount" min="0"
-                                   class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                          focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-                                          transition-all duration-200 hover:bg-gray-50">
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                          focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
+                                          transition-all duration-200 hover:bg-gray-100">
                         </div>
                     </div>
 
                     <!-- Usage Limits -->
                     <div class="grid grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Total Coupons</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Total Coupons</label>
                             <input type="number" id="totalCoupon" min="0"
-                                   class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                          focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-                                          transition-all duration-200 hover:bg-gray-50">
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                          focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
+                                          transition-all duration-200 hover:bg-gray-100">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Uses Per User</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Uses Per User</label>
                             <input type="number" id="userUsageLimit" min="1" value="1"
-                                   class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                          focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-                                          transition-all duration-200 hover:bg-gray-50">
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                          focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
+                                          transition-all duration-200 hover:bg-gray-100">
                         </div>
                     </div>
 
                     <!-- Date Range -->
                     <div class="grid grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Start Date</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                             <input type="datetime-local" id="startDate"
-                                   class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                          focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-                                          transition-all duration-200 hover:bg-gray-50">
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                          focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
+                                          transition-all duration-200 hover:bg-gray-100">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">End Date</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                             <input type="datetime-local" id="expiryDate"
-                                   class="w-full px-4 py-2.5 bg-white border border-gray-300 text-gray-800 rounded-lg 
-                                          focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500
-                                          transition-all duration-200 hover:bg-gray-50">
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl
+                                          focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500
+                                          transition-all duration-200 hover:bg-gray-100">
                         </div>
                     </div>
 
                     <!-- Modal Footer -->
-                    <div class="flex justify-end space-x-3 pt-5 border-t border-gray-200">
+                    <div class="flex justify-end space-x-4 pt-6 border-t">
                         <button type="button" id="cancelModal"
-                                class="px-5 py-2.5 text-sm font-medium bg-gray-200 text-gray-700 rounded-lg 
-                                       hover:bg-gray-300 transition-colors duration-200">
+                                class="px-6 py-3 text-sm font-medium bg-gray-100 text-gray-600 rounded-xl
+                                       hover:bg-gray-200 transition-all duration-200">
                             Cancel
                         </button>
                         <button type="submit"
-                                class="px-5 py-2.5 text-sm font-medium bg-blue-600 text-white rounded-lg 
-                                       hover:bg-blue-700 transition-colors duration-200 shadow-lg shadow-blue-500/20">
+                                class="px-6 py-3 text-sm font-medium bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl
+                                       hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg shadow-indigo-500/20">
                             Save Coupon
                         </button>
                     </div>
