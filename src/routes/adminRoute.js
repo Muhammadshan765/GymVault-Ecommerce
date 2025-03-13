@@ -12,14 +12,15 @@ import offerController from "../controllers/admin/offerController.js";
 import reportController from "../controllers/admin/reportController.js";
 
 //Admin Routes
-router.get("/login", adminMiddleware.isLogin, adminController.loadLogin);
-router.post("/login", adminController.login)
-router.get("/dashboard", adminMiddleware.checkSession, dashboardController.getDashboard)
-router.get("/customers",adminMiddleware.checkSession,adminMiddleware.errorHandler, customersController.getcustomers)
-router.post("/user/:id/toggle-block",adminMiddleware.checkSession,adminMiddleware.errorHandler,customersController.getToggle)
-router.get("/logout", adminController.logout)
+router.get("/login", adminMiddleware.isLogin, adminMiddleware.errorHandler, adminController.loadLogin);
+router.post("/login", adminController.login, adminMiddleware.errorHandler)
+router.get("/dashboard", adminMiddleware.checkSession, adminMiddleware.errorHandler, dashboardController.getDashboard)
+router.get('/dashboard/data', adminMiddleware.checkSession, adminMiddleware.errorHandler, dashboardController.getDashboardData)
+router.get("/customers", adminMiddleware.checkSession, adminMiddleware.errorHandler, customersController.getcustomers)
+router.post("/user/:id/toggle-block", adminMiddleware.checkSession, adminMiddleware.errorHandler, customersController.getToggle)
+router.get("/logout", adminMiddleware.checkSession, adminMiddleware.errorHandler, adminController.logout)
 
- 
+
 //Category Routes
 router.get("/category", adminMiddleware.checkSession, adminMiddleware.errorHandler, categoryController.getcategory)
 router.post("/category/add", adminMiddleware.checkSession, adminMiddleware.errorHandler, categoryController.addCategory)
@@ -34,24 +35,24 @@ router.post("/products/edit/:id", adminMiddleware.checkSession, adminMiddleware.
 router.post("/products/toggle-status/:id", adminMiddleware.checkSession, adminMiddleware.errorHandler, productsController.toggleProductStatus)
 
 //order routes
-router.get("/orders",adminMiddleware.checkSession,orderController.getOrders)
-router.patch("/orders/:orderId/items/:productId/status",adminMiddleware.checkSession,adminMiddleware.errorHandler,orderController.updateItemStatus)
-router.post("/orders/:orderId/items/:productId/return",adminMiddleware.checkSession,adminMiddleware.errorHandler,orderController.handleReturnRequest)
+router.get("/orders", adminMiddleware.checkSession, orderController.getOrders)
+router.patch("/orders/:orderId/items/:productId/status", adminMiddleware.checkSession, adminMiddleware.errorHandler, orderController.updateItemStatus)
+router.post("/orders/:orderId/items/:productId/return", adminMiddleware.checkSession, adminMiddleware.errorHandler, orderController.handleReturnRequest)
 
 //coupon routes
-router.get("/coupon",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.getCoupons)
-router.post("/coupons/add",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.addCoupons)
-router.delete("/coupons/delete/:id",adminMiddleware.checkSession,adminMiddleware.errorHandler,couponController.deleteCoupon)
+router.get("/coupon", adminMiddleware.checkSession, adminMiddleware.errorHandler, couponController.getCoupons)
+router.post("/coupons/add", adminMiddleware.checkSession, adminMiddleware.errorHandler, couponController.addCoupons)
+router.delete("/coupons/delete/:id", adminMiddleware.checkSession, adminMiddleware.errorHandler, couponController.deleteCoupon)
 
 //offer routes
-router.get("/offers",adminMiddleware.checkSession,adminMiddleware.errorHandler,offerController.getOffers)
-router.post("/offers",adminMiddleware.checkSession,adminMiddleware.errorHandler,offerController.createOffer)
-router.put("/offers/:offerId",adminMiddleware.checkSession,adminMiddleware.errorHandler,offerController.updateOffer)
-router.delete("/offers/:offerId",adminMiddleware.checkSession,adminMiddleware.errorHandler,offerController.deleteOffer)
+router.get("/offers", adminMiddleware.checkSession, adminMiddleware.errorHandler, offerController.getOffers)
+router.post("/offers", adminMiddleware.checkSession, adminMiddleware.errorHandler, offerController.createOffer)
+router.put("/offers/:offerId", adminMiddleware.checkSession, adminMiddleware.errorHandler, offerController.updateOffer)
+router.delete("/offers/:offerId", adminMiddleware.checkSession, adminMiddleware.errorHandler, offerController.deleteOffer)
 
 
-router.get("/sales-report",adminMiddleware.checkSession,adminMiddleware.errorHandler,reportController.getSalesReport)
-router.get("/sales-report/download-excel",adminMiddleware.checkSession,adminMiddleware.errorHandler,reportController.downloadExcel)
-router.get("/sales-report/download-pdf",adminMiddleware.checkSession,adminMiddleware.errorHandler,reportController.downloadPDF)
+router.get("/sales-report", adminMiddleware.checkSession, adminMiddleware.errorHandler, reportController.getSalesReport)
+router.get("/sales-report/download-excel", adminMiddleware.checkSession, adminMiddleware.errorHandler, reportController.downloadExcel)
+router.get("/sales-report/download-pdf", adminMiddleware.checkSession, adminMiddleware.errorHandler, reportController.downloadPDF)
 
 export default router;
