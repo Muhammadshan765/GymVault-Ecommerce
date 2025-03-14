@@ -1,5 +1,6 @@
 import orderSchema from '../../models/orderModel.js';
 import productSchema from '../../models/productModel.js';
+  import Wallet from '../../models/walletModel.js';
 
 const getOrders = async (req, res) => {
     try {
@@ -204,9 +205,37 @@ const handleReturnRequest = async (req, res, next) => {
                 }
             );
 
-            // Update payment status if payment was made
+            // Process refund to wallet if payment was made
             if (['wallet', 'online', 'razorpay'].includes(order.payment.method)) {
-                order.payment.paymentStatus = 'refunded';
+                // Find or create user wallet
+                const wallet = await Wallet.findOne({ userId: order.userId });
+                
+                if (wallet) {
+                    // Calculate refund amount for this item
+                    const refundAmount = item.subtotal;
+                    
+                    // Add refund to wallet
+                    wallet.balance += refundAmount;
+                    wallet.transactions.push({
+                        type: 'credit',
+                        amount: refundAmount,
+                        description: `Refund for returned item in order #${order.orderCode}`,
+                        orderId: order._id,
+                        date: new Date()
+                    });
+                    
+                    await wallet.save();
+                    
+                    // Update payment status
+                    order.payment.paymentStatus = 'refunded';
+                    
+                    // Add additional status history entry for refund
+                    item.order.statusHistory.push({
+                        status: 'refund completed',
+                        date: new Date(),
+                        comment: `Refund of ₹${refundAmount} processed to wallet`
+                    });
+                }
             }
         } else if (returnStatus === 'rejected') {
             item.order.status = 'delivered';
