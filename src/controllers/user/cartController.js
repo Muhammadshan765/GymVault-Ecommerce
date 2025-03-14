@@ -312,7 +312,7 @@ const addToCart = async (req, res) => {
 //Update quantity in cart
 const updateQuantity = async (req,res)=>{
     try{
-        const {productId,quantity}=req.body;
+        const {productId, quantity, size}=req.body;
         const userId = req.session.user;
 
         if(quantity<1){
@@ -356,15 +356,20 @@ const updateQuantity = async (req,res)=>{
             });
         }
 
-        const cartItem = cart.items.find(item=>item.productId._id.toString()===productId);
+        // Find the specific variant in cart (match both productId AND size)
+        const cartItem = cart.items.find(item=>
+            item.productId._id.toString()===productId && 
+            item.size === size
+        );
+        
         if(!cartItem){
             return res.status(404).json({
-                message:'Product not found in cart'
+                message:'Product variant not found in cart'
             });
         }
 
         // Check stock for the specific size
-        const sizeObj = product.size.find(s => s.size === cartItem.size);
+        const sizeObj = product.size.find(s => s.size === size);
         if (!sizeObj || sizeObj.stock < quantity) {
             return res.status(400).json({
                 message: 'Not enough stock available for this size'
@@ -380,7 +385,7 @@ const updateQuantity = async (req,res)=>{
         );
 
         const { finalPrice, appliedDiscount, discountPercentage, originalPrice } = 
-            calculateFinalPrice(product, categoryOffer, productOffer, cartItem.size);
+            calculateFinalPrice(product, categoryOffer, productOffer, size);
 
         // Update cart item
         cartItem.quantity = quantity;
@@ -434,6 +439,7 @@ const updateQuantity = async (req,res)=>{
 const removeFromCart = async (req, res) => {
     try {
         const { productId } = req.params;
+        const { size } = req.body; // Get size from request body
         const userId = req.session.user;
 
         // Find the cart
@@ -442,9 +448,9 @@ const removeFromCart = async (req, res) => {
             return res.status(404).json({ message: 'Cart not found' });
         }
 
-        // Remove the item
+        // Remove the specific variant (match both productId AND size)
         cart.items = cart.items.filter(item => 
-            item.productId.toString() !== productId);
+            !(item.productId.toString() === productId && item.size === size));
 
         await cart.save();
 

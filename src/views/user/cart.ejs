@@ -46,7 +46,9 @@
         <div class="space-y-4">
           <% if (cartItems && cartItems.length > 0) { %>
             <% cartItems.forEach(item => { %>
-              <div class="bg-white p-4 rounded-xl shadow-md" id="cart-item-<%= item.product._id %>">
+              <div class="bg-white p-4 rounded-xl shadow-md" 
+                   id="cart-item-<%= item.product._id %>-<%= item.product.size %>" 
+                   data-size="<%= item.product.size %>">
                 <div class="flex gap-4">
                   <img
                     src="<%= item.product.imageUrl[0] %>"
@@ -91,7 +93,7 @@
                         </button>
                       </div>
                       <div class="text-right">
-                        <div class="font-semibold" id="subtotal-<%= item.product._id %>">₹<%= item.subtotal %></div>
+                        <div class="font-semibold" id="subtotal-<%= item.product._id %>-<%= item.product.size %>">₹<%= item.subtotal %></div>
                         <div class="text-sm text-gray-500">
                           <% if (item.originalPrice !== item.price) { %>
                             <span class="line-through">₹<%= item.originalPrice %></span>
@@ -125,7 +127,9 @@
             <% if (cartItems && cartItems.length > 0) { %>
               <div class="space-y-6">
                 <% cartItems.forEach(item => { %>
-                  <div class="flex items-center border-b pb-6" id="cart-item-<%= item.product._id %>">
+                  <div class="flex items-center border-b pb-6" 
+                       id="cart-item-<%= item.product._id %>-<%= item.product.size %>"
+                       data-size="<%= item.product.size %>">
                     <img
                       src="<%= item.product.imageUrl[0] %>"
                       alt="<%= item.product.productName %>"
@@ -349,6 +353,10 @@
 
         const quantityDisplay = cartItem.querySelector('.quantity-display');
         const currentQuantity = parseInt(quantityDisplay.textContent);
+        const size = cartItem.dataset.size;
+        
+        // Create a unique variant ID for DOM targeting
+        const variantId = `${productId}-${size}`;
         
         let newQuantity;
         if (action === 'increase') {
@@ -371,7 +379,8 @@
                 },
                 body: JSON.stringify({
                     productId,
-                    quantity: newQuantity
+                    quantity: newQuantity,
+                    size: size
                 })
             });
 
@@ -392,8 +401,8 @@
                     `;
                 }
 
-                // Update subtotal displays
-                const subtotalElements = document.querySelectorAll(`#subtotal-${productId}, #cart-item-${productId} #subtotal`);
+                // Update subtotal displays - only for this specific variant
+                const subtotalElements = cartItem.querySelectorAll('#subtotal, [id^="subtotal-"]');
                 subtotalElements.forEach(el => {
                     el.textContent = `₹${data.subtotal}`;
                 });
@@ -453,7 +462,7 @@
                     totalDisplay.textContent = `Total: ₹${data.total}`;
                 }
 
-                // Update button states
+                // Update button states for this specific variant
                 const minusBtn = cartItem.querySelector('.quantity-btn:first-child');
                 const plusBtn = cartItem.querySelector('.quantity-btn:last-child');
                 
@@ -541,22 +550,26 @@
       }
 
       async function removeFromCart(button, productId) {
+        const cartItem = button.closest('[id^="cart-item-"]');
+        const size = cartItem.dataset.size;
+        
         const confirmed = await showAlert('confirm');
         
         if (confirmed) {
             try {
                 const response = await fetch(`/cart/remove/${productId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ size })
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Remove the item from the cart UI
-                    const cartItem = document.getElementById(`cart-item-${productId}`);
-                    if (cartItem) {
-                        cartItem.remove();
-                    }
+                    // Remove the specific variant from the cart UI
+                    cartItem.remove();
 
                     // Update totals
                     updateCartTotals(data.total);
