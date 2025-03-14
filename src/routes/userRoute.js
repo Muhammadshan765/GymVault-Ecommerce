@@ -50,6 +50,8 @@ router.post("/change-password", userMiddleware.checkSession, userController.post
 //user profile
 router.get("/profile", userMiddleware.checkSession, profileController.getProfile)
 router.patch("/profile/update", userMiddleware.checkSession, profileController.updateProfile)
+router.post("/profile/send-email-otp", userMiddleware.checkSession, profileController.sendEmailOTP)
+router.post("/profile/verify-email-otp", userMiddleware.checkSession, profileController.verifyEmailOTP)
 
 //user address
 router.get("/address", userMiddleware.checkSession, addressController.getAddress)

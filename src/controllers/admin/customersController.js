@@ -4,7 +4,7 @@ import User from "../../models/userModel.js"
 const getcustomers=async(req,res)=>{
   try{
   const page = parseInt(req.query.page)||1;
-  const limit = 10;
+  const limit = 8;
   const skip = (page-1)*limit;
 
 

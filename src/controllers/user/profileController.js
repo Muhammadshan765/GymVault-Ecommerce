@@ -1,4 +1,5 @@
 import userSchema from "../../models/userModel.js"
+import { generateOTP, sendOTPEmail, sendEmailChangeOTP } from "../../utils/sendOtp.js"
 
 const getProfile = async (req, res) => {
     try {
@@ -25,7 +26,6 @@ const updateProfile = async (req, res) => {
         } else if (!nameRegex.test(firstName.trim())) {
             errors.push('First name can only contain letters');
         }
-
 
         //lastname validation
         if (!lastName || lastName.trim().length === 0) {
@@ -65,9 +65,103 @@ const updateProfile = async (req, res) => {
     }
 };
 
+// Add new methods for email update with OTP
+const sendEmailOTP = async (req, res) => {
+    try {
+        const { newEmail } = req.body;
+        const userId = req.session.user;
+        
+        // Get the user to check if they're using Google auth
+        const user = await userSchema.findById(userId);
+        
+        // Check if user is authenticated via Google
+        if (user.googleId) {
+            return res.status(403).json({
+                message: "Google-authenticated accounts cannot change their email address"
+            });
+        }
+        
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!newEmail || !emailRegex.test(newEmail.trim())) {
+            return res.status(400).json({
+                message: "Please provide a valid email address"
+            });
+        }
+        
+        // Check if email already exists for another user
+        const existingUser = await userSchema.findOne({ email: newEmail.trim() });
+        if (existingUser && existingUser._id.toString() !== userId) {
+            return res.status(400).json({
+                message: "Email already in use by another account"
+            });
+        }
+        
+        // Generate OTP using the utility function
+        const otp = generateOTP();
+        
+        // Store OTP in session with expiry time (10 minutes)
+        req.session.emailOTP = {
+            code: otp,
+            email: newEmail.trim(),
+            expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
+        };
+        
+        // Send OTP email using the specialized function for email changes
+        await sendEmailChangeOTP(newEmail.trim(), otp);
+        
+        res.status(200).json({
+            message: "OTP sent to your new email address"
+        });
+    } catch (error) {
+        console.error("Error sending email OTP", error);
+        res.status(500).json({
+            message: "Error sending verification code"
+        });
+    }
+};
 
+const verifyEmailOTP = async (req, res) => {
+    try {
+        const { otp } = req.body;
+        const userId = req.session.user;
+        
+        // Check if OTP exists and is valid
+        if (!req.session.emailOTP || 
+            req.session.emailOTP.expiresAt < Date.now() || 
+            req.session.emailOTP.code !== otp) {
+            return res.status(400).json({
+                message: "Invalid or expired verification code"
+            });
+        }
+        
+        const newEmail = req.session.emailOTP.email;
+        
+        // Update user's email
+        await userSchema.findByIdAndUpdate(
+            userId,
+            { email: newEmail },
+            { new: true }
+        );
+        
+        // Clear OTP from session
+        delete req.session.emailOTP;
+        
+        res.status(200).json({
+            message: "Email updated successfully",
+            email: newEmail
+        });
+    } catch (error) {
+        console.error("Error verifying email OTP", error);
+        res.status(500).json({
+            message: "Error updating email"
+        });
+    }
+};
 
 export default {
     getProfile,
-    updateProfile
+    updateProfile,
+    sendEmailOTP,
+    verifyEmailOTP
 }

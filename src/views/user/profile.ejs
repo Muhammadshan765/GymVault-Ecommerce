@@ -76,24 +76,41 @@
               <label class="block text-sm font-medium text-gray-700" for="email">
                 Email Address
               </label>
-              <div class="relative">
+              <div class="relative group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <i class="fas fa-envelope text-gray-400"></i>
+                  <i class="fas fa-envelope text-gray-400 group-hover:text-gray-500 transition-colors"></i>
                 </div>
                 <input
-                  class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed"
+                  class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
                   id="email"
                   type="email"
                   name="email"
                   value="<%= user.email %>"
                   readonly
-                  disabled
                 />
+                <% if (!user.googleId) { %>
+                  <button 
+                    type="button" 
+                    id="changeEmailBtn"
+                    class="absolute inset-y-0 right-0 px-4 flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    Change
+                  </button>
+                <% } else { %>
+                  <div class="absolute inset-y-0 right-0 px-4 flex items-center">
+                    <span class="text-xs text-gray-500 flex items-center gap-1">
+                      <i class="fab fa-google text-gray-600"></i>
+                      Google Account
+                    </span>
+                  </div>
+                <% } %>
               </div>
-              <p class="text-xs text-gray-500 mt-2 flex items-center gap-2">
-                <i class="fas fa-info-circle"></i>
-                Email address cannot be changed
-              </p>
+              <% if (user.googleId) { %>
+                <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                  <i class="fas fa-info-circle"></i>
+                  Email cannot be changed for Google-authenticated accounts
+                </p>
+              <% } %>
             </div>
           </div>
 
@@ -151,6 +168,76 @@
           </div>
           <h3 class="text-xl font-semibold text-center text-gray-900 mb-2">Updating Profile</h3>
           <p class="text-gray-600 text-center">Please wait...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email Change Modal -->
+    <div id="emailModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 transform transition-all duration-300 scale-90 opacity-0 translate-y-4">
+        <div id="emailStep1" class="space-y-6">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-semibold text-gray-900">Change Email Address</h3>
+            <button onclick="hideEmailModal()" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <p class="text-gray-600">Enter your new email address. We'll send a verification code to confirm.</p>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700" for="newEmail">
+              New Email Address
+            </label>
+            <input
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent"
+              id="newEmail"
+              type="email"
+              placeholder="Enter your new email address"
+            />
+            <p id="newEmailError" class="text-red-500 text-sm hidden"></p>
+          </div>
+          <button 
+            id="sendOtpBtn"
+            class="w-full py-3 px-4 bg-black hover:bg-gray-800 text-white rounded-xl transition-colors duration-200"
+          >
+            Send Verification Code
+          </button>
+        </div>
+        
+        <div id="emailStep2" class="space-y-6 hidden">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-semibold text-gray-900">Verify Email Address</h3>
+            <button onclick="hideEmailModal()" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <p class="text-gray-600">Enter the 6-digit verification code sent to your new email address.</p>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700" for="otpCode">
+              Verification Code
+            </label>
+            <input
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black focus:border-transparent text-center tracking-widest text-lg"
+              id="otpCode"
+              type="text"
+              maxlength="6"
+              placeholder="000000"
+            />
+            <p id="otpError" class="text-red-500 text-sm hidden"></p>
+          </div>
+          <div class="flex gap-4">
+            <button 
+              onclick="showEmailStep1()"
+              class="w-1/2 py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl transition-colors duration-200"
+            >
+              Back
+            </button>
+            <button 
+              id="verifyOtpBtn"
+              class="w-1/2 py-3 px-4 bg-black hover:bg-gray-800 text-white rounded-xl transition-colors duration-200"
+            >
+              Verify
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -334,6 +421,178 @@
             submitButton.setAttribute('disabled', 'disabled');
           }
         });
+      });
+
+      // Email change functionality
+      function showEmailModal() {
+        // Check if user is Google-authenticated
+        const isGoogleUser = <%= user.googleId ? 'true' : 'false' %>;
+        
+        if (isGoogleUser) {
+          showAlert('error', 'Google-authenticated accounts cannot change their email address');
+          return;
+        }
+        
+        const modal = document.getElementById('emailModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const modalContent = modal.querySelector('div');
+        
+        // Show modal with animation
+        modal.classList.remove('hidden');
+        backdrop.classList.remove('hidden');
+        setTimeout(() => {
+          backdrop.classList.remove('opacity-0');
+          modalContent.classList.remove('scale-90', 'opacity-0', 'translate-y-4');
+        }, 50);
+        
+        // Reset form
+        document.getElementById('newEmail').value = '';
+        document.getElementById('newEmailError').classList.add('hidden');
+        showEmailStep1();
+      }
+      
+      function hideEmailModal() {
+        const modal = document.getElementById('emailModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const modalContent = modal.querySelector('div');
+        
+        // Hide with animation
+        backdrop.classList.add('opacity-0');
+        modalContent.classList.add('scale-90', 'opacity-0', 'translate-y-4');
+        
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          backdrop.classList.add('hidden');
+        }, 300);
+      }
+      
+      function showEmailStep1() {
+        document.getElementById('emailStep1').classList.remove('hidden');
+        document.getElementById('emailStep2').classList.add('hidden');
+      }
+      
+      function showEmailStep2() {
+        document.getElementById('emailStep1').classList.add('hidden');
+        document.getElementById('emailStep2').classList.remove('hidden');
+        document.getElementById('otpCode').value = '';
+        document.getElementById('otpError').classList.add('hidden');
+      }
+      
+      document.getElementById('changeEmailBtn').addEventListener('click', showEmailModal);
+      
+      document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+        const newEmail = document.getElementById('newEmail').value;
+        const errorElement = document.getElementById('newEmailError');
+        
+        // Basic validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!newEmail || !emailRegex.test(newEmail.trim())) {
+          errorElement.textContent = 'Please enter a valid email address';
+          errorElement.classList.remove('hidden');
+          return;
+        }
+        
+        try {
+          // Show loading state
+          const button = document.getElementById('sendOtpBtn');
+          const originalText = button.textContent;
+          button.textContent = 'Sending...';
+          button.disabled = true;
+          
+          const response = await fetch('/profile/send-email-otp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newEmail: newEmail.trim() }),
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            showEmailStep2();
+          } else {
+            errorElement.textContent = data.message || 'Error sending verification code';
+            errorElement.classList.remove('hidden');
+          }
+          
+          // Reset button
+          button.textContent = originalText;
+          button.disabled = false;
+          
+        } catch (error) {
+          console.error("Error:", error);
+          errorElement.textContent = 'An error occurred. Please try again.';
+          errorElement.classList.remove('hidden');
+          
+          // Reset button
+          const button = document.getElementById('sendOtpBtn');
+          button.textContent = 'Send Verification Code';
+          button.disabled = false;
+        }
+      });
+      
+      document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+        const otp = document.getElementById('otpCode').value;
+        const errorElement = document.getElementById('otpError');
+        
+        // Basic validation
+        if (!otp || otp.length !== 6 || !/^\d+$/.test(otp)) {
+          errorElement.textContent = 'Please enter a valid 6-digit verification code';
+          errorElement.classList.remove('hidden');
+          return;
+        }
+        
+        try {
+          // Show loading state
+          const button = document.getElementById('verifyOtpBtn');
+          const originalText = button.textContent;
+          button.textContent = 'Verifying...';
+          button.disabled = true;
+          
+          const response = await fetch('/profile/verify-email-otp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ otp }),
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            // Update email in the form
+            document.getElementById('email').value = data.email;
+            
+            // Hide modal
+            hideEmailModal();
+            
+            // Show success message
+            showAlert('success', 'Email updated successfully');
+          } else {
+            errorElement.textContent = data.message || 'Invalid verification code';
+            errorElement.classList.remove('hidden');
+          }
+          
+          // Reset button
+          button.textContent = originalText;
+          button.disabled = false;
+          
+        } catch (error) {
+          console.error("Error:", error);
+          errorElement.textContent = 'An error occurred. Please try again.';
+          errorElement.classList.remove('hidden');
+          
+          // Reset button
+          const button = document.getElementById('verifyOtpBtn');
+          button.textContent = 'Verify';
+          button.disabled = false;
+        }
+      });
+      
+      // Make OTP input only accept numbers
+      document.getElementById('otpCode').addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
       });
     </script>
   </div>
