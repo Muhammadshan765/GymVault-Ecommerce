@@ -730,8 +730,7 @@
                         response = await processWalletPayment(selectedAddress.value);
 
                         if (response.success) {
-                            await showAlert('success', `Order Placed Successfully! Order ID: ${response.orderId}`);
-                            window.location.href = `/orders?success=true&orderId=${response.orderId}`;
+                            window.location.href = `/order-success?orderId=${response.orderId}`;
                         } else {
                             throw new Error(response.message);
                         }
@@ -750,8 +749,7 @@
                         const data = await response.json();
 
                         if (data.success) {
-                            await showAlert('success', `Order Placed Successfully! Order ID: ${data.orderId}`);
-                            window.location.href = `/orders?success=true&orderId=${data.orderId}`;
+                            window.location.href = `/order-success?orderId=${data.orderId}`;
                         } else {
                             throw new Error(data.message);
                         }
@@ -783,8 +781,7 @@
 
                                     const verifyData = await verifyResponse.json();
                                     if (verifyData.success) {
-                                        await showAlert('success', 'Order Placed Successfully!', `Order ID: ${verifyData.orderId}`);
-                                        window.location.href = `/orders?success=true&orderId=${verifyData.orderId}`;
+                                        window.location.href = `/order-success?orderId=${verifyData.orderId}`;
                                     } else {
                                         throw new Error(verifyData.message);
                                     }
@@ -835,6 +832,7 @@
                     }
                 } catch (error) {
                     console.error('Error in placeOrder:', error);
+                    await showAlert('error', error.message || 'An error occurred while placing your order');
                 }
             }
 

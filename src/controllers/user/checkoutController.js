@@ -6,6 +6,7 @@ import Coupon from '../../models/couponModel.js';
 import razorpay from '../../utils/razorpay.js';
 import crypto from 'crypto';
 import  Wallet from "../../models/walletModel.js"
+import userSchema from '../../models/userModel.js';
 
 // Helper function (keep this at the top of the file)
 function calculateProportionalDiscounts(items, totalDiscount) {
@@ -898,6 +899,36 @@ const walletPayment=async (req, res,next) => {
     }
 };
 
+const getOrderSuccessPage = async (req, res) => {
+    try {
+        const { orderId } = req.query;
+        
+        if (!orderId) {
+            return res.redirect('/orders');
+        }
+        
+        const order = await orderSchema.findOne({
+            orderCode: orderId,
+            userId: req.session.user
+        });
+        
+        if (!order) {
+            return res.redirect('/orders');
+        }
+        
+        const user = await userSchema.findById(req.session.user);
+        
+        res.render('user/orderSuccess', {
+            orderId: order.orderCode,
+            userEmail: user.email,
+            user: req.session.user
+        });
+    } catch (error) {
+        console.error('Order success page error:', error);
+        res.redirect('/orders');
+    }
+};
+
 export default {
     getCheckoutPage,
     placeOrder,
@@ -907,7 +938,8 @@ export default {
     createRazorpayOrder,
     verifyPayment,
     handlePaymentFailure,
-    walletPayment
+    walletPayment,
+    getOrderSuccessPage
 }
 
 

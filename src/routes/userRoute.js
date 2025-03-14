@@ -68,6 +68,7 @@ router.delete("/cart/remove/:productId", userMiddleware.checkSession, cartContro
 //checkout
 router.get("/checkout", userMiddleware.checkSession, checkoutController.getCheckoutPage)
 router.post("/checkout/place-order", userMiddleware.checkSession, checkoutController.placeOrder)
+router.get("/order-success", userMiddleware.checkSession, checkoutController.getOrderSuccessPage)
 
 //view order
 router.get("/orders", userMiddleware.checkSession, orderController.getOrders)
