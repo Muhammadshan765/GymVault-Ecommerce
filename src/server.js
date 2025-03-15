@@ -50,7 +50,10 @@ app.use('/static', express.static(path.join(__dirname, '../public/static')));
 app.use("/admin", adminRoute)
 app.use("/",userRoute)
 
-
+// 404 handler 
+app.use((req, res) => {
+  res.status(404).render('notFound')
+});
 
 
 const PORT = process.env.PORT;
