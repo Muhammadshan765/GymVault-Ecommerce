@@ -582,6 +582,13 @@ const postChangePassword = async (req, res) => {
                 message: 'Current password is incorrect'
             });
         }
+        
+        // Check if new password is same as current password
+        if (await bcrypt.compare(newPassword, user.password)) {
+            return res.status(400).json({
+                message: 'New password cannot be the same as current password'
+            });
+        }
 
         //validate new password
         const passwordValidation = validatePassword(newPassword);
