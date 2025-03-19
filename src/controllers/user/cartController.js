@@ -252,6 +252,25 @@ const addToCart = async (req, res) => {
             );
 
             if (existingItem) {
+
+                  // Calculate new quantity
+                  const newQuantity = existingItem.quantity + parseInt(quantity);
+
+                  // Check if new quantity exceeds limit
+                  if (newQuantity > 3) {
+                      return res.status(400).json({
+                          success: false,
+                          message: `Cannot add more items. Maximum limit is 3 (Current quantity: ${existingItem.quantity})`
+                      });
+                  }
+  
+                  // Update quantity and price
+                  existingItem.quantity = newQuantity;
+                  existingItem.price = finalPrice;
+                  existingItem.subtotal = finalPrice * newQuantity;
+                  existingItem.originalPrice = sizeObj.price;
+                  existingItem.discountPercentage = discountPercentage;
+                  existingItem.appliedOffer = appliedOffer;
                 // Item already exists in cart
                 return res.status(200).json({
                     success: true,

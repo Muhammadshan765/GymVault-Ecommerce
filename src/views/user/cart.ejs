@@ -466,8 +466,21 @@
                 const minusBtn = cartItem.querySelector('.quantity-btn:first-child');
                 const plusBtn = cartItem.querySelector('.quantity-btn:last-child');
                 
-                if (minusBtn) minusBtn.disabled = newQuantity <= 1;
-                if (plusBtn) plusBtn.disabled = newQuantity >= 3;
+                if (minusBtn) {
+                    minusBtn.disabled = newQuantity <= 1;
+                    minusBtn.classList.toggle('opacity-50', newQuantity <= 1);
+                }
+                if (plusBtn) {
+                    plusBtn.disabled = newQuantity >= 3;
+                    plusBtn.classList.toggle('opacity-50', newQuantity >= 3);
+                    
+                    // Update the onclick attribute to ensure it works properly
+                    if (newQuantity >= 3) {
+                        plusBtn.removeAttribute('onclick');
+                    } else {
+                        plusBtn.setAttribute('onclick', `updateQuantity(this, '${productId}', 'increase')`);
+                    }
+                }
 
                 // Success feedback
                 button.classList.add('bg-green-200');
@@ -485,8 +498,12 @@
             
             showAlert('error', error.message || 'Failed to update quantity');
         } finally {
-            // Re-enable buttons
-            buttons.forEach(btn => btn.disabled = false);
+            // Re-enable buttons based on quantity restrictions
+            const minusBtn = cartItem.querySelector('.quantity-btn:first-child');
+            const plusBtn = cartItem.querySelector('.quantity-btn:last-child');
+            
+            if (minusBtn) minusBtn.disabled = newQuantity <= 1;
+            if (plusBtn) plusBtn.disabled = newQuantity >= 3;
         }
       }
 
