@@ -218,10 +218,10 @@
                   <button 
                     id="cartButton-<%= product._id %>"
                     onclick="handleCartAction('<%= product._id %>')"
-                    class="flex-1 px-6 py-4 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                    class="flex-1 px-6 py-4 <%= product.isInCart ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-900 hover:bg-gray-800' %> text-white rounded-xl font-medium transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                   >
-                    <i class="fas fa-shopping-cart"></i>
-                    Add To Cart
+                    <i class="fas <%= product.isInCart ? 'fa-shopping-bag' : 'fa-shopping-cart' %>"></i>
+                    <%= product.isInCart ? 'In Cart' : 'Add To Cart' %>
                   </button>
                 <% } %>
                 
@@ -629,6 +629,25 @@
             removeToast(loadingId);
 
             if (response.ok) {
+                // Check if item is already in cart
+                if (data.alreadyInCart) {
+                    Swal.fire({
+                        title: 'Already in Cart',
+                        text: 'This item is already in your cart',
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Go to Cart',
+                        cancelButtonText: 'Continue Shopping'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/cart';
+                        }
+                    });
+                    return;
+                }
+                
                 showToast('success', data.message);
                 
                 // Update cart count in navbar
@@ -653,41 +672,27 @@
         }
       }
 
-      // Handle related product size selection
-      document.addEventListener('DOMContentLoaded', () => {
-        // Add click handlers to all related product size buttons
-        document.querySelectorAll('.size-button').forEach(button => {
-          button.addEventListener('click', (e) => {
-            if (button.disabled) return;
-            
-            // Remove active class from all buttons in the same product card
-            const productCard = button.closest('.p-5');
-            productCard.querySelectorAll('.size-button').forEach(btn => {
-              btn.classList.remove('border-gray-900', 'bg-gray-900', 'text-white');
-              btn.classList.add('border-gray-200', 'text-gray-800');
-            });
-            
-            // Add active class to selected button
-            button.classList.remove('border-gray-200', 'text-gray-800');
-            button.classList.add('border-gray-900', 'bg-gray-900', 'text-white');
-            
-            // Update price display
-            const price = button.dataset.price;
-            const priceElements = productCard.querySelectorAll('.text-lg.font-bold, .text-sm.text-gray-500');
-            
-            if (priceElements.length > 0) {
-              // If there's an offer applied
-              if (priceElements.length === 2) {
-                const discountPrice = price * (1 - (relProduct.offerPercentage / 100));
-                priceElements[0].textContent = `₹${Math.round(discountPrice).toLocaleString()}`;
-                priceElements[1].textContent = `₹${Number(price).toLocaleString()}`;
-              } else {
-                // If no offer is applied
-                priceElements[0].textContent = `₹${Number(price).toLocaleString()}`;
+      // Check if product is already in cart when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+          // Check if product is already in cart
+          if (product.isInCart) {
+              // Update button appearance
+              const button = document.getElementById(`cartButton-${product._id}`);
+              if (button) {
+                  button.classList.add('in-cart', 'bg-green-600', 'hover:bg-green-700');
+                  button.classList.remove('bg-gray-900', 'hover:bg-gray-800');
+                  button.innerHTML = `
+                      <i class="fas fa-shopping-bag"></i>
+                      In Cart
+                  `;
+                  
+                  // If cartSize is available, auto-select that size
+                  if (product.cartSize) {
+                      selectSize(product.cartSize, 
+                          product.size.find(s => s.size === product.cartSize)?.stock || 0);
+                  }
               }
-            }
-          });
-        });
+          }
       });
     </script>
   </div>

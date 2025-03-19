@@ -13,6 +13,28 @@ const getProductDetails = async (req, res) => {
             return res.status(404).redirect('/home');
         }
 
+        // Check if product is in user's cart
+        let isInCart = false;
+        let cartSize = null;
+        
+        if (req.session.user) {
+            const cart = await import('../../models/cartModel.js').then(module => module.default);
+            const userCart = await cart.findOne({ 
+                userId: req.session.user,
+                'items.productId': productId
+            });
+            
+            if (userCart) {
+                const cartItem = userCart.items.find(item => 
+                    item.productId.toString() === productId
+                );
+                if (cartItem) {
+                    isInCart = true;
+                    cartSize = cartItem.size;
+                }
+            }
+        }
+
         // Fetch active offers for this product and its category
         const offers = await Offer.find({
             status: 'active',
@@ -54,7 +76,9 @@ const getProductDetails = async (req, res) => {
                 offerPrice: Math.round(size.price * (1 - (priceDetails.discountPercentage / 100)))
             })),
             imageUrl: product.imageUrl || [],
-            rating: product.rating || 0
+            rating: product.rating || 0,
+            isInCart: isInCart,
+            cartSize: cartSize
         };
 
         // Calculate total stock
