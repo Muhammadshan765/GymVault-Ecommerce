@@ -79,6 +79,7 @@ router.post("/orders/:orderId/items/:productId/return", userMiddleware.checkSess
 router.get("/wishlist", userMiddleware.checkSession,userMiddleware.errorHandler,wishlistController.getWishlist)
 router.post("/wishlist/add", userMiddleware.checkSession, userMiddleware.errorHandler,wishlistController.addToWishlist)
 router.delete("/wishlist/remove/:productId", userMiddleware.checkSession, userMiddleware.errorHandler,wishlistController.removeWishlist)
+router.post("/wishlist/toggle/:productId", userMiddleware.checkSession, userMiddleware.errorHandler, wishlistController.toggleWishlist)
 
 //wallet 
 router.get("/wallet",userMiddleware.checkSession,userMiddleware.errorHandler,walletController.getWallet)

@@ -1,6 +1,7 @@
 import Product from '../../models/productModel.js';
 import Category from '../../models/categoryModel.js';
 import Offer from "../../models/offerModel.js"
+import Wishlist from "../../models/wishlistModel.js";
 
 const getHome = async (req, res) => {
     try {
@@ -48,12 +49,22 @@ const getHome = async (req, res) => {
             .sort({ createdAt: -1 })
             .limit(5);
 
+        // Get user's wishlist if logged in
+        let wishlistItems = [];
+        if (req.session.user) {
+            const wishlist = await Wishlist.findOne({ userId: req.session.user });
+            if (wishlist) {
+                wishlistItems = wishlist.items.map(item => item.productId.toString());
+            }
+        }
+
         // Process products with offers
         const processedProducts = products.map(product => {
             const productData = product.toObject();
+            const productId = product._id.toString();
 
             // Get product-specific offer
-            const productOffer = productOfferMap.get(product._id.toString());
+            const productOffer = productOfferMap.get(productId);
 
             // Get category offer
             const categoryOffer = product.categoriesId ?
@@ -92,6 +103,9 @@ const getHome = async (req, res) => {
             // Calculate total stock
             const totalStock = product.size.reduce((sum, size) => sum + size.stock, 0);
 
+            // Check if product is in wishlist
+            const isInWishlist = wishlistItems.includes(productId);
+
             return {
                 ...productData,
                 price: minPrice, // Original price
@@ -101,27 +115,27 @@ const getHome = async (req, res) => {
                 discountPercentage: bestDiscount,
                 appliedOffer: appliedOffer,
                 stock: totalStock,
-                size: processedSizes
+                size: processedSizes,
+                isInWishlist: isInWishlist
             };
         });
 
         res.render('user/home', {
             products: processedProducts,
-            title: 'Home'
+            title: 'Home',
+            isLoggedIn: !!req.session.user
         });
     } catch (error) {
         console.error('Error fetching products:', error);
         res.render('user/home', {
             products: [],
-            title: 'Home'
+            title: 'Home',
+            isLoggedIn: !!req.session.user
         });
     }
 };
 
 const getShop = async (req, res) => {
-    // At the start of getShop, add:
-    const sampleProduct = await Product.findOne({ isActive: true });
-
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 12;
@@ -131,8 +145,6 @@ const getShop = async (req, res) => {
         const minPrice = req.query.minPrice ? Number(req.query.minPrice) : '';
         const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : '';
         const stock = req.query.stock || '';
-
-
 
         // Get active offers first
         const activeOffers = await Offer.find({
@@ -182,17 +194,13 @@ const getShop = async (req, res) => {
 
         // Add size filter
         if (size && size !== '') {
-
             query['size'] = {
                 $elemMatch: {
                     size: size,
                     stock: { $gt: 0 }
                 }
             };
-
         }
-
-
 
         // Add price range filter
         if (minPrice || maxPrice) {
@@ -208,7 +216,6 @@ const getShop = async (req, res) => {
             // This will find products where all sizes have 0 stock
             query['size'] = { $not: { $elemMatch: { stock: { $gt: 0 } } } };
         }
-
 
         // Build sort options
         let sortOptions = {};
@@ -243,10 +250,21 @@ const getShop = async (req, res) => {
             .skip((page - 1) * limit)
             .limit(limit);
 
+        // Get user's wishlist if logged in
+        let wishlistItems = [];
+        if (req.session.user) {
+            const wishlist = await Wishlist.findOne({ userId: req.session.user });
+            if (wishlist) {
+                wishlistItems = wishlist.items.map(item => item.productId.toString());
+            }
+        }
+
         // Process products and apply offers
         const productsWithPrices = products.map(product => {
             const productData = product.toObject();
-            const productOffer = productOfferMap.get(product._id.toString());
+            const productId = product._id.toString();
+            
+            const productOffer = productOfferMap.get(productId);
             const categoryOffer = product.categoriesId ?
                 categoryOfferMap.get(product.categoriesId.toString()) : null;
 
@@ -283,6 +301,9 @@ const getShop = async (req, res) => {
             // Calculate total stock
             const totalStock = product.size.reduce((sum, size) => sum + size.stock, 0);
 
+            // Check if product is in wishlist
+            const isInWishlist = wishlistItems.includes(productId);
+
             return {
                 ...productData,
                 price: minPrice, // Original price
@@ -292,7 +313,8 @@ const getShop = async (req, res) => {
                 discountPercentage: bestDiscount,
                 appliedOffer: appliedOffer,
                 stock: totalStock,
-                size: processedSizes
+                size: processedSizes,
+                isInWishlist: isInWishlist
             };
         });
 
@@ -318,7 +340,8 @@ const getShop = async (req, res) => {
         if (req.xhr) {
             return res.json({
                 products: filteredProducts,
-                pagination
+                pagination,
+                isLoggedIn: !!req.session.user
             });
         }
 
@@ -327,7 +350,8 @@ const getShop = async (req, res) => {
             products: filteredProducts,
             pagination,
             search,
-            sort
+            sort,
+            isLoggedIn: !!req.session.user
         });
 
     } catch (error) {
@@ -344,7 +368,8 @@ const getShop = async (req, res) => {
                 hasPrevPage: false
             },
             search: '',
-            sort: 'default'
+            sort: 'default',
+            isLoggedIn: !!req.session.user
         });
     }
 };

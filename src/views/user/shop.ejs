@@ -215,10 +215,10 @@
                                 </div>
                               <% } %>
                               <!-- Wishlist Button -->
-                              <!-- <button onclick="event.preventDefault(); toggleWishlist('<%= product._id %>')" 
-                                      class="absolute top-3 left-3 p-2 bg-white/80 hover:bg-white rounded-full shadow-sm transition-all duration-200">
-                                <i class="fas fa-heart text-lg <%= product.isInWishlist ? 'text-red-500' : 'text-gray-400' %>"></i>
-                              </button> -->
+                              <button type="button" onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')" 
+                                      class="absolute top-2 left-2 p-2 bg-white/80 hover:bg-white rounded-full shadow-sm transition-all duration-200 z-10">
+                                <i class="fas fa-heart <%= product.isInWishlist ? 'text-red-500' : 'text-gray-400' %>"></i>
+                              </button>
                             </div>
             
                             <!-- Product Info -->
@@ -315,15 +315,26 @@
                       const currentPageSpan = document.getElementById('currentPage');
                       const totalPagesSpan = document.getElementById('totalPages');
                      
-                      
-            
                       // Store original products data
-                      let products = <%- JSON.stringify(products) %>;
-                      const originalProducts = [...products];
+                      let originalProducts = [];
+                      let isLoggedIn = false;
+                      
+                      try {
+                        const productsData = <%- JSON.stringify(products || []) %>;
+                        originalProducts = [...productsData];
+                        isLoggedIn = <%- JSON.stringify(!!locals.isLoggedIn) %>;
+                      } catch (e) {
+                        console.error('Error parsing data:', e);
+                      }
 
-                      // Function to toggle wishlist
-                      async function toggleWishlist(productId) {
+                      // Global function to toggle wishlist (accessible outside DOMContentLoaded)
+                      window.toggleWishlist = async function(button, productId) {
                           try {
+                              if (!isLoggedIn) {
+                                  window.location.href = '/login?message=Please+login+to+add+items+to+wishlist&alertType=info';
+                                  return;
+                              }
+                              
                               const response = await fetch(`/wishlist/toggle/${productId}`, {
                                   method: 'POST',
                                   headers: {
@@ -336,18 +347,18 @@
                               const data = await response.json();
                               
                               // Update UI based on response
-                              const wishlistBtn = document.querySelector(`[onclick*="${productId}"] i`);
+                              const heartIcon = button.querySelector('i.fa-heart');
                               if (data.added) {
-                                  wishlistBtn.classList.remove('text-gray-400');
-                                  wishlistBtn.classList.add('text-red-500');
+                                  heartIcon.classList.remove('text-gray-400');
+                                  heartIcon.classList.add('text-red-500');
                               } else {
-                                  wishlistBtn.classList.remove('text-red-500');
-                                  wishlistBtn.classList.add('text-gray-400');
+                                  heartIcon.classList.remove('text-red-500');
+                                  heartIcon.classList.add('text-gray-400');
                               }
                           } catch (error) {
                               console.error('Error toggling wishlist:', error);
                           }
-                      }
+                      };
             
                       // Function to apply all filters
                       async function applyFilters() {
@@ -388,9 +399,9 @@
                                               </span>
                                           </div>
                                       ` : ''}
-                                      <button onclick="event.preventDefault(); toggleWishlist('${product._id}')" 
-                                              class="absolute top-2 left-2 p-2 bg-white/80 hover:bg-white rounded-full shadow-sm transition-all duration-200">
-                                          <i class="fas fa-heart text-lg ${product.isInWishlist ? 'text-red-500' : 'text-gray-400'}"></i>
+                                      <button onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist(this, '${product._id}')" 
+                                              class="absolute top-2 left-2 p-2 bg-white/80 hover:bg-white rounded-full shadow-sm transition-all duration-200 z-10">
+                                          <i class="fas fa-heart ${product.isInWishlist ? 'text-red-500' : 'text-gray-400'}"></i>
                                       </button>
                                   </div>
                                   <div class="p-2">
@@ -415,7 +426,7 @@
             
                           
                           // Get unique sizes
-                          const sizes = [...new Set(originalProducts.flatMap(p => p.size))].filter(Boolean).sort();
+                          const sizes = [...new Set(originalProducts.flatMap(p => p.size.map(s => s.size)))].filter(Boolean).sort();
                           
                          
                           
@@ -429,44 +440,53 @@
                         
             
                           // Add size options
-                          size.forEach(size => {
+                          sizes.forEach(size => {
                               const option = new Option(size, size);
                               sizeFilter.add(option);
                           });
                       }
             
                       // Event listeners
-                      searchButton.addEventListener('click', applyFilters);
-                      searchInput.addEventListener('keyup', (e) => {
-                          if (e.key === 'Enter') applyFilters();
-                      });
+                      if (searchButton) {
+                        searchButton.addEventListener('click', applyFilters);
+                      }
+                      if (searchInput) {
+                        searchInput.addEventListener('keyup', (e) => {
+                            if (e.key === 'Enter') applyFilters();
+                        });
+                      }
                       
                       // Add input event listeners for immediate filtering
                       [sortFilter, sizeFilter, stockFilter].forEach(filter => {
-                          filter.addEventListener('change', applyFilters);
+                          if (filter) {
+                            filter.addEventListener('change', applyFilters);
+                          }
                       });
             
                       // Add debounced event listeners for price inputs
                       let priceTimeout;
                       [minPriceFilter, maxPriceFilter].forEach(input => {
-                          input.addEventListener('input', () => {
-                              clearTimeout(priceTimeout);
-                              priceTimeout = setTimeout(applyFilters, 500);
-                          });
+                          if (input) {
+                            input.addEventListener('input', () => {
+                                clearTimeout(priceTimeout);
+                                priceTimeout = setTimeout(applyFilters, 500);
+                            });
+                          }
                       });
             
                       // Reset filters
-                      resetButton.addEventListener('click', async () => {
-                          searchInput.value = '';
-                          sortFilter.value = 'default';
-                         
-                          
-                          sizeFilter.value = '';
-                          minPriceFilter.value = '';
-                          maxPriceFilter.value = '';
-                          stockFilter.value = '';
-                          await fetchProducts(1);
-                      });
+                      if (resetButton) {
+                        resetButton.addEventListener('click', async () => {
+                            if (searchInput) searchInput.value = '';
+                            sortFilter.value = 'default';
+                            
+                            sizeFilter.value = '';
+                            if (minPriceFilter) minPriceFilter.value = '';
+                            if (maxPriceFilter) maxPriceFilter.value = '';
+                            stockFilter.value = '';
+                            await fetchProducts(1);
+                        });
+                      }
             
                       // Add pagination state
                       let currentPage = 1;
@@ -477,11 +497,11 @@
                           try {
                               const queryParams = new URLSearchParams({
                                   page,
-                                  search: searchInput.value,
+                                  search: searchInput ? searchInput.value : '',
                                   sort: sortFilter.value,
                                   size: sizeFilter.value,
-                                  minPrice: minPriceFilter.value,
-                                  maxPrice: maxPriceFilter.value,
+                                  minPrice: minPriceFilter ? minPriceFilter.value : '',
+                                  maxPrice: maxPriceFilter ? maxPriceFilter.value : '',
                                   stock: stockFilter.value
                               });
             
@@ -516,29 +536,39 @@
                       }
             
                       // Add pagination event listeners
-                      prevPageBtn.addEventListener('click', () => {
-                          if (currentPage > 1) {
-                              fetchProducts(currentPage - 1);
-                          }
-                      });
+                      if (prevPageBtn) {
+                        prevPageBtn.addEventListener('click', () => {
+                            if (currentPage > 1) {
+                                fetchProducts(currentPage - 1);
+                            }
+                        });
+                      }
             
-                      nextPageBtn.addEventListener('click', () => {
-                          if (currentPage < totalPages) {
-                              fetchProducts(currentPage + 1);
-                          }
-                      });
+                      if (nextPageBtn) {
+                        nextPageBtn.addEventListener('click', () => {
+                            if (currentPage < totalPages) {
+                                fetchProducts(currentPage + 1);
+                            }
+                        });
+                      }
             
                       // Initialize pagination
-                      const initialPagination = <%- JSON.stringify(pagination || { currentPage: 1, totalPages: 1 }) %>;
-                      currentPage = initialPagination.currentPage;
-                      totalPages = initialPagination.totalPages;
-                      currentPageSpan.textContent = currentPage;
-                      totalPagesSpan.textContent = totalPages;
-                      prevPageBtn.disabled = !initialPagination.hasPrevPage;
-                      nextPageBtn.disabled = !initialPagination.hasNextPage;
+                      try {
+                        const initialPagination = <%- JSON.stringify(pagination || { currentPage: 1, totalPages: 1 }) %>;
+                        currentPage = initialPagination.currentPage;
+                        totalPages = initialPagination.totalPages;
+                        currentPageSpan.textContent = currentPage;
+                        totalPagesSpan.textContent = totalPages;
+                        prevPageBtn.disabled = !initialPagination.hasPrevPage;
+                        nextPageBtn.disabled = !initialPagination.hasNextPage;
+                      } catch (e) {
+                        console.error('Error parsing pagination:', e);
+                      }
             
                       // Initialize
-                      populateFilterOptions();
+                      if (sizeFilter) {
+                        populateFilterOptions();
+                      }
 
                       // Add size button click handlers
                       document.querySelectorAll('.size-btn').forEach(button => {

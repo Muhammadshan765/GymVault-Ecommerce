@@ -225,6 +225,11 @@
                     -<%= product.discountPercentage %>%
                   </div>
                 <% } %>
+                <!-- Wishlist Button -->
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')" 
+                        class="absolute top-4 left-4 p-3 bg-white/80 hover:bg-white rounded-full text-lg shadow-lg transform transition-all duration-300 hover:scale-110 focus:outline-none z-10">
+                  <i class="fas fa-heart <%= product.isInWishlist ? 'text-red-500' : 'text-gray-400' %>"></i>
+                </button>
                 <!-- Quick View Button -->
                 <div class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                   <span class="bg-white/90 text-gray-900 px-6 py-3 rounded-full text-sm font-semibold transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
@@ -278,3 +283,41 @@
 
     <%- include('../partials/footer')%>
 </div>
+
+<script>
+  // Make the toggleWishlist function globally available
+  window.toggleWishlist = async function(button, productId) {
+    try {
+      // Check if user is logged in
+      const isLoggedIn = <%- JSON.stringify(!!isLoggedIn) %>;
+      
+      if (!isLoggedIn) {
+        window.location.href = '/login?message=Please+login+to+add+items+to+wishlist&alertType=info';
+        return;
+      }
+      
+      const response = await fetch(`/wishlist/toggle/${productId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        const heartIcon = button.querySelector('i.fa-heart');
+        
+        if (data.added) {
+          heartIcon.classList.remove('text-gray-400');
+          heartIcon.classList.add('text-red-500');
+        } else {
+          heartIcon.classList.remove('text-red-500');
+          heartIcon.classList.add('text-gray-400');
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+    }
+  }
+</script>

@@ -193,10 +193,82 @@ const removeFromWishlistAfterCart = async (userId, productId) => {
     }
 };
 
+// Add a toggle wishlist function for using in the shop and home pages
+const toggleWishlist = async (req, res, next) => {
+    try {
+        const userId = req.session.user;
+        const productId = req.params.productId;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'Please login to add items to wishlist'
+            });
+        }
+
+        // Find product to get default size
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
+
+        // Get a default size (first available size)
+        const defaultSize = product.size[0]?.size;
+        if (!defaultSize) {
+            return res.status(400).json({
+                success: false,
+                message: 'No sizes available for this product'
+            });
+        }
+
+        // Find user's wishlist
+        let wishlist = await Wishlist.findOne({ userId });
+        
+        // Create wishlist if it doesn't exist
+        if (!wishlist) {
+            wishlist = new Wishlist({ userId, items: [] });
+        }
+
+        // Check if product is already in wishlist
+        const itemIndex = wishlist.items.findIndex(item => 
+            item.productId.toString() === productId
+        );
+
+        let message = '';
+        let added = false;
+
+        if (itemIndex > -1) {
+            // Remove product if it's already in wishlist
+            wishlist.items.splice(itemIndex, 1);
+            message = 'Product removed from wishlist';
+        } else {
+            // Add product to wishlist with default size
+            wishlist.items.push({ productId, size: defaultSize });
+            message = 'Product added to wishlist';
+            added = true;
+        }
+
+        await wishlist.save();
+
+        res.json({
+            success: true,
+            message,
+            added
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 export default {
     getWishlist,
     addToWishlist,
     removeWishlist,
-    removeFromWishlistAfterCart
+    removeFromWishlistAfterCart,
+    toggleWishlist
 }
 
