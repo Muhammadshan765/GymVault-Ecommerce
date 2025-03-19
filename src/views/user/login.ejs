@@ -6,29 +6,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - GymVault</title>
     <script src="https://cdn.tailwindcss.com"></script>
-   
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        .carousel-item {
+            min-width: 100%;
+            height: 100%;
+        }
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .carousel-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+        }
+        .carousel-indicator.active {
+            background-color: white;
+        }
+    </style>
+</head>
 
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="flex w-full justify-between">
         <div class="hidden md:block w-1/2 image-mask">
-            <!-- Slider main container -->
-            <div class="swiper h-screen">
-                <!-- Additional required wrapper -->
-                <div class="swiper-wrapper">
-                    <!-- Slides -->
-                    <div class="swiper-slide">
+            <!-- Tailwind Carousel -->
+            <div class="carousel h-screen">
+                <div class="carousel-inner">
+                    <div class="carousel-item">
                         <img src="/images/our-range-whey.avif" alt="Gym Equipment" class="object-cover w-full h-screen">
                     </div>
-                    <div class="swiper-slide">
-                        <img src="  \images\image7.webp" alt="Gym Equipment" class="object-cover w-full h-screen">
+                    <div class="carousel-item">
+                        <img src="/images/image7.webp" alt="Gym Equipment" class="object-cover w-full h-screen">
                     </div>
-                    <div class="swiper-slide">
-                        <img src="  \images\A_couple_talking.webp" alt="Workout" class="object-cover w-full h-screen">
+                    <div class="carousel-item">
+                        <img src="/images/A_couple_talking.webp" alt="Workout" class="object-cover w-full h-screen">
                     </div>
                 </div>
-                <!-- Pagination -->
-                <div class="swiper-pagination"></div>
+                <div class="carousel-indicators"></div>
             </div>
         </div>
         <div class="w-full md:w-1/2 p-8">
@@ -95,103 +126,126 @@
         </div>
     </div>
 
-    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script> -->
     <script>
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     // Initialize Swiper with autoplay
-        //     const swiper = new Swiper('.swiper', {
-        //         loop: true,
-        //         speed: 1000,
-        //         autoplay: {
-        //             delay: 3000,
-        //             disableOnInteraction: false,
-        //         },
-        //         effect: 'fade',
-        //         fadeEffect: {
-        //             crossFade: true
-        //         },
-        //         pagination: {
-        //             el: '.swiper-pagination',
-        //             clickable: true,
-        //         }
-        //     });
-        // });
-
-        // Password toggle functionality
-        document.querySelectorAll('.password-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function() {
-                const input = this.closest('.relative').querySelector('input');
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    this.classList.remove('fa-eye');
-                    this.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    this.classList.remove('fa-eye-slash');
-                    this.classList.add('fa-eye');
-                }
-            });
-        });
-
-        // Form validation and submission
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carousel functionality
+            const carousel = document.querySelector('.carousel');
+            const carouselInner = carousel.querySelector('.carousel-inner');
+            const carouselItems = carousel.querySelectorAll('.carousel-item');
+            const indicatorsContainer = carousel.querySelector('.carousel-indicators');
             
-            // Clear previous errors
-            document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+            let currentIndex = 0;
+            const totalItems = carouselItems.length;
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            let hasErrors = false;
-
-            // Email validation
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                document.getElementById('emailError').textContent = 'Please enter a valid email address';
-                document.getElementById('emailError').classList.remove('hidden');
-                hasErrors = true;
+            // Create indicators
+            for (let i = 0; i < totalItems; i++) {
+                const indicator = document.createElement('div');
+                indicator.classList.add('carousel-indicator');
+                if (i === 0) indicator.classList.add('active');
+                indicator.addEventListener('click', () => goToSlide(i));
+                indicatorsContainer.appendChild(indicator);
             }
-
-            // Password validation
-            if (!password) {
-                document.getElementById('passwordError').textContent = 'Password is required';
-                document.getElementById('passwordError').classList.remove('hidden');
-                hasErrors = true;
-            }
-
-            if (hasErrors) return;
-
-            // Show loading spinner
-            const loadingSpinner = document.getElementById('loading-spinner');
-            loadingSpinner.classList.remove('hidden');
-
-            try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password })
+            
+            const indicators = indicatorsContainer.querySelectorAll('.carousel-indicator');
+            
+            function goToSlide(index) {
+                currentIndex = index;
+                carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                // Update indicators
+                indicators.forEach((indicator, i) => {
+                    if (i === currentIndex) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
                 });
+            }
+            
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % totalItems;
+                goToSlide(currentIndex);
+            }
+            
+            // Auto-advance slides
+            setInterval(nextSlide, 5000);
+            
+            // Password toggle functionality
+            document.querySelectorAll('.password-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const input = this.closest('.relative').querySelector('input');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    }
+                });
+            });
 
-                const data = await response.json();
+            // Form validation and submission
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Clear previous errors
+                document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                let hasErrors = false;
 
-                // Hide loading spinner
-                loadingSpinner.classList.add('hidden');
+                // Email validation
+                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    document.getElementById('emailError').textContent = 'Please enter a valid email address';
+                    document.getElementById('emailError').classList.remove('hidden');
+                    hasErrors = true;
+                }
 
-                if (data.success) {
-                    window.location.href = data.redirectUrl || '/';
-                } else {
-                    document.getElementById('generalError').textContent = data.message;
+                // Password validation
+                if (!password) {
+                    document.getElementById('passwordError').textContent = 'Password is required';
+                    document.getElementById('passwordError').classList.remove('hidden');
+                    hasErrors = true;
+                }
+
+                if (hasErrors) return;
+
+                // Show loading spinner
+                const loadingSpinner = document.getElementById('loading-spinner');
+                loadingSpinner.classList.remove('hidden');
+
+                try {
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    // Hide loading spinner
+                    loadingSpinner.classList.add('hidden');
+
+                    if (data.success) {
+                        window.location.href = data.redirectUrl || '/';
+                    } else {
+                        document.getElementById('generalError').textContent = data.message;
+                        document.getElementById('generalError').classList.remove('hidden');
+                    }
+                } catch (error) {
+                    // Hide loading spinner
+                    loadingSpinner.classList.add('hidden');
+                    
+                    console.error('Error:', error);
+                    document.getElementById('generalError').textContent = 'Something went wrong! Please try again.';
                     document.getElementById('generalError').classList.remove('hidden');
                 }
-            } catch (error) {
-                // Hide loading spinner
-                loadingSpinner.classList.add('hidden');
-                
-                console.error('Error:', error);
-                document.getElementById('generalError').textContent = 'Something went wrong! Please try again.';
-                document.getElementById('generalError').classList.remove('hidden');
-            }
+            });
         });
     </script>
 </body>
