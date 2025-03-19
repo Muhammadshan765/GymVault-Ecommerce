@@ -6,12 +6,25 @@ const getcustomers=async(req,res)=>{
   const page = parseInt(req.query.page)||1;
   const limit = 8;
   const skip = (page-1)*limit;
+  
+  // Get search term from query params
+  const searchTerm = req.query.search || '';
+  
+  // Create search filter if search term exists
+  const searchFilter = searchTerm ? {
+    $or: [
+      { firstName: { $regex: searchTerm, $options: 'i' } },
+      { lastName: { $regex: searchTerm, $options: 'i' } },
+      { email: { $regex: searchTerm, $options: 'i' } }
+    ]
+  } : {};
 
-
-  const totalUsers = await User.countDocuments();
+  // Count total users with the search filter
+  const totalUsers = await User.countDocuments(searchFilter);
   const totalPages = Math.ceil(totalUsers/limit);
 
-  const userList = await User.find()
+  // Find users with search filter applied
+  const userList = await User.find(searchFilter)
   .sort({createdAt:-1})
   .skip(skip)
   .limit(limit);
@@ -26,7 +39,8 @@ const getcustomers=async(req,res)=>{
               hasPrevPage:page>1,
               nextPage:page+1,
               prevPage:page-1
-          }
+          },
+          searchTerm
       });
   }
 
@@ -40,7 +54,8 @@ const getcustomers=async(req,res)=>{
           hasPrevPage: page > 1,
           nextPage: page + 1,
           prevPage: page - 1
-      }
+      },
+      searchTerm
   });
   }catch(error){
       console.error(error);

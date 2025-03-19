@@ -1,6 +1,6 @@
 import orderSchema from '../../models/orderModel.js';
 import productSchema from '../../models/productModel.js';
-  import Wallet from '../../models/walletModel.js';
+import Wallet from '../../models/walletModel.js';
 
 const getOrders = async (req, res) => {
     try {
@@ -8,49 +8,168 @@ const getOrders = async (req, res) => {
         const limit = 10;
         const skip = (page - 1) * limit;
 
-        //get filter parameters
+        // Get filter parameters
         const status = req.query.status;
         const dateFrom = req.query.dateFrom;
         const dateTo = req.query.dateTo;
+        const searchQuery = req.query.search ? req.query.search.trim() : '';
 
-        //build filter object 
+        // Build filter object 
         let filter = {};
 
-        //exclude pending status by default 
-        filter['items.order.status'] = { $ne: 'pending' };
-
-        //add additional status filter if provided
-        if (status) {
+        // Exclude pending status by default 
+        if (!status) {
+            filter['items.order.status'] = { $ne: 'pending' };
+        } else {
+            // Add status filter if provided
             filter['items.order.status'] = status;
         }
 
+        // Add date range filters if provided
         if (dateFrom || dateTo) {
             filter.orderDate = {};
             if (dateFrom) filter.orderDate.$gte = new Date(dateFrom);
             if (dateTo) filter.orderDate.$lte = new Date(dateTo);
         }
 
-        // Add filter to also show orders with return requests
-        filter = {
+        // Build the base filter with OR condition for pending and return requests
+        let baseFilter = {
             $or: [
                 { 'items.order.status': { $ne: 'pending' } },
                 { 'items.return.isReturnRequested': true }
             ]
         };
 
-        const totalOrders = await orderSchema.countDocuments(filter);
-        const totalPages = Math.ceil(totalOrders / limit);
+        // If status filter is provided, override the default filter
+        if (status) {
+            baseFilter = {
+                $or: [
+                    { 'items.order.status': status },
+                    { 'items.return.isReturnRequested': true, 'items.return.status': status === 'returned' ? 'approved' : status }
+                ]
+            };
+        }
 
-        const orders = await orderSchema.find(filter)
-            .populate('userId', 'firstName lastName email')
-            .populate('items.product')
-            .sort({ orderDate: -1 })
-            .skip(skip)
-            .limit(limit);
+        // Create search filter if search query is provided
+        let searchFilter = {};
+        if (searchQuery) {
+            // Look up orders where the orderCode, customer info or product name matches the search query
+            searchFilter = {
+                $or: [
+                    { orderCode: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive search on order code
+                    { 'userId.firstName': { $regex: searchQuery, $options: 'i' } },
+                    { 'userId.lastName': { $regex: searchQuery, $options: 'i' } },
+                    { 'userId.email': { $regex: searchQuery, $options: 'i' } },
+                    { 'items.product.productName': { $regex: searchQuery, $options: 'i' } }
+                ]
+            };
+        }
+
+        // Combine date filters with base and search filters
+        let finalFilter = baseFilter;
+        if (dateFrom || dateTo) {
+            finalFilter.$and = [baseFilter, { orderDate: filter.orderDate }];
+        }
+
+        // Get total orders count for pagination
+        const ordersQuery = orderSchema.find(finalFilter);
+        
+        // Apply search filter through aggregation if search is specified
+        let orders;
+        let totalOrders;
+        
+        if (searchQuery) {
+            // We need to use aggregation for text search across populated fields
+            const aggregatePipeline = [
+                // Populate user and product data
+                { $lookup: { 
+                    from: 'users', 
+                    localField: 'userId', 
+                    foreignField: '_id', 
+                    as: 'userInfo' 
+                }},
+                { $unwind: '$userInfo' },
+                { $lookup: { 
+                    from: 'products', 
+                    localField: 'items.product', 
+                    foreignField: '_id', 
+                    as: 'productInfo' 
+                }},
+                // Match orders based on search criteria
+                { $match: {
+                    $or: [
+                        { orderCode: { $regex: searchQuery, $options: 'i' } },
+                        { 'userInfo.firstName': { $regex: searchQuery, $options: 'i' } },
+                        { 'userInfo.lastName': { $regex: searchQuery, $options: 'i' } },
+                        { 'userInfo.email': { $regex: searchQuery, $options: 'i' } },
+                        { 'productInfo.productName': { $regex: searchQuery, $options: 'i' } }
+                    ]
+                }},
+                // Apply status filter
+                { $match: status ? { 'items.order.status': status } : { 'items.order.status': { $ne: 'pending' } } },
+                // Apply date filter if exists
+                ...(dateFrom || dateTo ? [{ $match: { orderDate: filter.orderDate } }] : []),
+                // Count for pagination
+                { $count: 'total' }
+            ];
+            
+            const countResult = await orderSchema.aggregate(aggregatePipeline);
+            totalOrders = countResult.length > 0 ? countResult[0].total : 0;
+            
+            // Get orders with pagination
+            orders = await orderSchema.aggregate([
+                // Same lookup and matching as above
+                { $lookup: { 
+                    from: 'users', 
+                    localField: 'userId', 
+                    foreignField: '_id', 
+                    as: 'userInfo' 
+                }},
+                { $unwind: '$userInfo' },
+                { $lookup: { 
+                    from: 'products', 
+                    localField: 'items.product', 
+                    foreignField: '_id', 
+                    as: 'productInfo' 
+                }},
+                { $match: {
+                    $or: [
+                        { orderCode: { $regex: searchQuery, $options: 'i' } },
+                        { 'userInfo.firstName': { $regex: searchQuery, $options: 'i' } },
+                        { 'userInfo.lastName': { $regex: searchQuery, $options: 'i' } },
+                        { 'userInfo.email': { $regex: searchQuery, $options: 'i' } },
+                        { 'productInfo.productName': { $regex: searchQuery, $options: 'i' } }
+                    ]
+                }},
+                { $match: status ? { 'items.order.status': status } : { 'items.order.status': { $ne: 'pending' } } },
+                ...(dateFrom || dateTo ? [{ $match: { orderDate: filter.orderDate } }] : []),
+                // Sorting, skipping and limiting
+                { $sort: { orderDate: -1 } },
+                { $skip: skip },
+                { $limit: limit }
+            ]);
+            
+            // Get populated data
+            orders = await orderSchema.populate(orders, [
+                { path: 'userId', select: 'firstName lastName email' },
+                { path: 'items.product' }
+            ]);
+        } else {
+            // Use the standard query approach if no search
+            totalOrders = await orderSchema.countDocuments(finalFilter);
+            orders = await orderSchema.find(finalFilter)
+                .populate('userId', 'firstName lastName email')
+                .populate('items.product')
+                .sort({ orderDate: -1 })
+                .skip(skip)
+                .limit(limit);
+        }
+        
+        const totalPages = Math.ceil(totalOrders / limit);
 
         // Process orders to handle null products and add return information
         const processedOrders = orders.map(order => {
-            const orderObj = order.toObject();
+            const orderObj = order.toObject ? order.toObject() : order;
             orderObj.items = orderObj.items.map(item => ({
                 ...item,
                 product: item.product || {
@@ -75,6 +194,8 @@ const getOrders = async (req, res) => {
             totalPages,
             hasNextPage: page < totalPages,
             hasPrevPage: page > 1,
+            status: status || '',  // Pass selected status to view
+            search: searchQuery,   // Pass search query to view
             admin: req.session.admin
         });
     } catch (error) {
@@ -86,7 +207,6 @@ const getOrders = async (req, res) => {
         });
     }
 };
-
 
 const updateItemStatus = async (req, res, next) => {
     try {
