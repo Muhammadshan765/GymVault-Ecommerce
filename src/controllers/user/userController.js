@@ -378,7 +378,13 @@ const postLogin = async (req, res, next) => {
 
 
 const getLogout = (req, res) => {
-    req.session.destroy(() => {
+    // Instead of destroying the entire session, just delete user-specific keys
+    delete req.session.user;
+    delete req.session.userEmail;
+    delete req.session.userName;
+    
+    // Regenerate the session to ensure old data is completely cleared for this user
+    req.session.save(() => {
         res.redirect('/login');
     });
 }

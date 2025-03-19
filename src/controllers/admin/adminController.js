@@ -1,6 +1,3 @@
-
-
-
 const loadLogin = (req, res) => {
   res.render('admin/login')
 }
@@ -53,9 +50,11 @@ const login = async (req, res) => {
 }
 
 const logout = (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/admin/login")
-  })
+  delete req.session.isAdmin;
+  
+  req.session.save(() => {
+    res.redirect("/admin/login");
+  });
 }
 
 export default {
