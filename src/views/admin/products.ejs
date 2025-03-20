@@ -147,7 +147,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-indigo-900 font-medium mb-2">Product Name</label>
-                                <input type="text" name="productName" id="productName" required
+                                <input type="text" name="productName" id="productName" required minlength="3" maxlength="10"
                                     oninput="this.value = capitalizeAndTrim(this.value)"
                                     class="w-full bg-white/50 border border-indigo-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none text-indigo-900 placeholder-indigo-400">
                                 <p class="text-xs text-indigo-600 mt-2">Only letters and spaces allowed</p>
@@ -155,7 +155,7 @@
 
                             <div>
                                 <label class="block text-indigo-900 font-medium mb-2">Brand</label>
-                                <input type="text" name="brand" id="brand" required pattern="[A-Za-z\s]+"
+                                <input type="text" name="brand" id="brand" required minlength="2" maxlength="10"
                                     oninput="this.value = capitalizeAndTrim(this.value)"
                                     class="w-full bg-white/50 border border-indigo-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none text-indigo-900 placeholder-indigo-400">
                                 <p class="text-xs text-indigo-600 mt-2">Only letters and spaces allowed</p>
@@ -200,11 +200,11 @@
 
                             <div>
                                 <label class="block text-indigo-900 font-medium mb-2">Description</label>
-                                <input type="text" name="description" id="variantDescription" required minlength="10"
-                                    maxlength="50" oninput="this.value = validateVariantDescription(this.value)"
+                                <input type="text" name="description" id="variantDescription" required minlength="10" maxlength="150"
+                                    oninput="this.value = validateAndTrimDescription(this.value)"
                                     class="w-full bg-white/50 border border-indigo-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none text-indigo-900">
                                 <p class="text-xs text-indigo-600 mt-2">
-                                    <span id="variantCharCount">0</span>/50 characters (minimum 10)
+                                    <span id="variantCharCount">0</span>/150 characters (minimum 10)
                                 </p>
                             </div>
 
@@ -933,14 +933,14 @@
                     const variantDescField = document.getElementById('variantDescription');
                     const variantCharCount = document.getElementById('variantCharCount');
 
-                    function validateVariantDescription(value) {
-                        // Update character count
-                        variantCharCount.textContent = value.length;
-
-                        // Trim and limit length
+                    function validateAndTrimDescription(value) {
+                        // Trim spaces and update character count
                         value = value.trim();
-                        if (value.length > 25) {
-                            value = value.substring(0, 25);
+                        document.getElementById('variantCharCount').textContent = value.length;
+
+                        // Ensure length is within bounds
+                        if (value.length > 150) {
+                            value = value.substring(0, 150);
                         }
 
                         return value;

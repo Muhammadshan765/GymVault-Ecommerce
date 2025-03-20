@@ -8,34 +8,26 @@ import upload from "../../utils/multer.js"
 
 // Add these validation functions at the top of the file
 const validateProductName = (name) => {
-    // Remove extra spaces and check length
     const trimmedName = name.trim();
     if (trimmedName.length < 3 || trimmedName.length > 10) {
-        throw new Error('Product name must be between 3 and 50 characters');
+        throw new Error('Product name must be between 3 and 10 characters');
     }
-    
-    // Allow letters, numbers, spaces, and basic punctuation
     const nameRegex = /^[a-zA-Z0-9\s]+$/;
     if (!nameRegex.test(trimmedName)) {
         throw new Error('Product name contains invalid characters');
     }
-    
     return trimmedName;
 };
 
 const validateBrand = (brand) => {
-    // Remove extra spaces and check length
     const trimmedBrand = brand.trim();
     if (trimmedBrand.length < 2 || trimmedBrand.length > 10) {
-        throw new Error('Brand name must be between 2 and 30 characters');
+        throw new Error('Brand name must be between 2 and 10 characters');
     }
-    
-    // Allow letters, numbers, spaces, and hyphens
     const brandRegex = /^[a-zA-Z0-9\s]+$/;
     if (!brandRegex.test(trimmedBrand)) {
         throw new Error('Brand name contains invalid characters');
     }
-    
     return trimmedBrand;
 };
 
@@ -127,6 +119,12 @@ const addProduct = async (req, res, next) => {
                 return res.status(400).json({ message: 'All fields are required' });
             }
 
+            // Validate description
+            const trimmedDescription = description.trim();
+            if (trimmedDescription.length < 10 || trimmedDescription.length > 150) {
+                return res.status(400).json({ message: 'Description must be between 10 and 150 characters' });
+            }
+
             // Parse and validate size-stock data
             let sizeStockArray;
             try {
@@ -173,7 +171,7 @@ const addProduct = async (req, res, next) => {
                 productName: validatedName,
                 brand: validatedBrand,
                 categoriesId,
-                description: description.trim(),
+                description: trimmedDescription,
                 size: sizeStockArray,
                 imageUrl: imageUrls, // Using Cloudinary URLs
                 stock: totalStock,
@@ -285,14 +283,29 @@ const updateProduct = async (req, res, next) => {
                 });
             }
 
+            // Validate product name and brand
+            let validatedName, validatedBrand;
+            try {
+                validatedName = validateProductName(productName);
+                validatedBrand = validateBrand(brand);
+            } catch (validationError) {
+                return res.status(400).json({ message: validationError.message });
+            }
+
+            // Validate description
+            const trimmedDescription = description.trim();
+            if (trimmedDescription.length < 10 || trimmedDescription.length > 150) {
+                return res.status(400).json({ message: 'Description must be between 10 and 150 characters' });
+            }
+
             // Update product in database
             const updatedProduct = await Product.findByIdAndUpdate(
                 productId,
                 {
-                    productName: productName.trim(),
-                    brand: brand.trim(),
+                    productName: validatedName,
+                    brand: validatedBrand,
                     categoriesId,
-                    description: description.trim(),
+                    description: trimmedDescription,
                     price: parseFloat(price),
                     size: sizeStockArray,
                     imageUrl: updatedImageUrls
