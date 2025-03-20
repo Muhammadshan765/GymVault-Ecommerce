@@ -138,7 +138,7 @@ const getHome = async (req, res) => {
 const getShop = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 12;
+        const limit = 7;
         const search = req.query.search || '';
         const sort = req.query.sort || 'default';
         const size = req.query.size || '';
@@ -202,13 +202,6 @@ const getShop = async (req, res) => {
             };
         }
 
-        // Add price range filter
-        if (minPrice || maxPrice) {
-            query.price = {};
-            if (minPrice) query.price.$gte = Number(minPrice);
-            if (maxPrice) query.price.$lte = Number(maxPrice);
-        }
-
         // Add stock filter
         if (stock === 'inStock') {
             query['size.stock'] = { $gt: 0 };
@@ -216,6 +209,9 @@ const getShop = async (req, res) => {
             // This will find products where all sizes have 0 stock
             query['size'] = { $not: { $elemMatch: { stock: { $gt: 0 } } } };
         }
+
+        // Note: We'll handle price filtering after applying discounts
+        // Removing the direct price query since it won't work with discounted prices
 
         // Build sort options
         let sortOptions = {};
@@ -227,10 +223,9 @@ const getShop = async (req, res) => {
                 sortOptions.productName = -1;
                 break;
             case 'priceLowToHigh':
-                sortOptions.price = 1;
-                break;
             case 'priceHighToLow':
-                sortOptions.price = -1;
+                // For price sorting, we'll handle it after applying offers
+                sortOptions.createdAt = -1; // Default sorting, will be overridden
                 break;
             case 'newArrivals':
                 sortOptions.createdAt = -1;
@@ -239,16 +234,13 @@ const getShop = async (req, res) => {
                 sortOptions.createdAt = -1;
         }
 
-        // Get total count
-        const totalProducts = await Product.countDocuments(query);
-        const totalPages = Math.ceil(totalProducts / limit);
+        // Get total count - we'll recalculate this after price filtering
+        const totalProductsBeforeFilter = await Product.countDocuments(query);
 
         // Fetch products
-        const products = await Product.find(query)
+        const allProducts = await Product.find(query)
             .populate('categoriesId')
-            .sort(sortOptions)
-            .skip((page - 1) * limit)
-            .limit(limit);
+            .sort(sortOptions);
 
         // Get user's wishlist if logged in
         let wishlistItems = [];
@@ -260,7 +252,7 @@ const getShop = async (req, res) => {
         }
 
         // Process products and apply offers
-        const productsWithPrices = products.map(product => {
+        const productsWithPrices = allProducts.map(product => {
             const productData = product.toObject();
             const productId = product._id.toString();
             
@@ -314,20 +306,41 @@ const getShop = async (req, res) => {
                 appliedOffer: appliedOffer,
                 stock: totalStock,
                 size: processedSizes,
-                isInWishlist: isInWishlist
+                isInWishlist: isInWishlist,
+                effectivePrice: discountedPrice // This is the price we'll use for filtering
             };
         });
 
-        // Filter by price range after processing offers
+        // Apply price-based sorting if needed
+        if (sort === 'priceLowToHigh' || sort === 'priceHighToLow') {
+            productsWithPrices.sort((a, b) => {
+                const priceA = a.effectivePrice;
+                const priceB = b.effectivePrice;
+                
+                return sort === 'priceLowToHigh' 
+                    ? priceA - priceB  // Low to high
+                    : priceB - priceA; // High to low
+            });
+        }
+
+        // Apply price range filter now that we have calculated all effective prices
         let filteredProducts = productsWithPrices;
         if (minPrice || maxPrice) {
             filteredProducts = productsWithPrices.filter(product => {
-                const price = product.offerApplied ? product.offerPrice : product.price;
-                if (minPrice && price < minPrice) return false;
-                if (maxPrice && price > maxPrice) return false;
+                const effectivePrice = product.effectivePrice;
+                
+                if (minPrice && effectivePrice < minPrice) return false;
+                if (maxPrice && effectivePrice > maxPrice) return false;
                 return true;
             });
         }
+
+        // Calculate pagination based on filtered products
+        const totalProducts = filteredProducts.length;
+        const totalPages = Math.ceil(totalProducts / limit);
+        
+        // Apply pagination to filtered products
+        const paginatedProducts = filteredProducts.slice((page - 1) * limit, page * limit);
 
         const pagination = {
             currentPage: page,
@@ -339,7 +352,7 @@ const getShop = async (req, res) => {
         // Handle AJAX requests
         if (req.xhr) {
             return res.json({
-                products: filteredProducts,
+                products: paginatedProducts,
                 pagination,
                 isLoggedIn: !!req.session.user
             });
@@ -347,7 +360,7 @@ const getShop = async (req, res) => {
 
         // Regular page load
         res.render('user/shop', {
-            products: filteredProducts,
+            products: paginatedProducts,
             pagination,
             search,
             sort,
