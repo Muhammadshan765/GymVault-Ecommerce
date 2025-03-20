@@ -111,17 +111,8 @@ const addProduct = async (req, res, next) => {
                 return res.status(400).json({ message: 'Please upload exactly 3 images' });
             }
 
-            // Validate file types and sizes
-            for (const file of req.files) {
-                if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                    return res.status(400).json({ message: 'Each image must be less than 5MB' });
-                }
-
-                const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-                if (!validTypes.includes(file.mimetype)) {
-                    return res.status(400).json({ message: 'Invalid file type. Only JPG, JPEG, PNG, and WebP are allowed' });
-                }
-            }
+            // Get Cloudinary URLs from uploaded files
+            const imageUrls = req.files.map(file => file.path);
 
             const {
                 productName,
@@ -175,9 +166,6 @@ const addProduct = async (req, res, next) => {
                 return res.status(400).json({ message: 'A product with this name already exists' });
             }
 
-            // Process and save the images
-            const imageUrls = req.files.map(file => `/static/uploads/products/${file.filename}`);
-
             // Calculate total stock
             const totalStock = sizeStockArray.reduce((sum, item) => sum + item.stock, 0);
 
@@ -187,7 +175,7 @@ const addProduct = async (req, res, next) => {
                 categoriesId,
                 description: description.trim(),
                 size: sizeStockArray,
-                imageUrl: imageUrls,
+                imageUrl: imageUrls, // Using Cloudinary URLs
                 stock: totalStock,
                 isActive: true
             });
@@ -196,16 +184,7 @@ const addProduct = async (req, res, next) => {
             res.status(201).json({ message: 'Product added successfully' });
 
         } catch (error) {
-            // Delete uploaded files if there's an error
-            if (req.files) {
-                req.files.forEach(file => {
-                    const filePath = path.join(process.cwd(), 'public', 'uploads', 'products', file.filename);
-                    if (fs.existsSync(filePath)) {
-                        fs.unlinkSync(filePath);
-                    }
-                });
-            }
-            
+            // No need to manually delete files as Cloudinary handles this
             console.error('Error adding product:', error);
             res.status(400).json({ message: error.message || 'Error adding product' });
         }
@@ -250,7 +229,7 @@ const getProductDetails = async (req, res, next) => {
 };
 
 // Update Product
-const updateProduct = async (req, res,next) => {
+const updateProduct = async (req, res, next) => {
     const uploadMultiple = upload.array('images', 3);
 
     uploadMultiple(req, res, async (err) => {
@@ -300,23 +279,9 @@ const updateProduct = async (req, res,next) => {
             let updatedImageUrls = [...existingProduct.imageUrl];
             
             if (req.files && req.files.length > 0) {
-                // For each new image uploaded
+                // For each new image uploaded, use the Cloudinary URL
                 req.files.forEach((file, index) => {
-                    // Replace the image URL at the corresponding index
-                    updatedImageUrls[index] = `/static/uploads/products/${file.filename}`;
-                    
-                    // Delete the old image file
-                    const oldImageUrl = existingProduct.imageUrl[index];
-                    if (oldImageUrl) {
-                        const oldImagePath = path.join(process.cwd(), 'public', oldImageUrl);
-                        try {
-                            if (fs.existsSync(oldImagePath)) {
-                                fs.unlinkSync(oldImagePath);
-                            }
-                        } catch (error) {
-                            console.error('Error deleting old image:', error);
-                        }
-                    }
+                    updatedImageUrls[index] = file.path;
                 });
             }
 
@@ -329,7 +294,7 @@ const updateProduct = async (req, res,next) => {
                     categoriesId,
                     description: description.trim(),
                     price: parseFloat(price),
-                    size: sizeStockArray, // Use the parsed and validated size-stock array
+                    size: sizeStockArray,
                     imageUrl: updatedImageUrls
                 },
                 { new: true }
@@ -338,16 +303,7 @@ const updateProduct = async (req, res,next) => {
             res.status(200).json({ message: 'Product updated successfully' });
 
         } catch (error) {
-            // Clean up any uploaded files if there's an error
-            if (req.files) {
-                req.files.forEach(file => {
-                    const filePath = path.join(process.cwd(), 'public', 'uploads', 'products', file.filename);
-                    if (fs.existsSync(filePath)) {
-                        fs.unlinkSync(filePath);
-                    }
-                });
-            }
-            
+            // No need to manually delete files as Cloudinary handles this
             res.status(500).json({ message: error.message || 'Error updating product' });
         }
     });
