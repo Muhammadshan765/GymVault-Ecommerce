@@ -1,15 +1,15 @@
 <div class="fixed z-50 top-0 w-full bg-gray-900 text-white shadow-lg">
     <!-- Main Navigation Bar -->
-    <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+    <div class="container mx-auto px-2 xs:px-3 sm:px-6 h-12 xs:h-14 sm:h-16 flex items-center justify-between">
         <!-- Left Side (Logo & Brand) -->
-        <div class="flex items-center space-x-8">
+        <div class="flex items-center space-x-2 xs:space-x-3 sm:space-x-8">
             <div class="flex items-center">
-                <img src="/images/image.png" alt="GymVault" class="h-10 hover:scale-105 transition-transform duration-300" />
-                <span class="ml-3 text-2xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">GymVault</span>
+                <img src="/images/image.png" alt="GymVault" class="h-7 xs:h-8 sm:h-10 hover:scale-105 transition-transform duration-300" />
+                <span class="ml-1 xs:ml-2 sm:ml-3 text-base xs:text-xl sm:text-2xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent truncate max-w-[90px] xs:max-w-full">GymVault</span>
             </div>
             
             <!-- Primary Navigation -->
-            <nav class="hidden lg:flex items-center space-x-6">
+            <nav class="hidden lg:flex items-center space-x-4 xl:space-x-6">
                 <a href="/home" class="text-gray-300 hover:text-red-500 transition-colors duration-300 flex items-center space-x-2">
                     <i class="fa-solid fa-home"></i>
                     <span>Home</span>
@@ -21,58 +21,57 @@
         </div>
 
         <!-- Center (Search) -->
-        <div class="hidden md:block flex-1 max-w-xl mx-8">
+        <div class="hidden md:block flex-1 max-w-xl mx-2 lg:mx-8">
             <form action="/shop" method="GET" class="relative" id="searchForm">
                 <input type="text" 
                        name="search"
                        id="searchInput"
                        placeholder="Search for fitness equipment..." 
-                       class="w-full py-2 px-4 pr-10 rounded-full bg-gray-800 border border-gray-700 text-gray-300 placeholder-gray-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none transition-all duration-300"
+                       class="w-full py-1.5 sm:py-2 px-3 sm:px-4 pr-8 sm:pr-10 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-sm sm:text-base placeholder-gray-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none transition-all duration-300"
                        value="<%= locals.searchQuery || '' %>"
                 />
                 <button type="submit" 
                         id="searchButton"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition-colors duration-300">
-                    <i class="fa-solid fa-search"></i>
+                        class="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition-colors duration-300">
+                    <i class="fa-solid fa-search text-sm sm:text-base"></i>
                 </button>
             </form>
         </div>
 
         <!-- Right Side (Icons) -->
-        <div class="flex items-center space-x-1 sm:space-x-4">
+        <div class="flex items-center space-x-0.5 xs:space-x-1 sm:space-x-4">
+            <%  if(locals.user) { %>
+                <span class="hidden md:block text-gray-300 text-xs sm:text-sm lg:text-base truncate max-w-[60px] lg:max-w-full"> <%=locals.user.firstName%> </span>
+            <% } %>
 
-        <%  if(locals.user) { %>
-            <span class="hidden md:block text-gray-300"> <%=locals.user.firstName%>  </span>
-        <% } %>
-
-            <a href="/wishlist" class="p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110">
-                <i class="fa-regular fa-heart text-xl"></i>
+            <a href="/wishlist" class="p-1 sm:p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110">
+                <i class="fa-regular fa-heart text-base xs:text-lg sm:text-xl"></i>
             </a>
             <div class="relative group">
-                <button class="p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110">
-                    <i class="fa-regular fa-user text-xl"></i>
+                <button class="p-1 sm:p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110">
+                    <i class="fa-regular fa-user text-base xs:text-lg sm:text-xl"></i>
                 </button>
                 <!-- Dropdown Menu -->
-                <div class="absolute right-0 mt-2 w-48 bg-gray-900 rounded-lg shadow-xl py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <a href="/profile" class="block px-4 py-2 text-gray-300 hover:text-red-500 hover:bg-gray-800">
-                        <i class="fa-regular fa-user mr-2"></i>Profile
+                <div class="absolute right-0 mt-2 w-36 xs:w-40 sm:w-48 bg-gray-900 rounded-lg shadow-xl py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 z-50">
+                    <a href="/profile" class="block px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base text-gray-300 hover:text-red-500 hover:bg-gray-800">
+                        <i class="fa-regular fa-user mr-1 sm:mr-2"></i>Profile
                     </a>
-                    <a href="/logout" class="block px-4 py-2 text-gray-300 hover:text-red-500 hover:bg-gray-800">
-                        <i class="fa-solid fa-sign-out-alt mr-2"></i>Logout
+                    <a href="/logout" class="block px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base text-gray-300 hover:text-red-500 hover:bg-gray-800">
+                        <i class="fa-solid fa-sign-out-alt mr-1 sm:mr-2"></i>Logout
                     </a>
                 </div>
             </div>
-            <a href="/cart" class="p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110 relative">
-                <i class="fa-solid fa-cart-shopping text-xl"></i>
+            <a href="/cart" class="p-1 sm:p-2 text-gray-300 hover:text-red-500 transition-all duration-300 hover:scale-110 relative">
+                <i class="fa-solid fa-cart-shopping text-base xs:text-lg sm:text-xl"></i>
                 <% if (locals.cartCount && cartCount > 0) { %>
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full animate-pulse">
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] xs:text-xs w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded-full animate-pulse">
                         <%= cartCount > 9 ? '9+' : cartCount %>
                     </span>
                 <% } %>
             </a>
      
-            <button id="menu-toggle" class="lg:hidden p-2 text-gray-300 hover:text-red-500 transition-all duration-300">
-                <i class="fa-solid fa-bars text-2xl"></i>
+            <button id="menu-toggle" class="lg:hidden p-1 sm:p-2 text-gray-300 hover:text-red-500 transition-all duration-300">
+                <i class="fa-solid fa-bars text-lg xs:text-xl sm:text-2xl"></i>
             </button>
         </div>
     </div>
@@ -80,42 +79,42 @@
 
 <!-- Mobile Menu -->
 <div id="mobile-menu" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden lg:hidden z-40" aria-hidden="true">
-    <div class="fixed top-16 right-0 w-full max-w-sm h-screen bg-gray-900 shadow-xl transform transition-transform duration-300">
+    <div class="fixed top-12 xs:top-14 sm:top-16 right-0 w-full max-w-[280px] xs:max-w-sm h-[calc(100vh-3rem)] xs:h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] bg-gray-900 shadow-xl transform transition-transform duration-300 overflow-y-auto">
         <!-- Search Bar for Mobile -->
-        <div class="p-4 border-b border-gray-800">
+        <div class="p-2 xs:p-3 sm:p-4 border-b border-gray-800">
             <form action="/shop" method="GET" class="relative" id="mobileSearchForm">
                 <input type="text"
                        name="search"
                        id="mobileSearchInput" 
                        placeholder="Search products..." 
-                       class="w-full py-2 px-4 pr-10 rounded-full bg-gray-800 border border-gray-700 text-gray-300 placeholder-gray-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none"
+                       class="w-full py-1.5 xs:py-2 px-3 xs:px-4 pr-8 xs:pr-10 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-sm xs:text-base placeholder-gray-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none"
                        value="<%= locals.searchQuery || '' %>"
                 />
                 <button type="submit" 
                         id="mobileSearchButton"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500">
-                    <i class="fa-solid fa-search"></i>
+                        class="absolute right-2 xs:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500">
+                    <i class="fa-solid fa-search text-sm xs:text-base"></i>
                 </button>
             </form>
         </div>
 
         <!-- Mobile Navigation Links -->
-        <nav class="flex flex-col p-4">
-            <div class="text-lg font-bold text-red-500 mb-4">Menu</div>
-            <a href="/home" class="p-3 text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
-                <i class="fa-solid fa-home w-8"></i>Home
+        <nav class="flex flex-col p-2 xs:p-3 sm:p-4">
+            <div class="text-sm xs:text-base sm:text-lg font-bold text-red-500 mb-1 xs:mb-2 sm:mb-4">Menu</div>
+            <a href="/home" class="p-1.5 xs:p-2 sm:p-3 text-sm xs:text-base text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
+                <i class="fa-solid fa-home w-5 xs:w-6 sm:w-8"></i>Home
             </a>
-            <a href="/shop" class="p-3 text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
-                <i class="fa-solid fa-store w-8"></i>Shop
+            <a href="/shop" class="p-1.5 xs:p-2 sm:p-3 text-sm xs:text-base text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
+                <i class="fa-solid fa-store w-5 xs:w-6 sm:w-8"></i>Shop
             </a>
-            <a href="#" class="p-3 text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
-                <i class="fa-solid fa-envelope w-8"></i>Contact
+            <a href="#" class="p-1.5 xs:p-2 sm:p-3 text-sm xs:text-base text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
+                <i class="fa-solid fa-envelope w-5 xs:w-6 sm:w-8"></i>Contact
             </a>
-            <a href="#" class="p-3 text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
-                <i class="fa-solid fa-info-circle w-8"></i>About
+            <a href="#" class="p-1.5 xs:p-2 sm:p-3 text-sm xs:text-base text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
+                <i class="fa-solid fa-info-circle w-5 xs:w-6 sm:w-8"></i>About
             </a>
-            <a href="/logout" class="p-3 text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
-                <i class="fa-solid fa-sign-out-alt w-8"></i>Logout
+            <a href="/logout" class="p-1.5 xs:p-2 sm:p-3 text-sm xs:text-base text-gray-300 hover:text-red-500 hover:bg-gray-800 rounded-lg transition-all duration-300 flex items-center">
+                <i class="fa-solid fa-sign-out-alt w-5 xs:w-6 sm:w-8"></i>Logout
             </a>
         </nav>
     </div>
