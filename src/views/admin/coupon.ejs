@@ -40,11 +40,15 @@
                         <tbody class="divide-y divide-gray-100">
                             <% coupons.forEach(coupon => { %>
                                 <% 
-                                const now = new Date();
+                                // Convert all dates to their numeric timestamp values for reliable comparison
+                                const now = Date.now();
                                 const startDate = new Date(coupon.startDate);
                                 const expiryDate = new Date(coupon.expiryDate);
-                                const isExpired = expiryDate < now;
-                                const isScheduled = startDate > now;
+                                const startTimestamp = startDate.getTime();
+                                const expiryTimestamp = expiryDate.getTime();
+
+                                const isExpired = expiryTimestamp < now;
+                                const isScheduled = startTimestamp > now;
                                 %>
                                 <tr class="hover:bg-gray-50/80 transition-colors duration-200">
                                     <td class="px-6 py-4">

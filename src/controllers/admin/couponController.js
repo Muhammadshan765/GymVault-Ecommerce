@@ -23,7 +23,6 @@ const addCoupons = async (req, res, next) => {
             userUsageLimit
         } = req.body;
 
-
         // Validate description
         if (!description || description.trim().length === 0) {
             return res.status(400).json({ message: 'Description is required' });
@@ -38,6 +37,10 @@ const addCoupons = async (req, res, next) => {
             return res.status(400).json({ message: 'Discount percentage must be between 0 and 100' });
         }
 
+        // Convert dates to UTC to ensure consistent handling across different environments
+        const startDateUTC = new Date(startDate);
+        const expiryDateUTC = new Date(expiryDate);
+
         // Check if coupon code already exists
         const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
         if (existingCoupon) {
@@ -51,8 +54,8 @@ const addCoupons = async (req, res, next) => {
             discountPercentage,
             minimumPurchase: minimumPurchase || 0,
             maximumDiscount: maximumDiscount || null,
-            startDate,
-            expiryDate,
+            startDate: startDateUTC,
+            expiryDate: expiryDateUTC,
             totalCoupon: totalCoupon || 1,
             userUsageLimit: userUsageLimit || 1
         });
@@ -61,7 +64,6 @@ const addCoupons = async (req, res, next) => {
         res.status(200).json({
             message: 'Coupon added successfully'
         });
-
 
     } catch (error) {
         next(error)
