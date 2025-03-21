@@ -44,11 +44,12 @@ const createOffer = async (req, res, next) => {
             });
         }
 
-        // Validate dates - remove the manual timezone adjustment
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const now = new Date();
+        // Convert dates to UTC
+        const start = new Date(startDate).toISOString();
+        const end = new Date(endDate).toISOString();
+        const now = new Date().toISOString();
 
+        // Ensure start date is in the future
         if (start < now) {
             return res.status(400).json({
                 success: false,
@@ -56,6 +57,7 @@ const createOffer = async (req, res, next) => {
             });
         }
 
+        // Ensure end date is after start date
         if (end <= start) {
             return res.status(400).json({
                 success: false,
@@ -163,11 +165,12 @@ const updateOffer = async (req, res, next) => {
             endDate
         } = req.body;
 
-        // Validate dates - remove the manual timezone adjustment
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const now = new Date();
+        // Convert dates to UTC
+        const start = new Date(startDate).toISOString();
+        const end = new Date(endDate).toISOString();
+        const now = new Date().toISOString();
 
+        // Ensure start date is in the future
         if (start < now) {
             return res.status(400).json({
                 success: false,
@@ -175,6 +178,7 @@ const updateOffer = async (req, res, next) => {
             });
         }
 
+        // Ensure end date is after start date
         if (end <= start) {
             return res.status(400).json({
                 success: false,
