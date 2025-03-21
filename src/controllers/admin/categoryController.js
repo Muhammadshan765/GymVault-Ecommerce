@@ -23,8 +23,8 @@ const addCategory = async (req, res, next) => {
           return res.status(400).send('Category can only contain Alphabets');
       }
 
-      if (trimmedCategoryName.length > 10) {
-          return res.status(400).send('Category name must not exceed 10 characters')
+      if (trimmedCategoryName.length > 20) {
+          return res.status(400).send('Category name must not exceed 20 characters')
       }
 
       //capitaize first letter,rest lowercase
@@ -73,8 +73,8 @@ const editCatagory = async (req, res, next) => {
           return res.status(400).send('Catagory name can only contain alphabets');
       }
 
-      if (trimmedCategoryName.length > 10) {
-          return res.status(400).send('Category name must not exceed 10 characters');
+      if (trimmedCategoryName.length > 20) {
+          return res.status(400).send('Category name must not exceed 20 characters');
 
       }
 

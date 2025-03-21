@@ -138,7 +138,7 @@ const getHome = async (req, res) => {
 const getShop = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 7;
+        const limit = 12;
         const search = req.query.search || '';
         const sort = req.query.sort || 'default';
         const size = req.query.size || '';
