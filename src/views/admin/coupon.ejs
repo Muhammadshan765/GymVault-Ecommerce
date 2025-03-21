@@ -371,17 +371,12 @@
               }
           });
 
-          // Convert dates to simple date format without time
-          const start = new Date(startDate);
-          start.setHours(0, 0, 0, 0);
+          // Use timestamps for date comparison to avoid timezone issues
+          const startTimestamp = new Date(startDate).getTime();
+          const expiryTimestamp = new Date(expiryDate).getTime();
+          const nowTimestamp = Date.now();
 
-          const expiry = new Date(expiryDate);
-          expiry.setHours(0, 0, 0, 0);
-
-          const currentDate = new Date();
-          currentDate.setHours(0, 0, 0, 0);
-
-          if (start < currentDate) {
+          if (startTimestamp < nowTimestamp) {
               return Swal.fire({
                   icon: 'error',
                   title: 'Validation Error',
@@ -390,7 +385,7 @@
               });
           }
 
-          if (expiry <= start) {
+          if (expiryTimestamp <= startTimestamp) {
               return Swal.fire({
                   icon: 'error',
                   title: 'Validation Error',
@@ -501,7 +496,11 @@
 
         // Helper function to format date for datetime-local input
         function formatDateForInput(date) {
-          return new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+          // Create a new date to avoid modifying the original
+          const localDate = new Date(date);
+          
+          // Convert to local timezone and format for datetime-local input
+          return new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000))
             .toISOString()
             .slice(0, 16);
         }
