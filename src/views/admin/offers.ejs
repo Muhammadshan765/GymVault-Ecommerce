@@ -521,6 +521,11 @@
             document.getElementById('selectionDiv').classList.add('hidden');
         }
 
+        function formatDateForInput(dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm in UTC
+        }
+
         function editOffer(button) {
             try {
                 const offer = JSON.parse(decodeURIComponent(button.dataset.offer));
@@ -533,12 +538,7 @@
                 const type = offer.categoryId ? 'category' : 'product';
                 document.getElementById('offerType').value = type;
                 
-                // Format dates properly for datetime-local input
-                const formatDateForInput = (dateString) => {
-                    const date = new Date(dateString);
-                    return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
-                };
-
+                // Format dates properly for datetime-local input in UTC
                 document.getElementById('startDate').value = formatDateForInput(offer.startDate);
                 document.getElementById('endDate').value = formatDateForInput(offer.endDate);
                 
