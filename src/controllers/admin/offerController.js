@@ -44,11 +44,11 @@ const createOffer = async (req, res, next) => {
             });
         }
 
-        // Convert dates to UTC
-        const start = new Date(startDate).toISOString();
-        const end = new Date(endDate).toISOString();
-        const now = new Date().toISOString();
-
+        // Parse dates with explicit time zone handling
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const now = new Date();
+        
         // Ensure start date is in the future
         if (start < now) {
             return res.status(400).json({
@@ -67,7 +67,7 @@ const createOffer = async (req, res, next) => {
 
         //check for existing offers with date overlap
         let existingOffers;
-        if (type === 'produt') {
+        if (type === 'product') {
             existingOffers = await Offer.find({
                 productIds: { $in: itemIds },
                 $or: [
@@ -117,8 +117,8 @@ const createOffer = async (req, res, next) => {
         const offerData = {
             name,
             discount: Number(discount),
-            startDate: start,
-            endDate: end,
+            startDate: start.toISOString(),
+            endDate: end.toISOString(),
             status: 'active'
         };
 
@@ -165,10 +165,10 @@ const updateOffer = async (req, res, next) => {
             endDate
         } = req.body;
 
-        // Convert dates to UTC
-        const start = new Date(startDate).toISOString();
-        const end = new Date(endDate).toISOString();
-        const now = new Date().toISOString();
+        // Parse dates with explicit time zone handling
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const now = new Date();
 
         // Ensure start date is in the future
         if (start < now) {
@@ -259,8 +259,8 @@ const updateOffer = async (req, res, next) => {
         const updateData = {
             name,
             discount: Number(discount),
-            startDate: start,
-            endDate: end
+            startDate: start.toISOString(),
+            endDate: end.toISOString()
 
         };
 
