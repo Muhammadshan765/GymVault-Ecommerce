@@ -149,11 +149,11 @@
 
                                                         <!-- Cancel/Return Button (if applicable) -->
                                                         <% if (item.order.status === 'pending' || item.order.status === 'processing') { %>
-                                                            <% if (order.payment.paymentStatus !== 'failed') { %>
+                                                            <% if (order.payment.paymentStatus !== 'failed' && (!item.hasOwnProperty('return') || !item.return?.isReturnRequested)) { %>
                                                                 <button onclick="cancelOrderItem('<%= order._id %>', '<%= item.product._id %>', '<%= item.product.productName %>')"
                                                                     class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
-                                                                Cancel
-                                                            </button>
+                                                                    Cancel
+                                                                </button>
                                                             <% } %>
                                                         <% } %>
  

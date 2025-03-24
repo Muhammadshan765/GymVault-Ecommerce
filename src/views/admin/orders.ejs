@@ -113,13 +113,15 @@
                                                                 </span>
                                                                 
                                                                 <% if (!['delivered', 'cancelled', 'returned', 'refund processing'].includes(item.order.status)) { %>
-                                                                    <select onchange="updateItemStatus(event, '<%= order._id %>', '<%= item.product._id %>')"
-                                                                            class="status-select text-xs rounded-lg bg-gray-50 text-gray-800 border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all px-2 py-1">
-                                                                            <option value="">Update Status</option>
-                                                                            <option value="shipped">Ship</option>
-                                                                            <option value="delivered">Deliver</option>
-                                                                            <option value="cancelled">Cancel</option>
-                                                                    </select>
+                                                                    <% if (!item.return?.isReturnRequested || item.return.status !== 'pending') { %>
+                                                                        <select onchange="updateItemStatus(event, '<%= order._id %>', '<%= item.product._id %>')"
+                                                                                class="status-select text-xs rounded-lg bg-gray-50 text-gray-800 border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all px-2 py-1">
+                                                                                <option value="">Update Status</option>
+                                                                                <option value="shipped">Ship</option>
+                                                                                <option value="delivered">Deliver</option>
+                                                                                <option value="cancelled">Cancel</option>
+                                                                        </select>
+                                                                    <% } %>
                                                                 <% } %>
 
                                                                 <% if (item.return?.isReturnRequested && item.return.status === 'pending') { %>
