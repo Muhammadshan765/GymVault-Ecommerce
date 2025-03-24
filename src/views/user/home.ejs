@@ -8,26 +8,82 @@
     <section class="relative mt-14 sm:mt-16">
       <!-- Mobile Hero (visible only on small screens) -->
       <div class="sm:hidden">
-        <div class="relative h-[60vh] sm:h-[70vh] mybg-green overflow-hidden">
-          <!-- Mobile Content -->
-          <div class="container mx-auto px-4 h-full flex flex-col justify-center z-10 relative">
-            <div class="animate-fadeIn">
-              <span class="text-gray-300 text-xs md:text-sm tracking-wider mb-2 md:mb-4 inline-block opacity-90">WELCOME TO GymVault</span>
-              <h1 class="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4 leading-tight">
-                Discover Your Perfect <br class="md:hidden"> Fitness Gear
-              </h1>
-              <p class="text-gray-200 text-sm md:text-base mb-5 md:mb-6 max-w-lg opacity-90">
-                Explore our collection of premium gym equipment for every workout
-              </p>
-              <div class="flex gap-3 md:gap-4 mt-2">
-                <a href="/shop" class="bg-white text-gray-900 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg shadow-lg hover:bg-gray-100 transition-all duration-300 text-xs sm:text-sm font-medium flex-1 text-center transform hover:scale-105">
-                  Shop Now
-                </a>
-                <a href="#featured" class="border border-white text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-white/10 transition-all duration-300 text-xs sm:text-sm font-medium flex-1 text-center transform hover:scale-105">
-                  View Featured
-                </a>
+        <div class="relative h-[60vh] sm:h-[70vh] overflow-hidden">
+          <!-- Slideshow container for mobile -->
+          <div class="relative w-full h-full" id="mobileSlideshow">
+            <div class="mobile-slide absolute inset-0 opacity-100 transition-opacity duration-1000 transform scale-100 hover:scale-105 transition-transform duration-7000">
+              <img 
+                src="/images/Banner.webp" 
+                alt="Gym Equipment" 
+                class="w-full h-full object-cover object-center"
+                srcset="/images/Banner.webp 640w,
+                        /images/Banner.webp 768w,
+                        /images/Banner.webp 1024w"
+                sizes="(max-width: 640px) 100vw,
+                       (max-width: 768px) 100vw,
+                       100vw"
+                loading="eager"
+              />
+            </div>
+            <div class="mobile-slide absolute inset-0 opacity-0 transition-opacity duration-1000 transform scale-100 hover:scale-105 transition-transform duration-7000">
+              <img 
+                src="/images/Website-Banner-_Anniversary-Loot-Deal_-_1242x400_V2.webp" 
+                alt="Workout" 
+                class="w-full h-full object-cover object-center"
+                srcset="/images/Website-Banner-_Anniversary-Loot-Deal_-_1242x400_V2.webp 640w,
+                        /images/Website-Banner-_Anniversary-Loot-Deal_-_1242x400_V2.webp 768w,
+                        /images/Website-Banner-_Anniversary-Loot-Deal_-_1242x400_V2.webp 1024w"
+                sizes="(max-width: 640px) 100vw,
+                       (max-width: 768px) 100vw,
+                       100vw"
+                loading="lazy"
+              />
+            </div>
+            <div class="mobile-slide absolute inset-0 opacity-0 transition-opacity duration-1000 transform scale-100 hover:scale-105 transition-transform duration-7000">
+              <img 
+                src="/images/mt-brand-athlete-banner.webp" 
+                alt="Supplements" 
+                class="w-full h-full object-cover object-center"
+                srcset="/images/mt-brand-athlete-banner.webp 640w,
+                        /images/mt-brand-athlete-banner.webp 768w,
+                        /images/mt-brand-athlete-banner.webp 1024w"
+                sizes="(max-width: 640px) 100vw,
+                       (max-width: 768px) 100vw,
+                       100vw"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          <!-- Enhanced gradient overlay for better text readability -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent">
+            <!-- Mobile Content -->
+            <div class="container mx-auto px-4 h-full flex flex-col justify-center z-10 relative">
+              <div class="animate-fadeIn max-w-lg mx-auto text-center">
+                <span class="text-gray-300 text-xs md:text-sm tracking-wider mb-2 md:mb-4 inline-block opacity-90">WELCOME TO GymVault</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4 leading-tight">
+                  Discover Your Perfect <br class="md:hidden"> Fitness Gear
+                </h1>
+                <p class="text-gray-200 text-sm md:text-base mb-5 md:mb-6 opacity-90">
+                  Explore our collection of premium gym equipment for every workout
+                </p>
+                <div class="flex gap-3 md:gap-4 mt-2 justify-center">
+                  <a href="/shop" class="bg-white text-gray-900 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg shadow-lg hover:bg-gray-100 transition-all duration-300 text-xs sm:text-sm font-medium flex-1 max-w-[150px] text-center transform hover:scale-105">
+                    Shop Now
+                  </a>
+                  <a href="#featured" class="border border-white text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-white/10 transition-all duration-300 text-xs sm:text-sm font-medium flex-1 max-w-[150px] text-center transform hover:scale-105">
+                    View Featured
+                  </a>
+                </div>
               </div>
             </div>
+          </div>
+          
+          <!-- Mobile slide indicators with improved positioning -->
+          <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+            <button class="mobile-slide-indicator w-8 h-1.5 bg-white/30 rounded-full hover:bg-white/80 transition-all duration-300 focus:outline-none active-indicator"></button>
+            <button class="mobile-slide-indicator w-8 h-1.5 bg-white/30 rounded-full hover:bg-white/80 transition-all duration-300 focus:outline-none"></button>
+            <button class="mobile-slide-indicator w-8 h-1.5 bg-white/30 rounded-full hover:bg-white/80 transition-all duration-300 focus:outline-none"></button>
           </div>
           
           <!-- Enhanced Mobile Decorative Elements -->
@@ -378,4 +434,76 @@
       console.error('Error toggling wishlist:', error);
     }
   }
+
+  // Mobile slideshow functionality with touch support
+  let currentMobileSlide = 0;
+  const mobileSlides = document.querySelectorAll('.mobile-slide');
+  const mobileIndicators = document.querySelectorAll('.mobile-slide-indicator');
+  let touchStartX = 0;
+  let touchEndX = 0;
+  
+  function showMobileSlide(n) {
+    mobileSlides.forEach(slide => {
+      slide.style.opacity = '0';
+      slide.style.zIndex = '0';
+    });
+    mobileSlides[n].style.opacity = '1';
+    mobileSlides[n].style.zIndex = '1';
+    
+    mobileIndicators.forEach(ind => {
+      ind.classList.remove('active-indicator', 'bg-white/80');
+      ind.classList.add('bg-white/30');
+    });
+    mobileIndicators[n].classList.add('active-indicator', 'bg-white/80');
+    mobileIndicators[n].classList.remove('bg-white/30');
+  }
+  
+  function nextMobileSlide() {
+    currentMobileSlide = (currentMobileSlide + 1) % mobileSlides.length;
+    showMobileSlide(currentMobileSlide);
+  }
+
+  function prevMobileSlide() {
+    currentMobileSlide = (currentMobileSlide - 1 + mobileSlides.length) % mobileSlides.length;
+    showMobileSlide(currentMobileSlide);
+  }
+  
+  // Touch events for swipe functionality
+  document.getElementById('mobileSlideshow').addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+
+  document.getElementById('mobileSlideshow').addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  });
+
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    const swipeDistance = touchEndX - touchStartX;
+    
+    if (Math.abs(swipeDistance) > swipeThreshold) {
+      if (swipeDistance > 0) {
+        prevMobileSlide();
+      } else {
+        nextMobileSlide();
+      }
+    }
+  }
+  
+  // Indicator click handlers
+  mobileIndicators.forEach((indicator, index) => {
+    indicator.addEventListener('click', () => {
+      currentMobileSlide = index;
+      showMobileSlide(currentMobileSlide);
+    });
+  });
+  
+  // Auto advance slides
+  const slideInterval = setInterval(nextMobileSlide, 5000);
+  
+  // Pause auto-advance on user interaction
+  document.getElementById('mobileSlideshow').addEventListener('touchstart', () => {
+    clearInterval(slideInterval);
+  });
 </script>
