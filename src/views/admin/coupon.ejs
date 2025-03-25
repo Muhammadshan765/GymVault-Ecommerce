@@ -41,7 +41,7 @@
                             <% coupons.forEach(coupon => { %>
                                 <% 
                                 // Convert all dates to their numeric timestamp values for reliable comparison
-                                const now = Date.now();
+                                const now = new Date().getTime(); // Use UTC time
                                 const startDate = new Date(coupon.startDate);
                                 const expiryDate = new Date(coupon.expiryDate);
 
@@ -373,10 +373,14 @@
               }
           });
 
-          // Convert dates to UTC before comparison
-          const startTimestamp = new Date(startDate).getTime();
-          const expiryTimestamp = new Date(expiryDate).getTime();
-          const nowTimestamp = Date.now();
+          // Convert dates to UTC before sending to server
+          const startDateTime = new Date(startDate);
+          const expiryDateTime = new Date(expiryDate);
+          
+          // Convert to UTC timestamps for validation
+          const startTimestamp = startDateTime.getTime();
+          const expiryTimestamp = expiryDateTime.getTime();
+          const nowTimestamp = new Date().getTime(); // Use UTC time
 
           if (startTimestamp < nowTimestamp) {
               return Swal.fire({
@@ -396,15 +400,15 @@
               });
           }
 
-          // Prepare form data
+          // Prepare form data with UTC dates
           const formData = {
               code,
               description: description || undefined,
               discountPercentage,
               minimumPurchase: minimumPurchase || 0,
               maximumDiscount: maximumDiscount || 0,
-              startDate,
-              expiryDate,
+              startDate: startDateTime.toISOString(), // Send as UTC
+              expiryDate: expiryDateTime.toISOString(), // Send as UTC
               totalCoupon: totalCoupon || 0,
               userUsageLimit: userUsageLimit || 1
           };
@@ -473,9 +477,6 @@
               // Format dates for datetime-local input
               const startDate = new Date(coupon.startDate);
               const endDate = new Date(coupon.expiryDate);
-
-              startDate.setMinutes(startDate.getMinutes() - 330);
-              endDate.setMinutes(endDate.getMinutes() - 330);
               
               document.getElementById('startDate').value = formatDateForInput(startDate);
               document.getElementById('expiryDate').value = formatDateForInput(endDate);
@@ -498,7 +499,8 @@
 
         // Helper function to format date for datetime-local input
         function formatDateForInput(date) {
-          return new Date(date).toISOString().slice(0, 16);
+          const utcDate = new Date(date);
+          return utcDate.toISOString().slice(0, 16);
         }
 
         // Delete coupon handler

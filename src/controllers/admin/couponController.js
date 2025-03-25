@@ -41,10 +41,15 @@ const addCoupons = async (req, res, next) => {
         const startDateTime = new Date(startDate);
         const expiryDateTime = new Date(expiryDate);
         
+        // Debug logs for timezone troubleshooting
+        console.log('Start Date (UTC):', startDateTime.toISOString());
+        console.log('Expiry Date (UTC):', expiryDateTime.toISOString());
+        console.log('Now (UTC):', new Date().toISOString());
+
         // Convert to UTC timestamps for comparison
         const startTimestamp = startDateTime.getTime();
         const expiryTimestamp = expiryDateTime.getTime();
-        const nowTimestamp = Date.now();
+        const nowTimestamp = new Date().getTime(); // Using UTC time
 
         // Validate start date isn't in the past (using UTC)
         if (startTimestamp < nowTimestamp) {
@@ -69,8 +74,8 @@ const addCoupons = async (req, res, next) => {
             discountPercentage,
             minimumPurchase: minimumPurchase || 0,
             maximumDiscount: maximumDiscount || null,
-            startDate: startDateTime,
-            expiryDate: expiryDateTime,
+            startDate: startDateTime.toISOString(), // Store as UTC
+            expiryDate: expiryDateTime.toISOString(), // Store as UTC
             totalCoupon: totalCoupon || 1,
             userUsageLimit: userUsageLimit || 1
         });
