@@ -44,6 +44,8 @@
                                 const now = Date.now();
                                 const startDate = new Date(coupon.startDate);
                                 const expiryDate = new Date(coupon.expiryDate);
+
+                                // Ensure we're using UTC timestamps for comparison
                                 const startTimestamp = startDate.getTime();
                                 const expiryTimestamp = expiryDate.getTime();
 
@@ -371,7 +373,7 @@
               }
           });
 
-          // Use timestamps for date comparison to avoid timezone issues
+          // Convert dates to UTC before comparison
           const startTimestamp = new Date(startDate).getTime();
           const expiryTimestamp = new Date(expiryDate).getTime();
           const nowTimestamp = Date.now();
@@ -496,13 +498,7 @@
 
         // Helper function to format date for datetime-local input
         function formatDateForInput(date) {
-          // Create a new date to avoid modifying the original
-          const localDate = new Date(date);
-          
-          // Convert to local timezone and format for datetime-local input
-          return new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000))
-            .toISOString()
-            .slice(0, 16);
+          return new Date(date).toISOString().slice(0, 16);
         }
 
         // Delete coupon handler
