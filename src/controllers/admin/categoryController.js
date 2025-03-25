@@ -1,4 +1,3 @@
-
 import Category from "../../models/categoryModel.js"
  
 const getcategory = async (req, res, next) => {
@@ -15,49 +14,54 @@ const getcategory = async (req, res, next) => {
 
 const addCategory = async (req, res, next) => {
   try {
-      const { categoryName, categoryDescription } = req.body;
-      const trimmedCategoryName = categoryName.trim();
+    const { categoryName, categoryDescription } = req.body;
+    const trimmedCategoryName = categoryName.trim();
 
-      //Validate category
-      if (!/^[A-Za-z]+$/.test(trimmedCategoryName)) {
-          return res.status(400).send('Category can only contain Alphabets');
-      }
+    // Validate category name
+    if (!trimmedCategoryName) {
+      return res.status(400).send('Category name is required');
+    }
 
-      if (trimmedCategoryName.length > 20) {
-          return res.status(400).send('Category name must not exceed 20 characters')
-      }
+    if (!/^[A-Za-z]+$/.test(trimmedCategoryName)) {
+      return res.status(400).send('Category name can only contain alphabets');
+    }
 
-      //capitaize first letter,rest lowercase
-      const formattedCategoryName = trimmedCategoryName.charAt(0).toUpperCase() + trimmedCategoryName.slice(1).toLowerCase();
+    if (trimmedCategoryName.length > 20) {
+      return res.status(400).send('Category name must not exceed 20 characters');
+    }
 
-      //check if category name exists
-      const existingCategory = await Category.findOne({
-          name: { $regex: new RegExp(`${formattedCategoryName}$`, 'i') }
-      });
+    // Validate description
+    const trimmedDescription = categoryDescription.trim();
+    if (!trimmedDescription) {
+      return res.status(400).send('Description is required');
+    }
 
-      if (existingCategory) {
-          return res.status(400).send('Category name already exists');
-      }
+    if (trimmedDescription.length < 25 || trimmedDescription.length > 100) {
+      return res.status(400).send('Description must be between 25 and 100 characters');
+    }
 
+    //capitaize first letter,rest lowercase
+    const formattedCategoryName = trimmedCategoryName.charAt(0).toUpperCase() + trimmedCategoryName.slice(1).toLowerCase();
 
-      //validate categoryDescription 
-      if (categoryDescription.length < 10 || categoryDescription.length > 100) {
-          return res.status(400).send('Description must be between 10 and 100 characters');
+    //check if category name exists
+    const existingCategory = await Category.findOne({
+        name: { $regex: new RegExp(`${formattedCategoryName}$`, 'i') }
+    });
 
-      }
+    if (existingCategory) {
+        return res.status(400).send('Category name already exists');
+    }
 
+    const newCategory = new Category({
+        name: formattedCategoryName,
+        description: trimmedDescription,
+        isActive: true,
+    });
 
-      const newCategory = new Category({
-          name: formattedCategoryName,
-          description: categoryDescription,
-          isActive: true,
-      });
-
-
-      await newCategory.save();
-      res.redirect('/admin/category');
+    await newCategory.save();
+    res.redirect('/admin/category');
   } catch (error) {
-      next(error)
+    next(error)
   }
 };
 
@@ -65,49 +69,55 @@ const addCategory = async (req, res, next) => {
 //Edit category
 const editCatagory = async (req, res, next) => {
   try {
-      const { categoryId, categoryName, categoryDescription } = req.body;
-      const trimmedCategoryName = categoryName.trim();
+    const { categoryId, categoryName, categoryDescription } = req.body;
+    const trimmedCategoryName = categoryName.trim();
 
-      //validate catagory name
-      if (!/^[A-Za-z]+$/.test(trimmedCategoryName)) {
-          return res.status(400).send('Catagory name can only contain alphabets');
-      }
+    // Validate category name
+    if (!trimmedCategoryName) {
+      return res.status(400).send('Category name is required');
+    }
 
-      if (trimmedCategoryName.length > 20) {
-          return res.status(400).send('Category name must not exceed 20 characters');
+    if (!/^[A-Za-z]+$/.test(trimmedCategoryName)) {
+      return res.status(400).send('Category name can only contain alphabets');
+    }
 
-      }
+    if (trimmedCategoryName.length > 20) {
+      return res.status(400).send('Category name must not exceed 20 characters');
+    }
 
-      //capitalise first letter
-      const formattedCategoryName = trimmedCategoryName.charAt(0).toUpperCase() +
-          trimmedCategoryName.slice(1).toLowerCase();
+    // Validate description
+    const trimmedDescription = categoryDescription.trim();
+    if (!trimmedDescription) {
+      return res.status(400).send('Description is required');
+    }
 
-      // Check if category name already exists (excluding current category)
-      const existingCategory = await Category.findOne({
-          _id: { $ne: categoryId },
-          name: { $regex: new RegExp(`^${formattedCategoryName}$`, 'i') }
-      });
+    if (trimmedDescription.length < 25 || trimmedDescription.length > 100) {
+      return res.status(400).send('Description must be between 25 and 100 characters');
+    }
 
-      if (existingCategory) {
-          return res.status(400).send('Category name already exists.');
-      }
+    //capitalise first letter
+    const formattedCategoryName = trimmedCategoryName.charAt(0).toUpperCase() +
+        trimmedCategoryName.slice(1).toLowerCase();
 
-      //validate category description
-      if (categoryDescription.length < 10 || categoryDescription.length > 100) {
-          return res.status(400).send(
-              'Description must be between 10 and 100 characters.'
-          );
-      }
+    // Check if category name already exists (excluding current category)
+    const existingCategory = await Category.findOne({
+        _id: { $ne: categoryId },
+        name: { $regex: new RegExp(`^${formattedCategoryName}$`, 'i') }
+    });
 
-      await Category.findByIdAndUpdate(categoryId, {
-          name: formattedCategoryName,
-          description: categoryDescription,
-      });
+    if (existingCategory) {
+        return res.status(400).send('Category name already exists.');
+    }
 
-      res.redirect('/admin/category');
+    await Category.findByIdAndUpdate(categoryId, {
+        name: formattedCategoryName,
+        description: trimmedDescription,
+    });
+
+    res.redirect('/admin/category');
 
   } catch (error) {
-      next(error)
+    next(error)
   }
 };
 
