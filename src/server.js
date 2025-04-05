@@ -57,7 +57,7 @@ app.use((req, res) => {
   res.status(404).render('notFound')
 });
 
-
+//PORT & LOG
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log("server connected successfully");
